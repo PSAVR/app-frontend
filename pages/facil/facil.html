@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <title>Selector de Escenario VR</title>
+    <meta name="description" content="WebXR VR Level Selector">
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+  </head>
+  <body>
+    <a-scene id="nivel-vr" data-nivel="facil" vr-mode-ui="enabled: true" background="color: #ECECEC">
+
+      <!-- Assets -->
+      <a-assets>
+        <a-asset-item id="modelo-escenario" src="../../models/facil/facilscenarioo.glb"></a-asset-item>
+      </a-assets>
+
+      <a-entity id="contador-texto" 
+                text="value: Iniciando..." 
+                position="0 2 -2">
+      </a-entity>
+
+
+      <!-- Cámara -->
+
+        <a-entity camera look-controls wasd-controls position="0 1.6 0">
+          <a-entity 
+            cursor="fuse: true; fuseTimeout: 1000" 
+            position="0 0 -1"
+            geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03" 
+            material="color: black; shader: flat">
+          </a-entity>
+        </a-entity>
+
+
+    </a-scene>
+  </body>
+  <script src="../global.js"></script>
+
+</html>

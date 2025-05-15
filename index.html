@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login VR</title>
+  <link rel="stylesheet" href="../styles/login.css" />
+</head>
+<body>
+  <main>
+    <div class="glass-container">
+      <form id="loginForm">
+        <h1>Iniciar sesión</h1>
+
+        <div class="input-container">
+          <input type="text" id="username" required />
+          <label class="label" for="username">Nombre de usuario</label>
+          <div class="underline"></div>
+        </div>
+
+        <button type="submit" class="sigin">
+          <span class="shadow"></span>
+          <span class="edge"></span>
+          <span class="front">Ingresar</span>
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const username = document.getElementById("username").value;
+      localStorage.setItem("username", username);
+      window.location.href = "/pages/main.html";
+    });
+  </script>
+</body>
+</html>
