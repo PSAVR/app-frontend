@@ -2,14 +2,17 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Login VR</title>
+  <title>Login / Registro VR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../styles/login.css" />
 </head>
 <body>
   <main>
     <div class="glass-container">
       <form id="loginForm">
-        <h1>Iniciar sesión</h1>
+        <h1 id="formTitle">Iniciar sesión</h1>
 
         <div class="input-container">
           <input type="text" id="username" required />
@@ -17,21 +20,64 @@
           <div class="underline"></div>
         </div>
 
+        <div class="input-container">
+          <input type="password" id="password" required />
+          <label class="label" for="password">Contraseña</label>
+          <div class="underline"></div>
+        </div>
+
         <button type="submit" class="sigin">
           <span class="shadow"></span>
           <span class="edge"></span>
-          <span class="front">Ingresar</span>
+          <span class="front" id="submitButtonText">Ingresar</span>
         </button>
+
+        <p id="toggleText">
+          ¿No tienes cuenta? <a href="#" id="toggleMode">Regístrate aquí</a>
+        </p>
       </form>
     </div>
   </main>
 
   <script>
+    let isRegistering = false;
+
+    document.getElementById("toggleMode").addEventListener("click", function (e) {
+      e.preventDefault();
+      isRegistering = !isRegistering;
+      document.getElementById("formTitle").textContent = isRegistering ? "Registrarse" : "Iniciar sesión";
+      document.getElementById("submitButtonText").textContent = isRegistering ? "Registrar" : "Ingresar";
+      document.getElementById("toggleText").innerHTML = isRegistering
+        ? '¿Ya tienes cuenta? <a href="#" id="toggleMode">Inicia sesión</a>'
+        : '¿No tienes cuenta? <a href="#" id="toggleMode">Regístrate aquí</a>';
+      
+      document.getElementById("toggleMode").addEventListener("click", arguments.callee);
+    });
+
     document.getElementById("loginForm").addEventListener("submit", function (e) {
       e.preventDefault();
-      const username = document.getElementById("username").value;
-      localStorage.setItem("username", username);
-      window.location.href = "/pages/main.html";
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+      const storedUsers = JSON.parse(localStorage.getItem("users") || "{}");
+
+      if (isRegistering) {
+        if (storedUsers[username]) {
+          alert("El usuario ya está registrado.");
+        } else {
+          storedUsers[username] = { password: password };
+          localStorage.setItem("users", JSON.stringify(storedUsers));
+          localStorage.setItem("username", username);
+          alert("Registro exitoso.");
+          window.location.href = "index.html";
+        }
+      } else {
+        if (storedUsers[username] && storedUsers[username].password === password) {
+          localStorage.setItem("username", username);
+          window.location.href = "/pages/main.html";
+        } else {
+          alert("Nombre de usuario o contraseña incorrectos.");
+        }
+      }
     });
   </script>
 </body>

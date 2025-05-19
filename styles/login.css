@@ -1,23 +1,32 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Quicksand", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
 main {
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100vw;
   height: 100vh;
-  background-image: url(../assets/imgs/galaxy.jpg);
-  background-repeat: no-repeat;
-  background-size: cover;
+  background: linear-gradient(135deg, #cbd5f0, #e8dffb);
 }
 
 .glass-container {
   width: min(90%, 600px);
-  height: clamp(10px, 90%, 350px);
-  background-color: rgba(255, 255, 255, 0.05);
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
+  height: clamp(300px, 90%, 420px);
+  background-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(10px);
-  border-radius: 15px;
-  padding: 30px 15px;
+  border-radius: 20px;
+  padding: 40px 25px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
+
 
 form {
   display: flex;
@@ -28,45 +37,47 @@ form {
   height: 100%;
 }
 
+/* Título */
 form > h1 {
   text-align: center;
-  font-size: 3.5rem;
-  color: #FFF;
+  font-size: 2.8rem;
+  color: #4a4a6a;
+  margin-bottom: 10px;
 }
 
-/* Input */
+/* Inputs */
 .input-container {
   position: relative;
-  margin: 0 auto 15px;
-  width: 90%;
+  margin-bottom: 25px;
+  width: 100%;
 }
 
-.input-container input[type="text"] {
-  font-size: 2rem;
+.input-container input {
+  font-size: 1.6rem;
   width: 100%;
   border: none;
-  border-bottom: 2px solid #ccc;
-  color: #FFF;
-  padding: 5px 0;
+  border-bottom: 2px solid #aaa;
+  color: #333;
+  padding: 8px 0;
   background-color: transparent;
   outline: none;
 }
 
 .input-container .label {
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   position: absolute;
   top: 0;
   left: 0;
-  color: #ccc;
+  color: #888;
   transition: all 0.3s ease;
   pointer-events: none;
 }
 
-.input-container input[type="text"]:focus ~ .label,
-.input-container input[type="text"]:valid ~ .label {
-  top: -25px;
-  font-size: 2rem;
-  color: #7d13ee;
+.input-container input:focus ~ .label,
+.input-container input:valid ~ .label {
+  top: -22px;
+  font-size: 1.3rem;
+  color: #6b5ca5;
 }
 
 .input-container .underline {
@@ -75,37 +86,24 @@ form > h1 {
   left: 0;
   height: 2px;
   width: 100%;
-  background-color: #7d13ee;
+  background-color: #6b5ca5;
   transform: scaleX(0);
   transition: all 0.3s ease;
 }
 
-.input-container input[type="text"]:focus ~ .underline,
-.input-container input[type="text"]:valid ~ .underline {
+.input-container input:focus ~ .underline,
+.input-container input:valid ~ .underline {
   transform: scaleX(1);
-}
-
-.input-container input[type="text"]::placeholder {
-  opacity: 0;
-  transition: all 0.3s ease;
-}
-
-.input-container input[type="text"]:focus::placeholder,
-.input-container input[type="text"]:valid::placeholder {
-  opacity: 1;
 }
 
 /* Botón animado */
 .sigin {
   position: relative;
   background: transparent;
-  padding: 0px;
+  padding: 0;
   border: none;
   cursor: pointer;
-  outline-offset: 4px;
-  outline-color: deeppink;
-  transition: filter 250ms;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  outline: none;
 }
 
 .shadow {
@@ -114,12 +112,11 @@ form > h1 {
   left: 0;
   height: 100%;
   width: 100%;
-  background: hsl(226, 25%, 69%);
+  background: #d0c5f3;
   border-radius: 8px;
   filter: blur(2px);
-  will-change: transform;
   transform: translateY(2px);
-  transition: transform 600ms cubic-bezier(0.3, 0.7, 0.4, 1);
+  transition: transform 400ms ease;
 }
 
 .edge {
@@ -131,10 +128,9 @@ form > h1 {
   border-radius: 8px;
   background: linear-gradient(
     to right,
-    hsl(248, 39%, 39%) 0%,
-    hsl(248, 39%, 49%) 8%,
-    hsl(248, 39%, 39%) 92%,
-    hsl(248, 39%, 29%) 100%
+    #bbaeea 0%,
+    #c6b8ef 50%,
+    #bbaeea 100%
   );
 }
 
@@ -142,19 +138,15 @@ form > h1 {
   display: block;
   position: relative;
   border-radius: 8px;
-  background: #7d13ee;
-  padding: 16px 32px;
+  background: #a292f1;
+  padding: 14px 28px;
   color: white;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
-  font-size: 1.2rem;
+  letter-spacing: 1.2px;
+  font-size: 1.1rem;
   transform: translateY(-4px);
-  transition: transform 600ms cubic-bezier(0.3, 0.7, 0.4, 1);
-}
-
-.sigin:hover {
-  filter: brightness(110%);
+  transition: transform 400ms ease;
 }
 
 .sigin:hover .front {
@@ -173,6 +165,18 @@ form > h1 {
   transform: translateY(1px);
 }
 
-.sigin:focus:not(:focus-visible) {
-  outline: none;
+#toggleText {
+  margin-top: 15px;
+  font-size: 1rem;
+  color: #5f5f8a;
+}
+
+#toggleText a {
+  color: #6b5ca5;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+#toggleText a:hover {
+  text-decoration: underline;
 }
