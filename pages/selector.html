@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Selector principal</title>
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+</head>
+<body>
+<a-scene>
+    <!-- Fondo pastel suave -->
+    <a-sky color="#e8dffb"></a-sky>
+
+    <!-- Cámara con cursor -->
+    <a-entity camera look-controls position="0 1.6 0">
+      <a-entity 
+        cursor="fuse: true; fuseTimeout: 1000" 
+        position="0 0 -1"
+        geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
+        material="color: #6b5ca5; shader: flat">
+      </a-entity>
+    </a-entity>
+    <!-- Contenedor de botones principales (centrados) -->
+    <a-entity id="selector">
+        <!-- VER MI PERFIL -->
+        <a-box id="btnPerfil" position="-2 1.2 -3" color="#C7BCFF" depth="0.3" height="0.6" width="1.8"></a-box>
+        <a-text value="Ver Mi Perfil" align="center" width="3" color="white" position="-2 1.2 -2.8"></a-text>
+
+        <!-- INICIAR JUEGO -->
+        <a-box id="btnJuego" position="2 1.2 -3" color="#C7BCFF" depth="0.3" height="0.6" width="1.8"></a-box>
+        <a-text value="Iniciar Juego" align="center" width="3" color="white" position="2 1.2 -2.8"></a-text>
+    </a-entity>
+</a-scene>
+
+<script>
+  const API_BASE = 'http://localhost:4000';
+  async function ensureSession() {
+    try {
+      const r = await fetch(`${API_BASE}/api/auth/me`, { credentials:'include' });
+      if (!r.ok) throw 0;
+      const me = await r.json();
+      localStorage.setItem('user_id', me.user_id);   // por comodidad para el resto de llamadas
+      localStorage.setItem('username', me.username);
+      return me;
+    } catch {
+      window.location.href = '/pages/index.html'; // sin sesión -> login
+    }
+  }
+  document.addEventListener('DOMContentLoaded', ensureSession);
+
+  // Botones del selector
+  document.addEventListener('DOMContentLoaded', () => {
+    const btnJuego  = document.querySelector('#btnJuego');
+    const btnPerfil = document.querySelector('#btnPerfil');
+
+    // INICIAR JUEGO -> pasa al flujo Nivel -> Tiempo -> Inmersión
+    btnJuego.addEventListener('click', () => {
+      window.location.href = 'main.html';
+    });
+
+    // VER MI PERFIL (cambia la ruta si tienes otra)
+    btnPerfil.addEventListener('click', () => {
+      window.location.href = 'profile.html';
+    });
+  });
+</script>
+</body>
+</html>

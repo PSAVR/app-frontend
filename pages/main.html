@@ -1,51 +1,180 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="utf-8">
-    <title>Menú VR Selector</title>
-    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-    <!-- Enlace al archivo externo de JavaScript -->
-    <script src="logic.js" defer></script>
-  </head>
-  <body>
-    <a-scene>
-      <!-- Cámara con cursor -->
-      <a-entity camera look-controls position="0 1.6 0">
-        <a-entity 
-          cursor="fuse: true; fuseTimeout: 1000" 
-          position="0 0 -1"
-          geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
-          material="color: black; shader: flat">
-        </a-entity>
+<head>
+  <meta charset="utf-8">
+  <title>Menú VR Selector</title>
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+  <script src="logic.js" defer></script>
+  <link rel="stylesheet" href="../styles/login.css" />
+</head>
+<body>
+  <div id="progress-overlay" role="dialog" aria-modal="true">
+  <div id="progress-card">
+    <h3 id="progress-title">Progreso</h3>
+    <div id="progress-stars" style="font-size:22px; color:#7a6ef1; text-align:center; margin:6px 0 2px">—</div>
+    <div id="progress-meta">
+      <div><strong>Intentos:</strong> <span id="progress-attempts">0</span></div>
+      <div><strong>Máximo %:</strong> <span id="progress-maxpct">0</span>%</div>
+      <div><strong>Última actualización:</strong> <span id="progress-date">—</span></div>
+    </div>
+    <button id="progress-close">CONTINUAR</button>
+  </div>
+</div>
+  <a-scene>
+    <!-- Cámara con cursor -->
+     <a-entity camera look-controls position="0 1.6 0">
+      <a-entity
+        cursor="fuse: true; fuseTimeout: 1000"
+        raycaster="objects: .clickable; interval: 0"
+        position="0 0 -1"
+        geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
+        material="color: #6b5ca5; shader: flat">
       </a-entity>
-      <a-text id="usernameText" position="0 2.5 -3" align="center" color="black" width="6"></a-text>
+    </a-entity>
 
-      <!-- Panel de selección de tiempo -->
-      <a-entity id="menu-tiempo">
-        <a-text value="Escoge el tiempo" position="0 2 -3" align="center" color="black" width="4"></a-text>
 
-        <a-box id="boton-1min" position="-1 1 -3" color="#4CAF50" depth="0.2" height="0.5" width="1.5"></a-box>
-        <a-text value="1 minuto" position="-1 1 -2.9" align="center" color="white" width="2"></a-text>
+    <!-- Nombre de usuario -->
+    <a-text id="usernameText" position="0 2.7 -3" align="center" color="#4a4a6a" width="6"></a-text>
 
-        <a-box id="boton-2min" position="1 1 -3" color="#2196F3" depth="0.2" height="0.5" width="1.5"></a-box>
-        <a-text value="2 minutos" position="1 1 -2.9" align="center" color="white" width="2"></a-text>
-      </a-entity>
+    <!-- Panel de dificultad -->
+    <a-entity id="menu-dificultad">
+      <a-text value="Inicia tu inmersion" position="0 2.3 -3" align="center" color="#4a4a6a" width="6"></a-text>
 
-      <!-- Panel de selección de dificultad (oculto al inicio) -->
-      <a-entity id="menu-dificultad" visible="false">
-        <a-text value="Escoge la dificultad" position="0 2 -3" align="center" color="black" width="4"></a-text>
+      <a-box id="boton-facil" class="clickable" position="-2 1.2 -3" color="#b3b8ff" depth="0.3" height="0.6" width="1.8"></a-box>
+      <a-text value="Facil" position="-1.7 1.3 -2.4" align="center" color="white" width="3"></a-text>
 
-        <a-box id="boton-facil" position="-2 1 -3" color="#8BC34A" depth="0.2" height="0.5" width="1.5"></a-box>
-        <a-text value="Fácil" position="-2 1 -2.9" align="center" color="white" width="2"></a-text>
+      <a-box id="boton-intermedio" class="clickable" position="0 1.2 -3" color="#bbaeea" depth="0.3" height="0.6" width="1.8"></a-box>
+      <a-text value="Intermedio" position="0 1.3 -2.4" align="center" color="white" width="4"></a-text>
 
-        <a-box id="boton-intermedio" position="0 1 -3" color="#FFC107" depth="0.2" height="0.5" width="1.5"></a-box>
-        <a-text value="Intermedio" position="0 1 -2.9" align="center" color="white" width="3"></a-text>
+      <a-box id="boton-dificil"  class="clickable" position="2 1.2 -3" color="#a292f1" depth="0.3" height="0.6" width="1.8"></a-box>
+      <a-text value="Dificil" position="1.7 1.3 -2.4" align="center" color="white" width="3"></a-text>
+    </a-entity>
 
-        <a-box id="boton-dificil" position="2 1 -3" color="#F44336" depth="0.2" height="0.5" width="1.5"></a-box>
-        <a-text value="Difícil" position="2 1 -2.9" align="center" color="white" width="2"></a-text>
-      </a-entity>
+    <a-entity id="stars-facil"      position="-2 0.55 -3"></a-entity>
+    <a-entity id="stars-intermedio" position="0  0.55 -3"></a-entity>
+    <a-entity id="stars-dificil"    position="2  0.55 -3"></a-entity>
 
-      <a-sky color="#ECECEC"></a-sky>
-    </a-scene>
-  </body>
+    <!-- Panel de selección de tiempo -->
+    <a-entity id="menu-tiempo" visible="false" >
+      <a-text value="Escoge el tiempo" position="0 2.6 -2.8" align="center" color="#4a4a6a" width="6"></a-text>
+      
+      <!-- Botón 1 minuto -->
+      <a-box id="boton-1min" class="clickable" position="-2 1.2 -3" color="#b3b8ff" depth="0.3" height="0.6" width="1.8"></a-box>
+      <a-text value="1 minuto" position="-2 1.2 -2.8" align="center" color="white" width="3"></a-text>
+
+      <!-- Botón 2 minutos -->
+      <a-box id="boton-2min" class="clickable" position="0 1.2 -3" color="#bbaeea" depth="0.3" height="0.6" width="1.8"></a-box>
+      <a-text value="2 minutos" position="0 1.2 -2.8" align="center" color="white" width="3"></a-text>
+
+      <!-- Botón 3 minutos -->
+      <a-box id="boton-3min" class="clickable" position="2 1.2 -3" color="#a292f1" depth="0.3" height="0.6" width="1.8"></a-box>
+      <a-text value="3 minutos" position="2 1.2 -2.8" align="center" color="white" width="3"></a-text>
+    </a-entity>
+
+    <!-- Fondo pastel suave -->
+    <a-sky color="#e8dffb"></a-sky>
+  </a-scene>
+
+  <script>
+    // ====== Config ======
+    const API_BASE = 'http://localhost:4000';
+
+    // Verifica sesión (cookie) y devuelve el usuario
+    async function ensureSession() {
+      const r = await fetch(`${API_BASE}/api/auth/me`, { credentials:'include' });
+      if (!r.ok) { location.href = 'index.html'; return null; }
+      const me = await r.json();
+      localStorage.setItem('user_id', me.user_id);
+      localStorage.setItem('username', me.username);
+      return me;
+    }
+
+    // Mapas de nombres
+    const LEVEL_NAME_TO_KEY = { 'Fácil':'facil','Intermedio':'intermedio','Difícil':'dificil' };
+
+    // Utilidades modal
+    const fmtDate = iso => (!iso ? '—' : (isNaN(new Date(iso)) ? '—' : new Date(iso).toLocaleString()));
+    function openProgressModal(row){
+      document.getElementById('progress-title').textContent = `Progreso: ${row.level_name}`;
+      document.getElementById('progress-stars').textContent = '★'.repeat(Math.max(0, Math.round(row.max_stars||0))) || '—';
+      document.getElementById('progress-attempts').textContent = row.attempts ?? 0;
+      document.getElementById('progress-maxpct').textContent = Math.round(row.max_progress ?? 0);
+      document.getElementById('progress-date').textContent = fmtDate(row.date);
+      document.getElementById('progress-overlay').style.display = 'flex';
+    }
+    document.getElementById('progress-close').onclick = () => {
+      document.getElementById('progress-overlay').style.display = 'none';
+    };
+
+    // ====== ESTRELLAS como imágenes (para que siempre se vean) ======
+    const STAR_SVG = encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 95">
+        <path fill="#4b3fb8"
+          d="M50 4l12.3 25 27.6 4-20 19.2 4.7 27.3L50 69.6 25.4 79.5l4.7-27.3-20-19.2 27.6-4L50 4z"/>
+      </svg>
+    `);
+    const STAR_SRC = `data:image/svg+xml;utf8,${STAR_SVG}`;
+
+    function mountStarSlot(slotId, row){
+      const slot = document.getElementById(slotId);
+      if (!slot) return;
+      slot.innerHTML = '';
+
+      // Si no hay estrellas, ocultamos el slot
+      if (!row || (row.max_stars||0) <= 0){
+        slot.setAttribute('visible','false');
+        return;
+      }
+      slot.setAttribute('visible','true');
+
+      const n = Math.max(0, Math.round(row.max_stars || 0));
+      const spacing = 0.3;     // distancia entre estrellas
+      const starSize = 0.22;   // tamaño
+      const totalWidth = (n - 1) * spacing;
+      const x0 = -totalWidth / 2; // centrar
+
+      // Área de impacto grande (invisible)
+      const hit = document.createElement('a-plane');
+      hit.setAttribute('width', String(Math.max(1.2, n * spacing + 0.2)));
+      hit.setAttribute('height','0.35');
+      hit.setAttribute('position','0 0 0');
+      hit.setAttribute('material','transparent:true; opacity:0.001; color:#fff');
+      hit.classList.add('clickable');
+      hit.addEventListener('click', () => openProgressModal(row));
+      slot.appendChild(hit);
+
+      // Estrellas como imágenes
+      for (let i = 0; i < n; i++){
+        const star = document.createElement('a-image');
+        star.setAttribute('src', STAR_SRC);
+        star.setAttribute('width', String(starSize));
+        star.setAttribute('height', String(starSize));
+        star.setAttribute('position', `${x0 + i*spacing} 0 0.01`);
+        star.classList.add('clickable');
+        star.addEventListener('click', () => openProgressModal(row));
+        slot.appendChild(star);
+      }
+    }
+
+    async function loadProgress(userId){
+      const r = await fetch(`${API_BASE}/api/users/${userId}/progress`, { credentials:'include' });
+      if (!r.ok) throw new Error('No se pudo cargar progreso');
+      const rows = await r.json();
+      console.log('Progreso API:', rows);
+
+      const byKey = {};
+      rows.forEach(r => { byKey[ LEVEL_NAME_TO_KEY[r.level_name] ] = r; });
+
+      mountStarSlot('stars-facil', byKey.facil);
+      mountStarSlot('stars-intermedio', byKey.intermedio);
+      mountStarSlot('stars-dificil', byKey.dificil);
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const me = await ensureSession();
+      if (!me) return;
+      await loadProgress(me.user_id);
+    });
+  </script>
+</body>
 </html>

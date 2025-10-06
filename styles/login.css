@@ -7,6 +7,10 @@
   font-style: normal;
 }
 
+.hidden {
+  display: none !important;
+}
+
 main {
   display: flex;
   justify-content: center;
@@ -52,6 +56,7 @@ form > h1 {
   width: 100%;
 }
 
+.input-container select,
 .input-container input {
   font-size: 1.6rem;
   width: 100%;
@@ -61,7 +66,34 @@ form > h1 {
   padding: 8px 0;
   background-color: transparent;
   outline: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
+
+.input-container select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 16px;
+  padding-right: 30px;
+  padding-top: 16px;
+}
+
+.input-container input[type="date"] {
+  cursor: pointer;
+  padding-top: 16px;
+}
+
+/* Ocultar el placeholder del date field */
+.input-container input[type="date"]::-webkit-datetime-edit-text,
+.input-container input[type="date"]::-webkit-datetime-edit-month-field,
+.input-container input[type="date"]::-webkit-datetime-edit-day-field,
+.input-container input[type="date"]::-webkit-datetime-edit-year-field {
+  color: #333;
+}
+/**/
 
 .input-container .label {
   font-size: 1.4rem;
@@ -80,6 +112,21 @@ form > h1 {
   color: #6b5ca5;
 }
 
+/* Label flotante para select y date - SIEMPRE flotado */
+.input-container select ~ .label,
+.input-container input[type="date"] ~ .label {
+  top: -22px;
+  font-size: 1.3rem;
+  color: #888;
+}
+
+/* Color activo para select y date */
+.input-container select:focus ~ .label,
+.input-container input[type="date"]:focus ~ .label,
+.input-container.filled .label {
+  color: #6b5ca5;
+}
+
 .input-container .underline {
   position: absolute;
   bottom: 0;
@@ -92,7 +139,9 @@ form > h1 {
 }
 
 .input-container input:focus ~ .underline,
-.input-container input:valid ~ .underline {
+.input-container input:valid ~ .underline 
+.input-container select:focus ~ .underline,
+.input-container.filled .underline {
   transform: scaleX(1);
 }
 
@@ -132,6 +181,25 @@ form > h1 {
     #c6b8ef 50%,
     #bbaeea 100%
   );
+}
+
+/* === Solo cuando está activo el formulario de Registro === */
+.glass-container:has(#registerFields:not(.hidden)) {
+  height: auto;          /* en lugar de la altura fija/clamp */
+  max-height: none;
+  padding: 36px 28px 28px; /* mantiene el look del Figma */
+}
+
+.glass-container:has(#registerFields:not(.hidden)) form {
+  height: auto;          /* deja que el form crezca con su contenido */
+}
+
+/* (opcional) asegura 2 columnas ordenadas en registro, como en el Figma */
+#registerFields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px 20px;
+  width: 100%;
 }
 
 .front {
@@ -180,3 +248,148 @@ form > h1 {
 #toggleText a:hover {
   text-decoration: underline;
 }
+
+.sigin, #toggleText a {
+  text-align: center; margin-top: 10px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* =================== MODAL HORIZONTAL DE ESTRELLAS =================== */
+/* ===== Modal Progreso (Estrellas) ===== */
+/* Modal oculto por defecto */
+#progreso-modal {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: rgba(0, 0, 0, 0.8) !important;
+  z-index: 999999 !important;
+  display: none !important; /* Oculto por defecto */
+  align-items: center !important;
+  justify-content: center !important;
+  pointer-events: none !important; /* Sin interacción cuando está oculto */
+  font-family: 'Quicksand', sans-serif !important;
+}
+
+/* Solo cuando tiene la clase active, mostrar y permitir interacción */
+#progreso-modal.active {
+  display: flex !important;
+  pointer-events: auto !important;
+}
+
+/* Contenido del modal - perfectamente centrado */
+#progreso-modal .modal-content {
+  background: white !important;
+  border-radius: 12px !important;
+  padding: 24px !important;
+  width: min(90vw, 400px) !important;
+  max-width: 400px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+  text-align: center !important;
+  position: relative !important;
+  z-index: 1000000 !important;
+  margin: auto !important; /* Centrado adicional */
+  transform: translate(0, 0) !important; /* Reset cualquier transformación */
+}
+
+#progreso-modal h2 {
+  margin: 0 0 12px 0 !important;
+  font-weight: 700 !important;
+  color: #333 !important;
+  font-size: 1.5rem !important;
+}
+
+#progreso-modal p.subtitle {
+  margin: 0 0 16px 0 !important;
+  color: #666 !important;
+  font-size: 0.95rem !important;
+  line-height: 1.4 !important;
+}
+
+#progreso-modal .stars-row {
+  display: flex !important;
+  gap: 8px !important;
+  justify-content: center !important;
+  align-items: center !important;
+  margin: 16px 0 20px 0 !important;
+  font-size: 36px !important;
+  line-height: 1 !important;
+  color: #ffd700 !important;
+}
+
+#progreso-modal .modal-actions {
+  display: flex !important;
+  gap: 12px !important;
+  justify-content: center !important;
+  align-items: center !important;
+  margin-top: 16px !important;
+}
+
+#progreso-modal .btn {
+  padding: 12px 20px !important;
+  border-radius: 8px !important;
+  border: 1px solid #ddd !important;
+  background: #fafafa !important;
+  cursor: pointer !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #333 !important;
+  min-width: 80px !important;
+  text-align: center !important;
+}
+
+#progreso-modal .btn:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+#progreso-modal .btn.primary {
+  background: #0d6efd !important;
+  border-color: #0d6efd !important;
+  color: white !important;
+}
+
+#progreso-modal .btn.primary:hover {
+  background: #0b5ed7 !important;
+  border-color: #0a58ca !important;
+}
+
+/**/
+
+#progress-overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  background:rgba(90,66,187,.08);
+  align-items:center;
+  justify-content:center
+}
+
+
+#progress-card{
+  width:min(420px,92vw);
+  background:#fff;
+  border-radius:18px;
+  padding:22px;
+  box-shadow:0 18px 44px rgba(91,72,187,.25);
+  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial
+}
+
+#progress-card h3{
+  margin:0 0 10px;
+  text-align:center;
+  color:#5a56a3
+}
+
+#progress-meta{margin:8px 2px 14px;color:#555}
+
+#progress-close{border:0;background:#b6aaff;color:#fff;padding:9px 14px;border-radius:10px;font-weight:600;cursor:pointer;
+
+  display:block;margin:0 auto;box-shadow:0 10px 24px rgba(91,72,187,.22)}
+
+

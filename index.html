@@ -11,74 +11,227 @@
 <body>
   <main>
     <div class="glass-container">
-      <form id="loginForm">
+      <form id="loginForm" novalidate>
         <h1 id="formTitle">Iniciar sesión</h1>
 
-        <div class="input-container">
-          <input type="text" id="username" required />
-          <label class="label" for="username">Nombre de usuario</label>
-          <div class="underline"></div>
+        <div id="loginFields">
+          <div class="input-container">
+            <input type="text" id="email" required />
+            <label class="label" for="email">Email</label>
+            <div class="underline"></div>
+          </div>
+
+          <div class="input-container" id="passwordContainer">
+            <input type="password" id="password" required />
+            <label class="label" for="password">Contraseña</label>
+            <div class="underline"></div>
+          </div>
         </div>
 
-        <div class="input-container">
-          <input type="password" id="password" required />
-          <label class="label" for="password">Contraseña</label>
-          <div class="underline"></div>
-        </div>
+        <div id="registerFields" class="form-grid hidden">
+          <div class="input-container">
+            <input type="text" id="rEmail" required />
+            <label class="label" for="rEmail">Email</label>
+            <div class="underline"></div>
+          </div>
+
+          <div class="input-container">
+            <input type="password" id="rPass" required />
+            <label  class="label"  for="rPass">Contraseña</label>
+            <div class="underline"></div>
+          </div>
+
+          <div class="input-container">
+            <input type="text" id="rUser" required/>
+            <label class="label" for="rUser">Username</label>
+            <div class="underline"></div>
+          </div>
+          
+          <div class="input-container">
+            <input type="text" id="rInst" required/>
+            <label class= "label" for="rInst">Institución</label>
+            <div class="underline"></div>
+          </div>
+
+          <div class="input-container">
+            <select id="rGenero" required>
+              <option value=""></option>
+              <option value="femenino">Femenino</option>
+              <option value="masculino">Masculino</option>
+              <option value="no-binario">No binario</option>
+              <option value="no-decir">Prefiero no decir</option>
+            </select>
+            <label class="label" for="rGenero">Género</label>
+            <div class="underline"></div>
+          </div>
+
+          <div class="input-container">
+            <input type="date" id="rFecha" required />
+            <label class="label" for="rFecha">Fecha de Nacimiento</label>
+            <div class="underline"></div>
+          </div>
+
+      </div>
 
         <button type="submit" class="sigin">
           <span class="shadow"></span>
           <span class="edge"></span>
           <span class="front" id="submitButtonText">Ingresar</span>
         </button>
+        <div id="forgotPasswordContainer">
+          <p style="text-align: center; margin-top: 10px;">
+          <a href="#" id="forgotPasswordLink">¿Olvidaste tu contraseña?</a>
+          </p>
+        </div>
 
         <p id="toggleText">
           ¿No tienes cuenta? <a href="#" id="toggleMode">Regístrate aquí</a>
         </p>
       </form>
+
+      <!-- Sección de restablecimiento de contraseña -->
+      <form id="resetForm" class="hidden">
+        <h1>Recuperar contraseña</h1>
+
+        <div class="input-container">
+          <input type="text" id="resetEmail" required />
+          <label class="label" for="resetEmail">Email registrado</label>
+          <div class="underline"></div>
+        </div>
+
+        <div class="input-container">
+          <input type="password" id="newPassword" required />
+          <label class="label" for="newPassword">Nueva contraseña</label>
+          <div class="underline"></div>
+        </div>
+
+        <button type="submit" class="sigin">
+          <span class="shadow"></span>
+          <span class="edge"></span>
+          <span class="front">Actualizar contraseña</span>
+        </button>
+
+        <p style="text-align: center; margin-top: 10px;">
+          <a href="#" id="backToLogin">Volver a iniciar sesión</a>
+        </p>
+      </form>
     </div>
   </main>
-
   <script>
-    let isRegistering = false;
+  const API_BASE = 'http://localhost:4000';
+  let isRegistering = false;
 
-    document.getElementById("toggleMode").addEventListener("click", function (e) {
-      e.preventDefault();
-      isRegistering = !isRegistering;
-      document.getElementById("formTitle").textContent = isRegistering ? "Registrarse" : "Iniciar sesión";
-      document.getElementById("submitButtonText").textContent = isRegistering ? "Registrar" : "Ingresar";
-      document.getElementById("toggleText").innerHTML = isRegistering
-        ? '¿Ya tienes cuenta? <a href="#" id="toggleMode">Inicia sesión</a>'
-        : '¿No tienes cuenta? <a href="#" id="toggleMode">Regístrate aquí</a>';
-      
-      document.getElementById("toggleMode").addEventListener("click", arguments.callee);
+  const loginForm = document.getElementById("loginForm");
+  const resetForm = document.getElementById("resetForm");
+  const loginFields = document.getElementById("loginFields");
+  const registerFields = document.getElementById("registerFields");
+  const forgotPasswordContainer = document.getElementById("forgotPasswordContainer");
+
+  function updateToggleText() {
+    document.getElementById("toggleText").innerHTML = isRegistering
+      ? '¿Ya tienes cuenta? <a href="#" id="toggleMode">Inicia sesión</a>'
+      : '¿No tienes cuenta? <a href="#" id="toggleMode">Regístrate aquí</a>';
+    document.getElementById("toggleMode").addEventListener("click", toggleForm);
+  }
+
+  function toggleForm(e) {
+    e.preventDefault();
+    isRegistering = !isRegistering;
+
+    document.getElementById("formTitle").textContent = isRegistering ? "Registrarse" : "Iniciar sesión";
+    document.getElementById("submitButtonText").textContent = isRegistering ? "Registrar" : "Ingresar";
+
+    if (isRegistering) {
+      loginFields.classList.add("hidden");
+      registerFields.classList.remove("hidden");
+      forgotPasswordContainer.classList.add("hidden");
+      setTimeout(handleSpecialFields, 50);
+    } else {
+      loginFields.classList.remove("hidden");
+      registerFields.classList.add("hidden");
+      forgotPasswordContainer.classList.remove("hidden");
+    }
+    updateToggleText();
+  }
+  document.getElementById("toggleMode").addEventListener("click", toggleForm);
+
+  function handleSpecialFields() {
+    const fields = document.querySelectorAll('#registerFields select, #registerFields input[type="date"]');
+    fields.forEach(field => {
+      const container = field.parentElement;
+      const update = () => container.classList.toggle('filled', !!field.value);
+      ['change','input','focus','blur'].forEach(ev => field.addEventListener(ev, update));
+      update();
     });
+  }
 
-    document.getElementById("loginForm").addEventListener("submit", function (e) {
-      e.preventDefault();
-      const username = document.getElementById("username").value.trim();
-      const password = document.getElementById("password").value;
-      const storedUsers = JSON.parse(localStorage.getItem("users") || "{}");
-
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    try {
       if (isRegistering) {
-        if (storedUsers[username]) {
-          alert("El usuario ya está registrado.");
-        } else {
-          storedUsers[username] = { password: password };
-          localStorage.setItem("users", JSON.stringify(storedUsers));
-          localStorage.setItem("username", username);
-          alert("Registro exitoso.");
-          window.location.href = "index.html";
+        // === Registro ===
+        const email = document.getElementById("rEmail").value.trim();
+        const password = document.getElementById("rPass").value;
+        const username = document.getElementById("rUser").value.trim();
+        const college  = document.getElementById("rInst").value.trim() || null;
+        const birthdate = document.getElementById("rFecha").value || null;
+
+        if (!email || !password || !username) {
+          alert("Completa email, contraseña y username."); return;
         }
+
+        const resp = await fetch(`${API_BASE}/api/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ email, password, username, college, birthdate })
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || 'Error de registro');
+
+        localStorage.setItem('user_id', data.user_id);
+        localStorage.setItem('username', data.username);
+        // usa ruta relativa a tu estructura
+        window.location.href = "pages/selector.html";
       } else {
-        if (storedUsers[username] && storedUsers[username].password === password) {
-          localStorage.setItem("username", username);
-          window.location.href = "/pages/main.html";
-        } else {
-          alert("Nombre de usuario o contraseña incorrectos.");
-        }
+        // === Login ===
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+        if (!email || !password) { alert("Completa email y contraseña."); return; }
+
+        const resp = await fetch(`${API_BASE}/api/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ email, password })
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || 'Error de login');
+
+        localStorage.setItem('user_id', data.user_id);
+        localStorage.setItem('username', data.username);
+        window.location.href = "pages/selector.html";
       }
-    });
-  </script>
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+
+  // Reset de contraseña (modo demo localStorage)
+  document.getElementById("forgotPasswordLink").addEventListener("click", (e) => {
+    e.preventDefault(); loginForm.classList.add("hidden"); resetForm.classList.remove("hidden");
+  });
+  document.getElementById("backToLogin").addEventListener("click", (e) => {
+    e.preventDefault(); resetForm.classList.add("hidden"); loginForm.classList.remove("hidden");
+  });
+  resetForm.addEventListener("submit", (e) => {
+    e.preventDefault(); alert("Función demo. Implementar en backend si lo necesitas.");
+    resetForm.classList.add("hidden"); loginForm.classList.remove("hidden");
+  });
+
+  // inicia estado de selects/fecha
+  document.addEventListener('DOMContentLoaded', handleSpecialFields);
+</script>
+
 </body>
 </html>
