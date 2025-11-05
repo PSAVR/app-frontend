@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+  <meta charset="utf-8">
+  <title>Evaluación VR - 3 Escenarios</title>
+  <meta name="description" content="WebXR VR Evaluation System">
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+  <style>
+    
+  body, h1, h2, h3, h4, h5, h6, p, button {
+    font-family: 'Poppins', sans-serif;
+    color: #3b2e6d;
+  }
+  #loading-modal h2 {
+    font-size: 26px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: #3b2e6d;
+  }
+
+  #loading-modal .spinner {
+    border-top-color: #746aa6 !important; 
+  }
+
+  .result-overlay{
+    position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+    background:rgba(20, 16, 39, 0.65); z-index:9999;
+  }
+  .result-card{
+    width:min(540px, 92vw); background:#fff; border-radius:24px;
+    box-shadow:0 16px 40px rgba(0,0,0,.35); padding:28px 28px 24px; text-align:center;
+  }
+  .result-title{
+    margin:0 0 6px; font-size:32px; color:#3d356f; font-weight:800;
+  }
+  .result-text{
+    margin:8px 0 18px; color:#4c4a63; font-size:20px; line-height:1.5;
+  }
+  .result-stars{ display:flex; gap:14px; align-items:center; justify-content:center; margin:6px 0 22px; }
+  .result-stars .star{
+    font-size:40px; color:#7c3aed;
+    text-shadow:0 2px 10px rgba(124,58,237,.3);
+  }
+  .result-ok{
+    background:#a78bfa; border:none; color:#fff; font-weight:700;
+    padding:12px 28px; border-radius:12px; cursor:pointer; font-size:18px;
+    box-shadow:0 10px 24px rgba(124,58,237,.35);
+  }
+  .result-ok:hover{ filter:brightness(.95); }
+
+  .top-left-container {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  
+  /* Estilos del temporizador */
+  #timer-display {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 16px 24px;
+    border-radius: 12px;
+    font-size: 24px;
+    font-weight: 700;
+    color: #3b2e6d;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    border: 2px solid #a78bfa;
+    min-width: 120px;
+    text-align: center;
+  }
+  
+  /* Estilos del botón de acción */
+  #action-btn {
+    background: #a48cf0;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 16px 32px;
+    font-weight: 700;
+    font-size: 18px;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+  }
+  
+  #action-btn:hover {
+    background: #8f6ed4;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  #action-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+      .detalle-escenario {
+        margin: 10px 0;
+        padding: 10px;
+        border-left: 3px solid #4a4;
+        background: #efe;
+        text-align: left;
+      }
+
+      .detalle-escenario.error {
+        border-left-color: #f44;
+        background: #fee;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="top-left-container">
+      <div id="timer-display">00:30</div>
+      <button id="action-btn">INICIAR</button>
+    </div>
+
+    <div id="loading-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center;">
+      <div style="background: white; padding: 60px 80px; border-radius: 20px; text-align: center; max-width: 500px;">
+        <h2 style="margin: 0 0 20px 0; color: #333; font-size: 28px;">Generando tus resultados,<br>no salgas de esta vista</h2>
+        <div class="spinner" style="margin: 30px auto; width: 60px; height: 60px; border: 6px solid #f3f3f3; border-top: 6px solid #9b59b6; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+        <style>
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        </style>
+      </div>
+    </div>
+
+    <div id="progreso-modal" class="result-overlay">
+      <div class="modal-content result-card" style="max-width: 400px;">
+        <h2 id="titulo-progreso" class="result-title" style="font-size: 32px; margin-bottom: 10px;">Resultados</h2>
+        <p class="subtitle result-text" id="resumen-progreso" style="font-size: 18px; margin-bottom: 30px;">¡Buen trabajo! Sigue intentándolo.</p>
+        
+        <div class="stars-row result-stars" id="estrellas-ultima-sesion" style="font-size: 48px; margin: 20px 0;"></div>
+        
+        <div class="modal-actions" style="margin-top: 30px;">
+          <button class="result-ok" id="btn-salir" style="padding: 15px 50px; font-size: 18px;">Aceptar</button>
+        </div>
+      </div>
+    </div>
+
+    <a-scene id="escena-vr" vr-mode-ui="enabled: true" shadow="type: pcfsoft" renderer="colorManagement: true; physicallyCorrectLights: true">
+      <a-assets>
+        <a-asset-item id="modelo-facil" src="../models/facil/easyscenario.glb"></a-asset-item>
+        <a-asset-item id="modelo-inter" src="../models/inter/clasroom-medium.glb"></a-asset-item>
+        <a-asset-item id="modelo-dificil" src="../models/dif/lecture hall.glb"></a-asset-item>
+      </a-assets>
+    
+      <a-sky id="sky" rotation="0 -130 0" color="#87CEEB"></a-sky>
+      
+      <a-entity id="contador-texto" visible="false"></a-entity>
+      
+      <a-entity id="contenedor-modelo" position="0 0 0"></a-entity>
+    
+
+      <a-entity camera look-controls wasd-controls position="0 1.6 0">
+        <a-entity 
+          cursor="fuse: true; fuseTimeout: 1000" 
+          position="0 0 -1"
+          geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
+          material="color: black; shader: flat">
+        </a-entity>
+      </a-entity>
+    </a-scene>
+
+    <script src="/pages/config.js"></script>
+    <script>
+
+      const CONFIG_EVAL = {
+        duracionPorEscenario: 30,
+        escenarios: [
+          { 
+            id: 'facil', 
+            nombre: 'Prueba 1 - clasificación',
+            modelo: '#modelo-facil',
+            nivel: 1,
+            immersion_level_name: 'facil'
+          },
+          { 
+            id: 'intermedio', 
+            nombre: 'Prueba 2 - clasificación',
+            modelo: '#modelo-inter',
+            nivel: 2,
+            immersion_level_name: 'intermedio'
+          },
+          { 
+            id: 'dificil', 
+            nombre: 'Prueba 3 - clasificación',
+            modelo: '#modelo-dificil',
+            nivel: 3,
+            immersion_level_name: 'dificil'
+          }
+        ]
+      };
+
+      const estado = {
+        escenarioActual: 0,
+        tiempoRestante: CONFIG_EVAL.duracionPorEscenario,
+        mediaRecorder: null,
+        audioChunks: [],
+        grabando: false,
+        resultados: [],
+        audiosEnProceso: 0,
+        intervalo: null,
+        esperandoInicio: true,
+        modeloCargado: false
+      };
+
+      const elementos = {
+        escena: document.querySelector('#escena-vr'),
+        contenedor: document.querySelector('#contenedor-modelo'),
+        contadorTexto: document.querySelector('#contador-texto'),
+        sky: document.querySelector('#sky'),
+        loadingModal: document.querySelector('#loading-modal'),
+        modal: document.querySelector('#progreso-modal'),
+        estrellasRow: document.querySelector('#estrellas-ultima-sesion'),
+        resumenProgreso: document.querySelector('#resumen-progreso'),
+        btnSalir: document.querySelector('#btn-salir'),
+        timerDisplay: document.getElementById('timer-display'),
+        actionBtn: document.getElementById('action-btn')
+      };
+
+      function showMicBanner(message, color = "#842029", bg = "#f8d7da", border = "#f5c2c7") {
+        let bar = document.getElementById("mic-banner");
+        if (!bar) {
+          bar = document.createElement("div");
+          bar.id = "mic-banner";
+          bar.style.cssText = `
+            position:fixed; top:16px; left:50%; transform:translateX(-50%);
+            z-index:99999;
+            background:${bg}; color:${color}; border:1px solid ${border};
+            border-radius:12px; padding:14px 18px;
+            font:500 14px Inter,system-ui,Arial,sans-serif;
+            max-width:min(90vw,720px); text-align:center;
+            box-shadow:0 6px 20px rgba(0,0,0,.15);
+          `;
+          document.body.appendChild(bar);
+        }
+        bar.textContent = message;
+        setTimeout(() => bar?.remove?.(), 8000);
+      }
+
+      function handleMicError(err) {
+        let msg;
+        switch (err?.name) {
+          case "NotAllowedError":
+            msg = "El micrófono está bloqueado. Actívalo en Configuración > Privacidad > Micrófono o permite el acceso desde el navegador.";
+            break;
+          case "NotFoundError":
+            msg = "No se detectó ningún micrófono conectado o está apagado en los ajustes del sistema.";
+            break;
+          case "NotReadableError":
+            msg = "Otro programa está usando el micrófono. Ciérralo e inténtalo nuevamente.";
+            break;
+          default:
+            msg = "No se pudo acceder al micrófono. Revisa la configuración.";
+        }
+        showMicBanner(msg);
+        throw err;
+      }
+
+      async function ensureMicReady() {
+        try {
+          if (navigator.permissions?.query) {
+            const p = await navigator.permissions.query({ name: "microphone" });
+            if (p.state === "denied") {
+              handleMicError({ name: "NotAllowedError" });
+            }
+          }
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          stream.getTracks().forEach(t => t.stop());
+          return true;
+        } catch (e) {
+          handleMicError(e);
+        }
+      }
+
+      function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      }
+
+      function showInitialTime() {
+        elementos.timerDisplay.textContent = formatTime(CONFIG_EVAL.duracionPorEscenario);
+        elementos.actionBtn.textContent = 'INICIAR';
+        elementos.actionBtn.style.display = 'block';
+      }
+
+      let uiCountdownInterval = null;
+
+      function startAutoCountdown() {
+        let countdownSeconds = CONFIG_EVAL.duracionPorEscenario;
+        elementos.timerDisplay.textContent = formatTime(countdownSeconds);
+      
+        uiCountdownInterval = setInterval(() => {
+          if (countdownSeconds > 0) {
+            countdownSeconds--;
+            elementos.timerDisplay.textContent = formatTime(countdownSeconds);
+          } else {
+            clearInterval(uiCountdownInterval);
+            uiCountdownInterval = null;
+          }
+        }, 1000);
+      }
+
+      function stopAutoCountdown() {
+        if (uiCountdownInterval) {
+          clearInterval(uiCountdownInterval);
+          uiCountdownInterval = null;
+        }
+      }
+
+
+      async function getUserId() {
+        const ls = localStorage.getItem('user_id');
+        if (ls) return Number(ls);
+        try {
+          const base = (window.API_BASE || 'http://localhost:4000');
+          const r = await fetch(`${base}/api/auth/me`, { credentials: 'include' });
+          if (!r.ok) return null;
+          const me = await r.json();
+          localStorage.setItem('user_id', me.user_id);
+          return me.user_id;
+        } catch { return null; }
+      }
+
+     function drawStars(n = 0) {
+      elementos.estrellasRow.innerHTML = '';
+      for (let i = 0; i < Math.max(0, n); i++) {
+        const s = document.createElement('span');
+        s.textContent = '★';             
+        s.className = 'star';           
+        elementos.estrellasRow.appendChild(s);
+      }
+    }
+
+      function obtenerNivelPorAnsiedad(ansiedadPct) {
+        if (ansiedadPct >= 66) return { nombre: 'Fácil', color: '#4CAF50' };
+        if (ansiedadPct >= 33) return { nombre: 'Intermedio', color: '#FF9800' };
+        return { nombre: 'Difícil', color: '#F44336' };
+      }
+
+      function esperarSegundos(segundos) {
+        return new Promise(resolve => setTimeout(resolve, segundos * 1000));
+      }
+
+      elementos.escena.addEventListener('loaded', () => {
+        console.log('Escena VR cargada');
+        showInitialTime();
+        setTimeout(() => {
+          estado.escenarioActual = 0;
+          cambiarEscenario(0);
+        }, 2000);
+      });
+
+      elementos.actionBtn.addEventListener('click', function() {
+        if (estado.esperandoInicio && estado.escenarioActual === 0 && estado.modeloCargado) {
+          estado.esperandoInicio = false;
+          elementos.actionBtn.style.display = 'none';
+          iniciarEscenarioActual();
+        }
+      });
+
+      async function cambiarEscenario(indice) {
+        if (indice >= CONFIG_EVAL.escenarios.length) {
+          await finalizarEvaluacion();
+          return;
+        }
+
+        estado.escenarioActual = indice;
+        estado.modeloCargado = false;
+        const escenario = CONFIG_EVAL.escenarios[indice];
+        
+        console.log(`Cambiando a escenario ${indice + 1}: ${escenario.nombre}`);
+        
+        while (elementos.contenedor.firstChild) {
+          elementos.contenedor.removeChild(elementos.contenedor.firstChild);
+        }
+
+        const modeloEntity = document.createElement('a-entity');
+        modeloEntity.setAttribute('gltf-model', escenario.modelo);
+        
+        modeloEntity.addEventListener('model-loaded', () => {
+          console.log(`Modelo ${escenario.nombre} cargado completamente`);
+          estado.modeloCargado = true;
+          
+          if (indice === 0) {
+            elementos.actionBtn.disabled = false;
+            elementos.actionBtn.textContent = 'INICIAR';
+          } else {
+            iniciarEscenarioActual();
+          }
+        });
+
+        modeloEntity.addEventListener('model-error', () => {
+          console.error(`Error cargando modelo ${escenario.nombre}`);
+          estado.modeloCargado = true;
+        });
+        
+        if (typeof CONFIG_ESCENARIOS !== 'undefined') {
+          const config = CONFIG_ESCENARIOS[escenario.immersion_level_name];
+          if (config) {
+            modeloEntity.setAttribute('scale', config.modelo.scale);
+            modeloEntity.setAttribute('position', config.modelo.position);
+            modeloEntity.setAttribute('rotation', config.modelo.rotation);
+
+            config.luces.forEach(luz => {
+              const entidadLuz = document.createElement('a-light');
+              Object.entries(luz).forEach(([key, value]) => {
+                entidadLuz.setAttribute(key, value);
+              });
+              elementos.escena.appendChild(entidadLuz);
+            });
+          }
+        } else {
+          modeloEntity.setAttribute('position', '0 0 -5');
+          modeloEntity.setAttribute('scale', '1 1 1');
+        }
+        
+        elementos.contenedor.appendChild(modeloEntity);
+
+        const coloresCielo = ['#87CEEB', '#6B8E99', '#4A5568'];
+        elementos.sky.setAttribute('color', coloresCielo[indice]);
+
+        if (indice === 0) {
+          elementos.actionBtn.style.display = 'block';
+          elementos.actionBtn.disabled = true;
+          elementos.actionBtn.textContent = 'Cargando...';
+          estado.esperandoInicio = true;
+        } else {
+          elementos.actionBtn.style.display = 'none';
+        }
+      }
+
+      async function iniciarEscenarioActual() {
+        const escenario = CONFIG_EVAL.escenarios[estado.escenarioActual];
+        console.log(`Iniciando escenario: ${escenario.nombre}`);
+
+        const ok = await iniciarGrabacion();
+        if (!ok) {
+          elementos.actionBtn.style.display = 'block';
+          elementos.actionBtn.textContent = 'INICIAR';
+          elementos.timerDisplay.textContent = formatTime(CONFIG_EVAL.duracionPorEscenario);
+          return;
+        }
+  
+        startAutoCountdown();
+        iniciarContador(escenario);
+      }
+
+
+      async function iniciarGrabacion() {
+        try {
+          await ensureMicReady(); // lanza si falla
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        
+          estado.audioChunks = [];
+          estado.mediaRecorder = new MediaRecorder(stream);
+        
+          estado.mediaRecorder.ondataavailable = (event) => {
+            if (event.data.size > 0) estado.audioChunks.push(event.data);
+          };
+        
+          estado.mediaRecorder.start();
+          estado.grabando = true;
+          console.log('🎙️ Grabación iniciada');
+          return true;
+        } catch (error) {
+          console.error('Error al iniciar grabación:', error);
+          stopAutoCountdown();
+        
+          elementos.actionBtn.style.display = 'block';
+          elementos.actionBtn.textContent = 'INICIAR';
+          estado.esperandoInicio = true;
+          return false;
+        }
+      }
+
+
+
+      function detenerGrabacion() {
+        return new Promise((resolve) => {
+          if (estado.mediaRecorder && estado.grabando) {
+            estado.mediaRecorder.onstop = async () => {
+              const audioBlob = new Blob(estado.audioChunks, { type: 'audio/webm' });
+              const escenarioInfo = CONFIG_EVAL.escenarios[estado.escenarioActual];
+              console.log(`Grabación terminada para ${escenarioInfo.nombre}`);
+
+              // Procesar audio en serie
+              await procesarAudioEnSerie(audioBlob, estado.escenarioActual);
+              
+              estado.mediaRecorder.stream.getTracks().forEach(track => track.stop());
+              estado.grabando = false;
+              console.log('Grabación detenida completamente');
+              
+              // Continuar al siguiente escenario después de procesar
+              if (estado.escenarioActual < CONFIG_EVAL.escenarios.length - 1) {
+                await esperarSegundos(1);
+                cambiarEscenario(estado.escenarioActual + 1);
+              } else {
+                await finalizarEvaluacion();
+              }
+              
+              resolve();
+            };
+            
+            estado.mediaRecorder.stop();
+          } else {
+            resolve();
+          }
+        });
+      }
+
+      function iniciarContador(escenario) {
+        estado.tiempoRestante = CONFIG_EVAL.duracionPorEscenario;
+
+        if (estado.intervalo) clearInterval(estado.intervalo);
+
+        estado.intervalo = setInterval(() => {
+          estado.tiempoRestante--;
+
+          if (estado.tiempoRestante <= 0) {
+            clearInterval(estado.intervalo);
+            
+            detenerGrabacion().then(() => {
+              console.log('Grabación terminada, procesando audio...');
+            });
+          }
+        }, 1000);
+      }
+
+      async function procesarAudioEnSerie(audioBlob, indiceEscenario) {
+        const escenario = CONFIG_EVAL.escenarios[indiceEscenario];
+        console.log(`Enviando audio de ${escenario.nombre} al servidor...`);
+
+        try {
+          const base = (window.API_BASE || 'http://localhost:4000');
+          const user_id = await getUserId();
+          
+          if (!user_id) {
+            throw new Error('Sesión no válida');
+          }
+
+          const formData = new FormData();
+          formData.append('audio', audioBlob, `evaluacion_${escenario.id}.webm`);
+          formData.append('user_id', String(user_id));
+          formData.append('immersion_level_name', escenario.immersion_level_name);
+
+          console.log(`Enviando petición para ${escenario.nombre}...`);
+          
+          const response = await fetch(`${base}/api/sessions/eval/audio`, {
+            method: 'POST',
+            body: formData,
+            credentials: 'include'
+          });
+
+          console.log(`Respuesta recibida para ${escenario.nombre}:`, response.status);
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Error al procesar audio');
+          }
+
+          const data = await response.json();
+          console.log(`Datos procesados para ${escenario.nombre}:`, data);
+
+          const resultado = {
+            escenario: escenario.nombre,
+            nivel: escenario.nivel,
+            ansiedad: data?.model?.anxiety_pct ?? null,
+            estrellas: data?.detail?.star_rating ?? null,
+            progreso: data?.detail?.progress_percentage ?? null,
+            error: false
+          };
+
+          estado.resultados[indiceEscenario] = resultado;
+          estado.audiosEnProceso++;
+          
+          console.log(`Audio ${indiceEscenario + 1}/3 procesado exitosamente:`, resultado);
+          console.log(`Total audios procesados ahora: ${estado.audiosEnProceso}/3`);
+          
+        } catch (error) {
+          console.error(`Error procesando audio ${indiceEscenario + 1}:`, error);
+          estado.resultados[indiceEscenario] = {
+            escenario: escenario.nombre,
+            nivel: escenario.nivel,
+            error: true,
+            mensaje: error.message
+          };
+          estado.audiosEnProceso++;
+          console.log(`Audio ${indiceEscenario + 1} marcado como error. Total procesados: ${estado.audiosEnProceso}/3`);
+        }
+      }
+
+      async function finalizarEvaluacion() {
+        console.log('Finalizando evaluación...');
+        
+        elementos.loadingModal.style.display = 'flex';
+
+        console.log('Todos los audios procesados en serie');
+        console.log(`Audios procesados finales: ${estado.audiosEnProceso}/3`);
+
+        const resultadosValidos = estado.resultados.filter(r => r && !r.error);
+        
+        console.log('Resultados válidos:', resultadosValidos);
+        
+        if (resultadosValidos.length === 0) {
+          alert('Error: No se pudieron procesar los audios. Por favor, intenta de nuevo.');
+          location.reload();
+          return;
+        }
+
+        const ansiedadMaxima = Math.max(...resultadosValidos.map(r => r.ansiedad || 0));
+        
+        console.log(`Ansiedad máxima detectada: ${ansiedadMaxima}%`);
+        
+        const nivelAsignado = obtenerNivelPorAnsiedad(ansiedadMaxima);
+        
+        console.log(`Nivel asignado: ${nivelAsignado.nombre}`);
+
+        const estrellast = resultadosValidos.reduce((sum, r) => sum + (r.estrellas || 0), 0);
+        const estrellasPromedio = Math.round(estrellast / resultadosValidos.length);
+        
+        await asignarNivelInicial(ansiedadMaxima);
+
+        elementos.loadingModal.style.display = 'none';
+
+        elementos.resumenProgreso.textContent = `Tu nivel asignado es: ${nivelAsignado.nombre}`;
+        elementos.resumenProgreso.style.fontSize = '24px';
+        
+        drawStars(estrellasPromedio);
+
+        elementos.modal.style.display = 'flex';
+        elementos.modal.classList.add('active');
+      }
+
+      async function asignarNivelInicial(ansiedadMaxima) {
+        try {
+          const base = (window.API_BASE || 'http://localhost:4000');
+          
+          const response = await fetch(`${base}/api/users/me/assign-initial-level`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ anxiety_pct_max: ansiedadMaxima }),
+            credentials: 'include'
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.error || 'Error asignando nivel');
+          }
+
+          console.log('Nivel inicial asignado:', data.assigned_level);
+          
+          return data.assigned_level;
+          
+        } catch (error) {
+          console.error('Error asignando nivel inicial:', error);
+          return null;
+        }
+      }
+
+      elementos.btnSalir.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location.href = '../pages/selector.html';
+      });
+    </script>
+  </body>
+</html>

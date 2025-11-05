@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Instrucciones</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="./logic.js" defer></script>
+  <style>
+    :root{
+      --bg:#e8dffb;
+      --card:#f5f0ff;
+      --title:#3e357b;
+      --text:#433e64;
+      --accent:#9b5de5;
+    }
+    html,body{height:100%; margin:0; font-family: "Poppins", system-ui, sans-serif; background:var(--bg); color:var(--text);overflow: hidden;}
+    .shell{min-height:100%; display:flex; align-items:center; justify-content:center; padding:24px}
+    .card{
+      width:min(860px, 92vw);
+      background:var(--card);
+      border-radius:24px;
+      padding:36px 42px 32px;
+      text-align:left;
+      animation: fade .3s ease;
+    }
+    h1{
+      margin:0 0 18px; text-align:center; color:var(--title); font-size:48px; letter-spacing:.5px;
+    }
+    ul{font-size:20px; line-height:1.6; margin:14px 0 26px}
+    ul li{margin:8px 0}
+    .cta{
+      display:block; margin:0 auto; border:0; background:var(--accent); color:white;
+      padding:12px 28px; border-radius:12px; font-weight:700; cursor:pointer;
+    }
+    .cta:hover{ transform: translateY(-2px) }
+    .topbar{
+      position:fixed; top:16px; right:16px;
+    }
+
+    .meta{
+      text-align:center; margin-top:-6px; color:#6a6790; font-size:14px;
+    }
+    @keyframes fade{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="card">
+      <h1>Instrucciones</h1>
+      <ul>
+        <li>Prepara tu discurso para la exposición a continuación</li>
+        <li>El silencio es penalizado</li>
+        <li>Puedes finalizar la sesión antes, pero mínimamente debes exponer 30 segundos. Si la duración es menor, no se analizará la exposición</li>
+      </ul>
+      <button class="cta" id="continue-btn">CONTINUAR</button>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+  const qs = new URLSearchParams(location.search);
+  const levelId = parseInt(qs.get("level_id"), 10) || 1;    
+  const seconds = parseInt(qs.get("seconds"), 10) || 60;   
+  const minutes = Math.round(seconds / 60);
+
+  const LEVEL_SLUG = { 1:'facil', 2:'intermedio', 3:'dificil' };
+
+  document.getElementById("continue-btn").addEventListener("click", () => {
+    if (typeof setSeleccion === "function") {
+      setSeleccion(LEVEL_SLUG[levelId] || 'facil', minutes);
+    }
+    if (typeof irAJuego === "function") {
+      irAJuego();
+    } else {
+      console.error("irAJuego() no está definida — revisa que logic.js cargó bien");
+    }
+  });
+});
+  </script>
+  <script src="/pages/logout.js"></script>
+</body>
+</html>

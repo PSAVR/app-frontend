@@ -9,7 +9,6 @@
 <body>
 <a-scene>
     <a-sky color="#e8dffb"></a-sky>
- <!-- Cámara con cursor -->
     <a-entity camera look-controls position="0 1.6 0">
       <a-entity 
         cursor="fuse: true; fuseTimeout: 1000" 
@@ -19,34 +18,29 @@
       </a-entity>
     </a-entity>
 
-    <!-- Botones principales -->
     <a-entity id="selector-perfil">
-      <!-- VER HISTORIAL -->
-        <a-box id="btnHist" position="-2 1.2 -3" color="#C7BCFF" depth="0.3" height="0.6" width="1.8"></a-box>
+        <a-box id="btnHist" position="-2 1.2 -3" color="#746aa6" depth="0.3" height="0.6" width="1.8"></a-box>
         <a-text value="Ver Historial" align="center" width="3" color="#FFFFFF" position="-2 1.2 -2.8"></a-text>
 
-      <!-- VER MIS DATOS -->
-      <a-box id="btnCuenta" position="2 1.2 -3" color="#C7BCFF" depth="0.3" height="0.6" width="1.8"></a-box>
+      <a-box id="btnCuenta" position="2 1.2 -3" color="#746aa6" depth="0.3" height="0.6" width="1.8"></a-box>
         <a-text value="Ver Mis Datos" align="center" width="3" color="#FFFFFF" position="2 1.2 -2.8"></a-text>
     </a-entity>
   </a-scene>
 
 <script>
-    // Bind de navegación
     document.addEventListener('DOMContentLoaded', () => {
         const btnHist  = document.querySelector('#btnHist');
         const btnCuenta = document.querySelector('#btnCuenta');
 
-        // INICIAR JUEGO -> pasa al flujo Nivel -> Tiempo -> Inmersión
-    btnHist.addEventListener('click', () => {
+        btnHist.addEventListener('click', () => {
         window.location.href = 'historial.html';
     });
 
-    // VER MI PERFIL (cambia la ruta si tienes otra)
     btnCuenta.addEventListener('click', () => {
         window.location.href = 'cuenta.html';
     });
 });
 </script>
+<script src="/pages/logout.js"></script>
 </body>
 </html>

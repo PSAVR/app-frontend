@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Mi cuenta</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    :root{
+      --bg:#e8dffb;
+      --card:#f5f0ff;
+      --title:#3e357b;
+      --text:#433e64;
+      --accent:#9b5de5;
+    }
+    html,body{
+      height:100%; 
+      margin:0; 
+      font-family: "Poppins", system-ui, sans-serif;
+      background:var(--bg); 
+      color:var(--text);
+      overflow: hidden;
+    }
+    .shell{
+      height:100dvh; 
+      display:flex; 
+      align-items:center; 
+      justify-content:center; 
+      padding:24px}
+    .card{
+      width:min(860px, 92vw);
+      background:var(--card);
+      border-radius:24px;
+      padding:36px 42px 32px;
+      text-align:left;
+      animation: fade .3s ease;
+    }
+    h1{
+      margin:0 0 18px; text-align:center; color:var(--title); font-size:48px; letter-spacing:.5px;
+    }
+    .topbar{
+      position:fixed; top:16px; right:16px; z-index:10;
+    }
+
+    .row {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      margin: 18px 0;
+      padding: 12px 0;
+      border-bottom: 2px solid #e8e0ff;
+    }
+
+    .label {
+      width: 240px;
+      font-weight: 700;
+      font-size: 20px;
+      color: var(--title);
+    }
+
+    .value {
+      flex: 1;
+      font-size: 20px;
+      color: var(--text);
+    }
+
+    .actions {
+      display: flex;
+      justify-content: center;
+      margin-top: 40px;
+      gap: 15px;
+    }
+
+    .btn {
+      border: 0;
+      padding: 12px 28px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 16px;
+      font-family: "Poppins", system-ui, sans-serif;
+      transition: transform .15s ease;
+    }
+
+    .btn-danger {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      transform: translateY(-2px);
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,.55);
+      z-index: 11000;
+    }
+
+    .modal.open {
+      display: flex;
+    }
+
+    .dialog {
+      width: min(520px, 90vw);
+      background: var(--card);
+      border-radius: 24px;
+      padding: 32px;
+    }
+
+    .dialog h2 {
+      margin: 0 0 16px 0;
+      color: var(--title);
+      font-size: 32px;
+    }
+
+    .dialog p {
+      margin: 0 0 24px 0;
+      line-height: 1.6;
+      color: var(--text);
+      font-size: 18px;
+    }
+
+    .dialog .buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    .btn-outline {
+      background: white;
+      color: var(--title);
+      border: 2px solid #d0c4ff;
+    }
+
+    .btn-outline:hover {
+      background: #f8f6ff;
+    }
+
+    @media (max-width: 768px) {
+      .row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .label {
+        width: 100%;
+      }
+    }
+
+    @keyframes fade{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
+  </style>
+</head>
+<body>
+    <div class="shell">
+    <div class="card">
+      <h1>Mi Cuenta</h1>
+
+      <div class="row">
+        <div class="label">Email:</div>
+        <div class="value" id="vEmail">—</div>
+      </div>
+      <div class="row">
+        <div class="label">Username:</div>
+        <div class="value" id="vUser">—</div>
+      </div>
+      <div class="row">
+        <div class="label">Género:</div>
+        <div class="value" id="vGender">—</div>
+      </div>
+      <div class="row">
+        <div class="label">Institución:</div>
+        <div class="value" id="vInst">—</div>
+      </div>
+      <div class="row">
+        <div class="label">Fecha de Nacimiento:</div>
+        <div class="value" id="vDob">—</div>
+      </div>
+
+      <div class="actions">
+        <button id="btnDelete" class="btn btn-danger">Eliminar Cuenta</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="confirmModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="dialog">
+      <h2>¿Eliminar tu cuenta?</h2>
+      <p>Esta acción es permanente. Se eliminarán tus sesiones, detalles y progreso.</p>
+      <div class="buttons">
+        <button id="modalNo" class="btn btn-outline">Cancelar</button>
+        <button id="modalYes" class="btn btn-danger">Sí, eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = `${location.protocol}//${location.hostname}:4000`;
+    console.log('[cuenta] API_BASE =', API_BASE);
+
+    const $ = (s) => document.querySelector(s);
+
+    function formatDateISOtoLocal(iso) {
+      if (!iso) return '—';
+      try {
+        const d = new Date(iso);
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const yyyy = d.getFullYear();
+        return `${dd}/${mm}/${yyyy}`;
+      } catch { return '—'; }
+    }
+
+    const modal = $('#confirmModal');
+    const modalYes = $('#modalYes');
+    const modalNo  = $('#modalNo');
+
+    function openModal() {
+      modal.setAttribute('aria-hidden', 'false');
+      modal.classList.add('open');
+      modalYes.focus();
+    }
+    function closeModal() {
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden','true');
+    }
+
+    let me = null;
+
+    async function fetchMe(){
+      const r = await fetch(`${API_BASE}/api/auth/me`, { credentials:'include' });
+      if (!r.ok) return null;
+      return await r.json();
+    }
+
+    const safeLogout = typeof logout === 'function'
+  ? logout
+  : () => {
+      try { fetch(`${API_BASE}/api/auth/logout`, { method:'POST', credentials:'include' }); } catch {}
+      localStorage.removeItem('user_id');
+      window.location.replace('../index.html');
+    };
+
+    async function handleDelete(userId){
+      try{
+        const r = await fetch(`${API_BASE}/api/users/${userId}`, {
+          method:'DELETE',
+          credentials:'include'
+        });
+
+        if (!r.ok) {
+          const payload = await r.json().catch(()=>({}));
+          alert(`No se pudo eliminar la cuenta.\n${JSON.stringify(payload)}`);
+          return;
+        }
+        alert('Cuenta eliminada correctamente.');
+        await safeLogout(); 
+      }catch(e){
+        alert('Error eliminando la cuenta.');
+      }
+    }
+
+    $('#btnDelete').addEventListener('click', openModal);
+    modalNo.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e)=>{ if(e.target === modal) closeModal(); });
+
+    modalYes.addEventListener('click', async ()=>{
+      modalYes.disabled = true;
+      try{
+        closeModal();
+        await handleDelete(me?.user_id ?? me?.id);
+      } finally {
+        modalYes.disabled = false;
+      }
+    });
+
+    (async function init(){
+      me = await fetchMe();
+      if (!me || !me.user_id) {
+        alert('Tu sesión no está activa. Vuelve a iniciar sesión.');
+        return location.href = '../index.html';
+      }
+      $('#vEmail').textContent  = me.email ?? '—';
+      $('#vUser').textContent   = me.username ?? me.name ?? '—';
+      $('#vGender').textContent = me.gender ?? '—';
+      $('#vInst').textContent   = me.college ?? '—';
+      $('#vDob').textContent    = formatDateISOtoLocal(me.birthdate);
+      localStorage.setItem('user_id', String(me.user_id));
+    })();
+  </script>
+  <script src="/pages/logout.js"></script>
+</body>
+</html>

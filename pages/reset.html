@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Restablecer contraseña</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles/login.css" />
+  <style>
+    body{min-height:100vh}
+    .glass-container{max-width:520px}
+    .token-error{color:#b00020;margin-top:8px;font-size:.95rem;text-align:center}
+  </style>
+</head>
+<body class="reset-page">
+  <main>
+    <div class="glass-container">
+      <form id="resetForm" novalidate>
+        <h1>Restablecer contraseña</h1>
+
+        <p id="emailHint" style="text-align:center;opacity:.7;margin-top:-6px"></p>
+
+        <div class="input-container">
+          <input type="password" id="newPassword" required />
+          <label class="label" for="newPassword">Nueva contraseña</label>
+          <div class="underline"></div>
+        </div>
+
+        <div class="input-container">
+          <input type="password" id="confirmPassword" required />
+          <label class="label" for="confirmPassword">Confirmar contraseña</label>
+          <div class="underline"></div>
+        </div>
+
+        <div id="tokenError" class="token-error" style="display:none">
+          Token inválido o expirado. Vuelve a solicitar el enlace desde “Olvidé mi contraseña”.
+        </div>
+
+        <button type="submit" class="sigin">
+          <span class="shadow"></span>
+          <span class="edge"></span>
+          <span class="front">Actualizar contraseña</span>
+        </button>
+
+        <p style="text-align:center;margin-top:10px;">
+          <a href="../index.html">Volver a iniciar sesión</a>
+        </p>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    const API_BASE = 'http://localhost:4000';
+
+    // Leer token de la URL
+    const params = new URLSearchParams(location.search);
+    const token = params.get('token');
+
+    // (Opcional) Mostrar a qué correo apunta el token (solo si decides incluirlo en el backend)
+    // En tu backend ya codificas { email } en el token; aquí no podemos verlo sin validar.
+    // Si quieres mostrarlo, podrías crear un endpoint GET /api/auth/verify/:token que devuelva el email.
+
+    const resetForm = document.getElementById('resetForm');
+    const tokenError = document.getElementById('tokenError');
+
+    if (!token) {
+      tokenError.style.display = 'block';
+      resetForm.querySelector('button[type="submit"]').disabled = true;
+    }
+
+    resetForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!token) return;
+
+      const pass = document.getElementById('newPassword').value;
+      const pass2 = document.getElementById('confirmPassword').value;
+
+      if (pass !== pass2) {
+        alert('Las contraseñas no coinciden.');
+        return;
+      }
+
+      try {
+        const resp = await fetch(`${API_BASE}/api/auth/reset/${encodeURIComponent(token)}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ newPassword: pass })
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || 'No se pudo actualizar la contraseña');
+
+        alert('¡Contraseña actualizada! Ya puedes iniciar sesión.');
+        location.href = '../index.html';
+      } catch (err) {
+        tokenError.style.display = 'block';
+        alert(err.message);
+      }
+    });
+  </script>
+</body>
+</html>

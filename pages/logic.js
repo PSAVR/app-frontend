@@ -1,7 +1,16 @@
-// --- Estado elegido por el usuario ---
 let nivelSeleccionado = null;
 let tiempoSeleccionado = null;
 let estadoActual = 'seleccionando-nivel';
+
+window.setSeleccion = function (level, minutes) {
+  const MAP = { 1:'facil', 2:'intermedio', 3:'dificil', facil:'facil', intermedio:'intermedio', dificil:'dificil' };
+  nivelSeleccionado  = MAP[level] || (typeof level === 'string' ? level : 'facil');
+  tiempoSeleccionado = Number(minutes) || 1;
+  console.log('[setSeleccion]', { nivelSeleccionado, tiempoSeleccionado });
+};
+
+window.irAJuego = window.irAJuego || irAJuego;
+
 
 async function ensureMicPermission() {
   try {
@@ -21,7 +30,6 @@ async function ensureMicPermission() {
   }
 }
 
-// --- Ir a inmersión con el nivel/tiempo seleccionados ---
 async function irAJuego() {
 
   const ok = await ensureMicPermission();
@@ -32,14 +40,14 @@ async function irAJuego() {
   const nivel = nivelSeleccionado || 'facil';
   const tiempo = tiempoSeleccionado || 1;
 
-  console.log('🎮 Navegando a juego con:', { nivel, tiempo });
+  console.log('Navegando a juego con:', { nivel, tiempo });
 
   try {
     localStorage.setItem('nivelSeleccionado', nivel);
     localStorage.setItem('tiempoSeleccionado', tiempo);
-    console.log('✅ Datos guardados en localStorage');
+    console.log('Datos guardados en localStorage');
   } catch (e) { 
-    console.error('❌ Error guardando en localStorage:', e);
+    console.error('Error guardando en localStorage:', e);
   }
 
   setTimeout(() => {
@@ -49,7 +57,6 @@ async function irAJuego() {
 
 function setClickable(menuEl, enabled) {
   if (!menuEl) return;
-  // activamos/desactivamos SOLO los a-box del menú
   const boxes = menuEl.querySelectorAll('a-box');
   boxes.forEach(el => {
     if (enabled) el.classList.add('clickable');
@@ -72,49 +79,53 @@ function mostrarMenu(mostrarDificultad) {
 
 
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('📱 Iniciando aplicación');
+  console.log('Iniciando aplicación');
   
-  // Estado inicial - mostrar solo dificultad
   mostrarMenu(true);
 
-  // 1) FUNCIONES DE NIVEL
   function elegirNivel(niv) {
     if (estadoActual !== 'seleccionando-nivel') {
-      console.warn('⚠️ Ignorando selección de nivel - estado incorrecto:', estadoActual);
+      console.warn('Ignorando selección de nivel - estado incorrecto:', estadoActual);
       return;
     }
 
     nivelSeleccionado = niv;
     estadoActual = 'seleccionando-tiempo';
     
-    console.log(`🎯 Nivel seleccionado: ${niv}`);
+    console.log(`Nivel seleccionado: ${niv}`);
     
-    // Cambiar a menú de tiempo
     setTimeout(() => {
       mostrarMenu(false);
     }, 100);
   }
 
-  // 2) FUNCIONES DE TIEMPO
+function openInstructionsPage(levelSel, minutes) {
+  const MAP = { facil: 1, intermedio: 2, dificil: 3 };
+  const levelId = Number.isFinite(levelSel)
+    ? Number(levelSel)
+    : (MAP[String(levelSel).toLowerCase()] || 1);
+  const seconds = Math.max(1, Math.round(Number(minutes) || 1)) * 60;
+
+  const qs = new URLSearchParams({ level_id: String(levelId), seconds: String(seconds) });
+  const href = location.pathname.includes('/pages/')
+    ? 'instrucciones.html'
+    : '/pages/instrucciones.html';
+
+  console.log('[NAV] -> instrucciones', { levelId, seconds, href });
+  window.location.assign(`${href}?${qs.toString()}`);
+}
+
+window.openInstructionsPage = openInstructionsPage;
   function elegirTiempo(min) {
-    if (estadoActual !== 'seleccionando-tiempo') {
-      console.warn('⚠️ Ignorando selección de tiempo - estado incorrecto:', estadoActual);
-      return;
-    }
-
-    tiempoSeleccionado = min;
-    console.log(`⏱️ Tiempo seleccionado: ${min} minutos`);
-    
-    // Ir al juego
-    setTimeout(() => {
-      irAJuego();
-    }, 300);
-  }
-
-  // 3) EVENT LISTENERS
-  // Usar setTimeout para asegurar que el DOM esté completamente cargado
+  if (estadoActual !== 'seleccionando-tiempo') return;
+  tiempoSeleccionado = min;
+  console.log(`Tiempo seleccionado: ${min} minutos`);
   setTimeout(() => {
-    // Listeners de dificultad
+    openInstructionsPage(nivelSeleccionado, min); 
+  }, 300);
+}
+
+  setTimeout(() => {
     const btnFacil = document.querySelector('#boton-facil');
     const btnIntermedio = document.querySelector('#boton-intermedio');
     const btnDificil = document.querySelector('#boton-dificil');
@@ -122,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnFacil) {
       btnFacil.addEventListener('click', (e) => {
         e.stopPropagation();
-        console.log('🔘 Click en Fácil');
+        console.log('Click en Fácil');
         elegirNivel('facil');
       });
     }
@@ -130,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnIntermedio) {
       btnIntermedio.addEventListener('click', (e) => {
         e.stopPropagation();
-        console.log('🔘 Click en Intermedio');
+        console.log('Click en Intermedio');
         elegirNivel('intermedio');
       });
     }
@@ -138,12 +149,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnDificil) {
       btnDificil.addEventListener('click', (e) => {
         e.stopPropagation();
-        console.log('🔘 Click en Difícil');
+        console.log('Click en Difícil');
         elegirNivel('dificil');
       });
     }
 
-    // Listeners de tiempo
     const btn1min = document.querySelector('#boton-1min');
     const btn2min = document.querySelector('#boton-2min');
     const btn3min = document.querySelector('#boton-3min');
@@ -151,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btn1min) {
       btn1min.addEventListener('click', (e) => {
         e.stopPropagation();
-        console.log('🔘 Click en 1 minuto');
+        console.log('Click en 1 minuto');
         elegirTiempo(1);
       });
     }
@@ -159,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btn2min) {
       btn2min.addEventListener('click', (e) => {
         e.stopPropagation();
-        console.log('🔘 Click en 2 minutos');
+        console.log('Click en 2 minutos');
         elegirTiempo(2);
       });
     }
@@ -167,88 +177,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btn3min) {
       btn3min.addEventListener('click', (e) => {
         e.stopPropagation();
-        console.log('🔘 Click en 3 minutos');
+        console.log('Click en 3 minutos');
         elegirTiempo(3);
       });
     }
 
-    console.log('🚀 Event listeners configurados');
+    console.log('Event listeners configurados');
   }, 500);
 });
-
-/*let tiempoSeleccionado = null;
-let nivelSeleccionado = null;
-
-async function ensureMicPermission() {
-  try {
-    if (navigator.permissions && navigator.permissions.query) {
-      const st = await navigator.permissions.query({ name: 'microphone' });
-      if (st.state === 'granted') return true;   
-    }
-  } catch (_) {}
-
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    stream.getTracks().forEach(t => t.stop());
-    return true;
-  } catch (err) {
-    console.warn('Permiso de micrófono rechazado o falló:', err);
-    return false;
-  }
-}
-
-async function cargarNivel(dificultad) {
-
-  const ok = await ensureMicPermission();
-  if (!ok) {
-    alert('Necesitas permitir el micrófono para continuar. Revísalo en el candado del navegador.');
-    return; 
-  }
-
-  window.location.href = `game.html?nivel=${dificultad}`;
-
-
-  if (tiempoSeleccionado) {
-    setTimeout(() => {
-      window.location.href = 'main.html'; //aca podemos cambiar a la parte de resultados y estrellitas
-    }, tiempoSeleccionado * 60 * 1000); // minutos → milisegundos
-  }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelector('#boton-facil').addEventListener('click', () => {
-    cargarNivel('facil');
-    document.querySelector('#menu-dificultad').setAttribute('visible', 'false');
-    document.querySelector('#menu-tiempo').setAttribute('visible', 'true');
-  });
-
-  document.querySelector('#boton-intermedio').addEventListener('click', () => {
-    cargarNivel('intermedio');
-    document.querySelector('#menu-dificultad').setAttribute('visible', 'false');
-    document.querySelector('#menu-tiempo').setAttribute('visible', 'true');
-  });
-
-  document.querySelector('#boton-dificil').addEventListener('click', () => {
-    cargarNivel('dificil');
-    document.querySelector('#menu-dificultad').setAttribute('visible', 'false');
-    document.querySelector('#menu-tiempo').setAttribute('visible', 'true');
-  });
-
-  document.querySelector('#boton-1min').addEventListener('click', () => {
-    tiempoSeleccionado = 1;
-    localStorage.setItem('tiempoSeleccionado', tiempoSeleccionado);
-    document.querySelector('#menu-tiempo').setAttribute('visible', 'false');
-  });
-
-  document.querySelector('#boton-2min').addEventListener('click', () => {
-    tiempoSeleccionado = 2;
-    localStorage.setItem('tiempoSeleccionado', tiempoSeleccionado);
-    document.querySelector('#menu-tiempo').setAttribute('visible', 'false');
-  });
-
-  document.querySelector('#boton-3min').addEventListener('click', () => {
-    tiempoSeleccionado = 3;
-    localStorage.setItem('tiempoSeleccionado', tiempoSeleccionado);
-    document.querySelector('#menu-tiempo').setAttribute('visible', 'false');
-  });
-});*/

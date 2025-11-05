@@ -17,7 +17,7 @@ main {
   align-items: center;
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(135deg, #cbd5f0, #e8dffb);
+  background: #e8dffb;
 }
 
 .glass-container {
@@ -86,7 +86,6 @@ form > h1 {
   padding-top: 16px;
 }
 
-/* Ocultar el placeholder del date field */
 .input-container input[type="date"]::-webkit-datetime-edit-text,
 .input-container input[type="date"]::-webkit-datetime-edit-month-field,
 .input-container input[type="date"]::-webkit-datetime-edit-day-field,
@@ -112,7 +111,6 @@ form > h1 {
   color: #6b5ca5;
 }
 
-/* Label flotante para select y date - SIEMPRE flotado */
 .input-container select ~ .label,
 .input-container input[type="date"] ~ .label {
   top: -22px;
@@ -120,7 +118,6 @@ form > h1 {
   color: #888;
 }
 
-/* Color activo para select y date */
 .input-container select:focus ~ .label,
 .input-container input[type="date"]:focus ~ .label,
 .input-container.filled .label {
@@ -145,7 +142,6 @@ form > h1 {
   transform: scaleX(1);
 }
 
-/* Botón animado */
 .sigin {
   position: relative;
   background: transparent;
@@ -183,18 +179,16 @@ form > h1 {
   );
 }
 
-/* === Solo cuando está activo el formulario de Registro === */
 .glass-container:has(#registerFields:not(.hidden)) {
-  height: auto;          /* en lugar de la altura fija/clamp */
+  height: auto;          
   max-height: none;
-  padding: 36px 28px 28px; /* mantiene el look del Figma */
+  padding: 36px 28px 28px; 
 }
 
 .glass-container:has(#registerFields:not(.hidden)) form {
-  height: auto;          /* deja que el form crezca con su contenido */
+  height: auto;          
 }
 
-/* (opcional) asegura 2 columnas ordenadas en registro, como en el Figma */
 #registerFields {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -257,139 +251,9 @@ form > h1 {
   display: none !important;
 }
 
-/* =================== MODAL HORIZONTAL DE ESTRELLAS =================== */
-/* ===== Modal Progreso (Estrellas) ===== */
-/* Modal oculto por defecto */
-#progreso-modal {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  background: rgba(0, 0, 0, 0.8) !important;
-  z-index: 999999 !important;
-  display: none !important; /* Oculto por defecto */
-  align-items: center !important;
-  justify-content: center !important;
-  pointer-events: none !important; /* Sin interacción cuando está oculto */
-  font-family: 'Quicksand', sans-serif !important;
+.reset-page form > h1{
+  font-size: 2.3rem; 
+  line-height: 2.25;
+  margin-bottom: 18px;
 }
-
-/* Solo cuando tiene la clase active, mostrar y permitir interacción */
-#progreso-modal.active {
-  display: flex !important;
-  pointer-events: auto !important;
-}
-
-/* Contenido del modal - perfectamente centrado */
-#progreso-modal .modal-content {
-  background: white !important;
-  border-radius: 12px !important;
-  padding: 24px !important;
-  width: min(90vw, 400px) !important;
-  max-width: 400px !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
-  text-align: center !important;
-  position: relative !important;
-  z-index: 1000000 !important;
-  margin: auto !important; /* Centrado adicional */
-  transform: translate(0, 0) !important; /* Reset cualquier transformación */
-}
-
-#progreso-modal h2 {
-  margin: 0 0 12px 0 !important;
-  font-weight: 700 !important;
-  color: #333 !important;
-  font-size: 1.5rem !important;
-}
-
-#progreso-modal p.subtitle {
-  margin: 0 0 16px 0 !important;
-  color: #666 !important;
-  font-size: 0.95rem !important;
-  line-height: 1.4 !important;
-}
-
-#progreso-modal .stars-row {
-  display: flex !important;
-  gap: 8px !important;
-  justify-content: center !important;
-  align-items: center !important;
-  margin: 16px 0 20px 0 !important;
-  font-size: 36px !important;
-  line-height: 1 !important;
-  color: #ffd700 !important;
-}
-
-#progreso-modal .modal-actions {
-  display: flex !important;
-  gap: 12px !important;
-  justify-content: center !important;
-  align-items: center !important;
-  margin-top: 16px !important;
-}
-
-#progreso-modal .btn {
-  padding: 12px 20px !important;
-  border-radius: 8px !important;
-  border: 1px solid #ddd !important;
-  background: #fafafa !important;
-  cursor: pointer !important;
-  font-size: 14px !important;
-  font-weight: 500 !important;
-  color: #333 !important;
-  min-width: 80px !important;
-  text-align: center !important;
-}
-
-#progreso-modal .btn:hover {
-  transform: translateY(-1px) !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
-}
-
-#progreso-modal .btn.primary {
-  background: #0d6efd !important;
-  border-color: #0d6efd !important;
-  color: white !important;
-}
-
-#progreso-modal .btn.primary:hover {
-  background: #0b5ed7 !important;
-  border-color: #0a58ca !important;
-}
-
-/**/
-
-#progress-overlay{
-  display:none;
-  position:fixed;
-  inset:0;
-  z-index:9999;
-  background:rgba(90,66,187,.08);
-  align-items:center;
-  justify-content:center
-}
-
-
-#progress-card{
-  width:min(420px,92vw);
-  background:#fff;
-  border-radius:18px;
-  padding:22px;
-  box-shadow:0 18px 44px rgba(91,72,187,.25);
-  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial
-}
-
-#progress-card h3{
-  margin:0 0 10px;
-  text-align:center;
-  color:#5a56a3
-}
-
-#progress-meta{margin:8px 2px 14px;color:#555}
-
-#progress-close{border:0;background:#b6aaff;color:#fff;padding:9px 14px;border-radius:10px;font-weight:600;cursor:pointer;
-
-  display:block;margin:0 auto;box-shadow:0 10px 24px rgba(91,72,187,.22)}
-
 

@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Historial — Gráfico</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  
+  <style>
+    :root {
+      --bg: #e8dffb;
+      --ink: #6B5CA5;
+      --bar: #A998FF;
+      --title:#3e357b;
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    .stage {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 6vh 2vw 4vh;
+      gap: 3vh;
+    }
+
+    .title {
+      margin: 0;
+      font-weight: 800;
+      text-align: center;
+      font-size: clamp(30px, 4.5vw, 44px);
+      color: var(--title);
+    }
+
+    .controls {
+      width: 96vw;
+      max-width: 1600px;
+      background: white;
+      border-radius: 18px;
+      padding: 20px 30px;
+      box-shadow: 0 10px 28px rgba(107, 92, 165, 0.1);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .date-selector {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .date-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .date-group label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .date-group input {
+      padding: 10px 15px;
+      border: 2px solid #E0D5FF;
+      border-radius: 10px;
+      font-family: "Poppins", sans-serif;
+      font-size: 14px;
+      color: var(--ink);
+      background: white;
+      transition: all 0.3s;
+    }
+
+    .date-group input:focus {
+      outline: none;
+      border-color: var(--bar);
+      box-shadow: 0 0 0 3px rgba(169, 152, 255, 0.2);
+    }
+
+    .week-nav {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .week-nav button {
+      width: 44px;
+      height: 44px;
+      border: none;
+      background: var(--bar);
+      color: white;
+      border-radius: 12px;
+      font-size: 20px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .week-nav button:hover {
+      background: #9585f5;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(169, 152, 255, 0.4);
+    }
+
+    .week-nav button:active {
+      transform: translateY(0);
+    }
+
+    .week-nav button:disabled {
+      background: #E0D5FF;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .week-info {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--ink);
+      min-width: 140px;
+      text-align: center;
+    }
+
+    .chart-block {
+      width: 96vw;
+      max-width: 1600px;
+      background: white;
+      border-radius: 18px;
+      padding: 24px 30px 12px;
+      box-shadow: 0 10px 28px rgba(107, 92, 165, 0.1);
+    }
+
+    .chart-box {
+      position: relative;
+      width: 100%;
+      height: clamp(420px, 70vh, 800px);
+    }
+
+    canvas { position: absolute; inset: 0; }
+
+    #statusMsg {
+      text-align: center;
+      font-weight: 600;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 768px) {
+      .controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .date-selector {
+        flex-direction: column;
+      }
+      
+      .week-nav {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="stage">
+    <h1 class="title" id="pageTitle">Nivel *</h1>
+
+    <div class="controls">
+      <div class="date-selector">
+        <div class="date-group">
+          <label for="startDate">Fecha Inicio</label>
+          <input type="date" id="startDate" />
+        </div>
+        <div class="date-group">
+          <label for="endDate">Fecha Fin</label>
+          <input type="date" id="endDate" />
+        </div>
+      </div>
+      
+      <div class="week-nav">
+        <button id="prevWeek" title="Semana anterior">‹</button>
+        <span class="week-info" id="weekInfo">Semana actual</span>
+        <button id="nextWeek" title="Semana siguiente">›</button>
+      </div>
+    </div>
+
+    <div class="chart-block">
+      <div class="chart-box">
+        <canvas id="histChart"></canvas>
+      </div>
+      <p id="statusMsg"></p>
+    </div>
+  </section>
+
+  <script>
+  const API_BASE = 'http://localhost:4000';
+
+  function getQueryParams(){
+    const p = new URLSearchParams(location.search);
+    return {
+      level: (p.get('level') || 'Facil').trim()
+    };
+  }
+
+  async function ensureSession(){
+    const r = await fetch(`${API_BASE}/api/auth/me`, { credentials:'include' });
+    if(!r.ok){ location.href='/index.html'; return null; }
+    return r.json();
+  }
+
+  async function fetchLevelIdByName(name){
+    const r = await fetch(`${API_BASE}/api/levels/by-name/${encodeURIComponent(name)}`, { credentials:'include' });
+    if(!r.ok) throw new Error('Nivel no encontrado');
+    return r.json();
+  }
+
+  async function fetchHistory(userId, levelId, startDate, endDate){
+    const start = startDate.toISOString().split('T')[0];
+    const end = endDate.toISOString().split('T')[0];
+    const r = await fetch(`${API_BASE}/api/users/${userId}/history/level/${levelId}?start=${start}&end=${end}`, { credentials:'include' });
+    if(!r.ok) throw new Error('No se pudo cargar historial');
+    return r.json();
+  }
+
+  function localDateKey(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  function formatDate(date) {
+    return date.toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit' });
+  }
+
+  function buildDataset(rows, startDate, endDate){
+    const map = new Map();
+
+    rows.forEach(r => {
+      const d = new Date(r.played_at);
+      const key = localDateKey(d);
+      let anxiety = 0;
+      const summary = r.performance_summary || '';
+      const match = summary.match(/anxiety\s*=\s*([\d.]+)/i);
+      if (match) {
+        anxiety = parseFloat(match[1]);
+      } else {
+        anxiety = Number(r.anxiety_pct ?? 0);
+      }
+
+      map.set(key, {
+        anxiety,
+        star: r.star_rating ?? 0,
+        emo: r.emotion_result || '—',
+        pauses: r.pauses_count ?? 0,
+        played_at: d.toLocaleString('es-PE', { timeZone: 'America/Lima' })
+      });
+    });
+
+    const labels = [];
+    const data = [];
+    const tooltips = [];
+
+    const cur = new Date(startDate);
+    cur.setHours(0,0,0,0);
+    const end = new Date(endDate);
+    end.setHours(0,0,0,0);
+
+    while (cur <= end) {
+      const key = localDateKey(cur);
+      const dayName = cur.toLocaleDateString('es-PE', { weekday: 'short' });
+      labels.push(`${dayName.charAt(0).toUpperCase() + dayName.slice(1)} ${formatDate(cur)}`);
+
+      if (map.has(key)) {
+        const v = map.get(key);
+        data.push(Math.round(v.anxiety));
+        tooltips.push(v);
+      } else {
+        data.push(null);
+        tooltips.push({ anxiety: 0, star: 0, emo: '—', pauses: 0, played_at: '—' });
+      }
+
+      cur.setDate(cur.getDate() + 1);
+    }
+
+    return { labels, data, tooltips };
+  }
+
+  let chart;
+  function renderChart(dataset){
+    const ctx = document.getElementById('histChart').getContext('2d');
+    if (chart) chart.destroy();
+
+    chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: dataset.labels,
+        datasets: [{
+          label: 'Porcentaje de Ansiedad',
+          data: dataset.data,
+          borderColor: '#A998FF',
+          backgroundColor: function(context) {
+            const chart = context.chart;
+            const {ctx, chartArea} = chart;
+            if (!chartArea) return 'rgba(169, 152, 255, 0.1)';
+            
+            const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+            gradient.addColorStop(0, 'rgba(169, 152, 255, 0.4)');
+            gradient.addColorStop(0.5, 'rgba(169, 152, 255, 0.2)');
+            gradient.addColorStop(1, 'rgba(169, 152, 255, 0.05)');
+            return gradient;
+          },
+          borderWidth: 4,
+          fill: true,
+          tension: 0.3,
+          pointRadius: 8,
+          pointHoverRadius: 12,
+          pointBackgroundColor: '#A998FF',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 3,
+          pointHoverBackgroundColor: '#8B7AE5',
+          pointHoverBorderColor: '#fff',
+          pointHoverBorderWidth: 4,
+          spanGaps: true,
+          segment: {
+            borderDash: [5,5]
+          }
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+          intersect: false,
+          mode: 'index'
+        },
+        scales: {
+          y: {
+            title: { 
+              display: true, 
+              text: 'Porcentaje de Ansiedad', 
+              font: { size: 20, weight: '700' }, 
+              color: '#5E5E5E' 
+            },
+            ticks: { 
+              stepSize: 20, 
+              font: { size: 18, weight: '600' },
+              color: '#5E5E5E',
+              callback: function(value) {
+                return value + '%';
+              }
+            },
+            beginAtZero: true, 
+            max: 100, 
+            grid: { 
+              color: 'rgba(94,94,94,0.08)',
+              lineWidth: 1
+            }
+          },
+          x: {
+            ticks: { 
+              font: { size: 13, weight: '600' }, 
+              color: '#5E5E5E',
+              maxRotation: 45,
+              minRotation: 45
+            },
+            grid: { display: false }
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            titleColor: '#5E5E5E',
+            bodyColor: '#5E5E5E',
+            titleFont: { size: 18, weight: '700' },
+            bodyFont: { size: 16 },
+            backgroundColor: 'rgba(255,255,255,0.98)',
+            borderColor: 'rgba(169,152,255,0.5)',
+            borderWidth: 2,
+            padding: 16,
+            cornerRadius: 12,
+            displayColors: false,
+            callbacks: {
+              title: function(tooltipItems) {
+                return tooltipItems[0].label;
+              },
+              label: (ctx) => {
+                const i = ctx.dataIndex;
+                const t = dataset.tooltips[i];
+                if (t.played_at === '—') return 'Sin datos para este día';
+                return [
+                  `Ansiedad: ${Math.round(t.anxiety)}%`,
+                  `Estrellas: ${t.star}`,
+                  `Pausas: ${t.pauses}`,
+                  `Registrado: ${t.played_at}`
+                ];
+              }
+            }
+          }
+        },
+        animation: { 
+          duration: 800, 
+          easing: 'easeInOutQuart' 
+        }
+      }
+    });
+  }
+
+  let currentStartDate;
+  let currentEndDate;
+  let userData;
+  let levelData;
+
+  function updateWeekInfo() {
+    const weekInfo = document.getElementById('weekInfo');
+    const start = formatDate(currentStartDate);
+    const end = formatDate(currentEndDate);
+    weekInfo.textContent = `${start} - ${end}`;
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(currentEndDate);
+    endOfDay.setHours(23, 59, 59, 999);
+    document.getElementById('nextWeek').disabled = endOfDay >= today;
+  }
+
+  function setWeekRange(startDate) {
+    currentStartDate = new Date(startDate);
+    currentEndDate = new Date(startDate);
+    currentEndDate.setDate(currentEndDate.getDate() + 6);
+    
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+    if (currentEndDate > today) {
+      currentEndDate = new Date(today);
+      currentEndDate.setHours(0, 0, 0, 0);
+    }
+    
+    document.getElementById('startDate').valueAsDate = currentStartDate;
+    document.getElementById('endDate').valueAsDate = currentEndDate;
+    
+    updateWeekInfo();
+  }
+
+  async function loadData() {
+    const status = document.getElementById('statusMsg');
+    try {
+      status.textContent = 'Cargando…';
+      const rows = await fetchHistory(userData.user_id, levelData.level_id, currentStartDate, currentEndDate);
+      const ds = buildDataset(rows, currentStartDate, currentEndDate);
+      renderChart(ds);
+      status.textContent = rows.length ? '' : 'No hay sesiones en este período.';
+    } catch(err) {
+      console.error(err);
+      status.textContent = 'No se pudo cargar el historial.';
+    }
+  }
+
+  document.getElementById('prevWeek').addEventListener('click', () => {
+    const newStart = new Date(currentStartDate);
+    newStart.setDate(newStart.getDate() - 7);
+    setWeekRange(newStart);
+    loadData();
+  });
+
+  document.getElementById('nextWeek').addEventListener('click', () => {
+    const newStart = new Date(currentStartDate);
+    newStart.setDate(newStart.getDate() + 7);
+    setWeekRange(newStart);
+    loadData();
+  });
+
+  document.getElementById('startDate').addEventListener('change', (e) => {
+    currentStartDate = e.target.valueAsDate;
+    if (currentStartDate > currentEndDate) {
+      currentEndDate = new Date(currentStartDate);
+      document.getElementById('endDate').valueAsDate = currentEndDate;
+    }
+    updateWeekInfo();
+    loadData();
+  });
+
+  document.getElementById('endDate').addEventListener('change', (e) => {
+    currentEndDate = e.target.valueAsDate;
+    if (currentEndDate < currentStartDate) {
+      currentStartDate = new Date(currentEndDate);
+      document.getElementById('startDate').valueAsDate = currentStartDate;
+    }
+    updateWeekInfo();
+    loadData();
+  });
+
+  (async ()=>{
+    const status = document.getElementById('statusMsg');
+    const { level } = getQueryParams();
+    const pretty = { Facil:'Fácil', Intermedio:'Intermedio', Dificil:'Difícil' }[level] || level;
+    document.getElementById('pageTitle').textContent = `Nivel ${pretty}`;
+
+    try{
+      status.textContent = 'Cargando…';
+      userData = await ensureSession(); 
+      if(!userData) return;
+      
+      levelData = await fetchLevelIdByName(level);
+      
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      currentEndDate = new Date(today);
+      currentStartDate = new Date(today);
+      currentStartDate.setDate(today.getDate() - 6);
+      
+      document.getElementById('startDate').valueAsDate = currentStartDate;
+      document.getElementById('endDate').valueAsDate = currentEndDate;
+      updateWeekInfo();
+      await loadData();
+    }catch(err){
+      console.error(err);
+      status.textContent = 'No se pudo cargar el historial.';
+    }
+  })();
+</script>
+<script src="/pages/logout.js"></script>
+</body>
+</html>
