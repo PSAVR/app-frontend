@@ -7,8 +7,16 @@
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
 </head>
 <body>
-<a-scene>
-    <a-sky color="#e8dffb"></a-sky>
+<div id="dom-overlay" style="position:fixed; inset:0; pointer-events:none; z-index:10000">
+  <div style="pointer-events:auto"> </div>
+</div>
+<a-scene webxr="optionalFeatures: dom-overlay, hit-test; overlayElement: #dom-overlay" 
+  vr-mode-ui="enabled: true">
+    <a-assets>
+      <canvas id="lavaCanvas" width="1024" height="1024"></canvas>
+    </a-assets>
+    <a-sky id="sky" material="shader: flat; src: #lavaCanvas"></a-sky>
+
     <a-entity camera look-controls position="0 1.6 0">
       <a-entity 
         cursor="fuse: true; fuseTimeout: 1000" 
@@ -19,14 +27,13 @@
     </a-entity>
 
     <a-entity id="selector-perfil">
-        <a-box id="btnHist" position="-2 1.2 -3" color="#746aa6" depth="0.3" height="0.6" width="1.8"></a-box>
+        <a-box id="btnHist" position="-2 1.2 -3" color="#5a4d8a" depth="0.3" height="0.6" width="1.8"></a-box>
         <a-text value="Ver Historial" align="center" width="3" color="#FFFFFF" position="-2 1.2 -2.8"></a-text>
 
-      <a-box id="btnCuenta" position="2 1.2 -3" color="#746aa6" depth="0.3" height="0.6" width="1.8"></a-box>
+      <a-box id="btnCuenta" position="2 1.2 -3" color="#5a4d8a" depth="0.3" height="0.6" width="1.8"></a-box>
         <a-text value="Ver Mis Datos" align="center" width="3" color="#FFFFFF" position="2 1.2 -2.8"></a-text>
     </a-entity>
   </a-scene>
-
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const btnHist  = document.querySelector('#btnHist');
@@ -41,6 +48,9 @@
     });
 });
 </script>
-<script src="/pages/logout.js"></script>
+<script src="./js/logout.js"></script>
+<script src="./js/home-icon.js"></script>
+<script src="./js/fondo-lava.js"></script>
+
 </body>
 </html>

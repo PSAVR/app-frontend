@@ -1,52 +1,57 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Selector principal</title>
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
 </head>
 <body>
-<a-scene>
-    <a-sky color="#e8dffb"></a-sky>
-    <a-entity camera look-controls position="0 1.6 0">
-      <a-entity 
-        cursor="fuse: true; fuseTimeout: 1000" 
-        position="0 0 -1"
-        geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
-        material="color: #6b5ca5; shader: flat">
-      </a-entity>
-    </a-entity>
-    <a-entity id="selector">
-      <a-text id="welcomeText" value="Bienvenido" position="0 2.3 -3" align="center" color="#4a4a6a" width="6"></a-text>
-        <a-box id="btnPerfil" position="-2 1.2 -3" color="#746aa6" depth="0.3" height="0.6" width="1.8"></a-box>
-        <a-text value="Ver Mi Perfil" align="center" width="3" color="white" position="-2 1.2 -2.8"></a-text>
 
-        <a-box id="btnJuego" position="2 1.2 -3" color="#746aa6" depth="0.3" height="0.6" width="1.8"></a-box>
-        <a-text value="Iniciar Exposicion" align="center" width="3" color="white" position="2 1.2 -2.8"></a-text>
+<div id="dom-overlay" style="position:fixed; inset:0; pointer-events:none; z-index:10000">
+  <div style="pointer-events:auto"> </div>
+</div>
+<a-scene webxr="optionalFeatures: dom-overlay, hit-test; overlayElement: #dom-overlay" 
+  vr-mode-ui="enabled: true">
+  <a-assets>
+       <canvas id="lavaCanvas" width="1024" height="1024"></canvas>
+
+  </a-assets>
+  <a-sky id="sky" material="shader: flat; src: #lavaCanvas"></a-sky>
+
+  <a-entity camera look-controls position="0 1.6 0">
+    <a-entity cursor="fuse: true; fuseTimeout: 1000"
+              position="0 0 -1"
+              geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
+              material="color: #6b5ca5; shader: flat">
     </a-entity>
+  </a-entity>
+
+  <a-entity id="selector">
+    <a-text id="welcomeText" value="Bienvenido" position="0 2.3 -3" align="center" color="#3d3560" width="6"></a-text>
+
+    <a-box id="btnPerfil" position="-2 1.2 -3" color="#5a4d8a" depth="0.3" height="0.6" width="1.8"></a-box>
+    <a-text value="Ver Mi Perfil" align="center" width="3" color="white" position="-2 1.2 -2.8"></a-text>
+
+    <a-box id="btnJuego" position="2 1.2 -3" color="#5a4d8a" depth="0.3" height="0.6" width="1.8"></a-box>
+    <a-text value="Iniciar Exposicion" align="center" width="3" color="white" position="2 1.2 -2.8"></a-text>
+  </a-entity>
 </a-scene>
 <script>
   const API_BASE = 'http://localhost:4000';
+
   async function ensureMicPermission() {
     try {
       if (navigator.permissions && navigator.permissions.query) {
         const st = await navigator.permissions.query({ name: 'microphone' });
-        if (st.state === 'granted') {
-          console.log('Micrófono ya autorizado');
-          return true;
-        }
+        if (st.state === 'granted') return true;
       }
-    } catch (_) {}
-
+    } catch(_) {}
     try {
-      console.log('Solicitando acceso al micrófono...');
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       stream.getTracks().forEach(t => t.stop());
-      console.log('Micrófono concedido');
       return true;
-    } catch (err) {
-      console.warn('Permiso de micrófono rechazado o falló:', err);
+    } catch(err) {
       alert('Necesitas permitir el micrófono para continuar usando la app. Actívalo desde el candado del navegador.');
       return false;
     }
@@ -57,13 +62,11 @@
       const r = await fetch(`${API_BASE}/api/auth/me`, { credentials:'include' });
       if (!r.ok) throw 0;
       const me = await r.json();
-      console.log('Session found:', me);
-      localStorage.setItem('user_id', me.user_id);   
+      localStorage.setItem('user_id', me.user_id);
       localStorage.setItem('username', me.username);
       return me;
     } catch {
-      console.log('No session found, redirecting to login...');
-      location.href = 'http://localhost/index.html'; 
+      location.href = 'http://localhost/index.html';
     }
   }
 
@@ -72,26 +75,22 @@
     const welcomeEl = document.querySelector('#welcomeText');
     welcomeEl.setAttribute('value', `Bienvenido ${username}!`);
   }
-  
-    document.addEventListener('DOMContentLoaded', async () => {
+
+  document.addEventListener('DOMContentLoaded', async () => {
     await ensureSession();
-
     const micOk = await ensureMicPermission();
-    if (!micOk) return; 
+    if (!micOk) return;
 
-    const btnJuego  = document.querySelector('#btnJuego');
-    const btnPerfil = document.querySelector('#btnPerfil');
-
-    btnJuego.addEventListener('click', () => {
+    document.querySelector('#btnJuego').addEventListener('click', () => {
       window.location.href = 'main.html';
     });
-
-    btnPerfil.addEventListener('click', () => {
+    document.querySelector('#btnPerfil').addEventListener('click', () => {
       window.location.href = 'profile.html';
     });
   });
 </script>
-<script src="/pages/logout.js"></script>
-<script src="/pages/onboarding-gate1.js"></script>
+<script src="./js/logout.js"></script>
+<script src="./js/onboarding-gate1.js"></script>
+<script src="./js/fondo-lava.js"></script>
 </body>
 </html>

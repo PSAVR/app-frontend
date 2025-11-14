@@ -54,13 +54,8 @@
   <script>
     const API_BASE = 'http://localhost:4000';
 
-    // Leer token de la URL
     const params = new URLSearchParams(location.search);
     const token = params.get('token');
-
-    // (Opcional) Mostrar a qué correo apunta el token (solo si decides incluirlo en el backend)
-    // En tu backend ya codificas { email } en el token; aquí no podemos verlo sin validar.
-    // Si quieres mostrarlo, podrías crear un endpoint GET /api/auth/verify/:token que devuelva el email.
 
     const resetForm = document.getElementById('resetForm');
     const tokenError = document.getElementById('tokenError');

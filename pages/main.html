@@ -5,76 +5,7 @@
   <title>Menú VR Selector</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-  <script src="./logic.js" defer></script>
-  <style>
-    #progress-overlay{
-      display:none;
-      position:fixed;
-      inset:0;
-      z-index:9999;
-      background:rgba(90,66,187,.08);
-      align-items:center;
-      justify-content:center
-    }
-
-
-    #progress-card{
-      width:min(420px,92vw);
-      background:#fff;
-      border-radius:18px;
-      padding:22px;
-      box-shadow:0 18px 44px rgba(91,72,187,.25);
-      font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial
-    }
-
-    #progress-card h3{
-      margin:0 0 10px;
-      text-align:center;
-      color:#5a56a3
-    }
-
-    #progress-meta{margin:8px 2px 14px;color:#555}
-
-    #progress-close{border:0;background:#b6aaff;color:#fff;padding:9px 14px;border-radius:10px;font-weight:600;cursor:pointer;
-    
-      display:block;margin:0 auto;box-shadow:0 10px 24px rgba(91,72,187,.22)}
-    #progress-meta{
-      background:#f3eefc;
-      border-radius:18px;
-      padding:18px;
-      box-shadow:0 8px 24px rgba(123,105,241,.15);
-      margin:0 0 14px;
-    }
-
-    #progress-meta > div{ margin:8px 0; color:#5a5670; font-size:18px }
-
-    .progress-row{
-      display:flex; align-items:center; gap:12px; margin-top:8px;
-    }
-
-    .progress-track{
-      flex:1;
-      height:14px;
-      background:#ece8ff;
-      border-radius:999px;
-      position:relative;
-      overflow:hidden;
-    }
-
-    .progress-fill{
-      height:100%;
-      background:#b3a6ff;
-      border-radius:999px 0 0 999px;
-      transition:width .35s ease;
-    }
-
-    .progress-pct{
-      min-width:52px;
-      text-align:right;
-      color:#5a5670;
-      font-weight:700;
-    }
-  </style>
+  <link rel="stylesheet" href="../styles/main.css" />
 </head>
 <body>
 <div id="progress-overlay" role="dialog" aria-modal="true" aria-labelledby="progress-title">
@@ -94,7 +25,16 @@
     <button id="progress-close" type="button">CONTINUAR</button>
   </div>
 </div>
-  <a-scene>
+<div id="dom-overlay" style="position:fixed; inset:0; pointer-events:none; z-index:10000">
+  <div style="pointer-events:auto"> </div>
+</div>
+
+  <a-scene webxr="optionalFeatures: dom-overlay, hit-test; overlayElement: #dom-overlay" 
+  vr-mode-ui="enabled: true">
+    <a-assets>
+      <canvas id="lavaCanvas" width="1024" height="1024"></canvas>
+    </a-assets>
+    <a-sky id="sky" material="shader: flat; src: #lavaCanvas"></a-sky>
     <a-entity camera look-controls position="0 1.6 0">
       <a-entity
         cursor="fuse: true; fuseTimeout: 1000"
@@ -132,8 +72,6 @@
       <a-box id="boton-3min" class="clickable" position="2 1.2 -3" color="#6A0DAD" depth="0.3" height="0.6" width="1.8"></a-box>
       <a-text value="3 minutos" position="2 1.2 -2.8" align="center" color="white" width="3"></a-text>
     </a-entity>
-
-    <a-sky color="#e8dffb"></a-sky>
   </a-scene>
 
   <script>
@@ -289,6 +227,9 @@ function openProgressModal(row){
       setStarsVisible(!menuTiempo.getAttribute('visible'));
     });
   </script>
-  <script src="/pages/logout.js"></script>
+  <script src="./js/fondo-lava.js"></script>
+  <script src="./js/logout.js"></script>
+  <script src="./js/home-icon.js"></script>
+  <script src="./js/logic.js" defer></script>
 </body>
 </html>

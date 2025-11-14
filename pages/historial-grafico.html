@@ -5,178 +5,12 @@
   <title>Historial — Gráfico</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  
-  <style>
-    :root {
-      --bg: #e8dffb;
-      --ink: #6B5CA5;
-      --bar: #A998FF;
-      --title:#3e357b;
-    }
-
-    * { box-sizing: border-box; }
-    html, body {
-      height: 100%;
-      margin: 0;
-      font-family: "Poppins", sans-serif;
-      background: var(--bg);
-      color: var(--ink);
-    }
-
-    .stage {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 6vh 2vw 4vh;
-      gap: 3vh;
-    }
-
-    .title {
-      margin: 0;
-      font-weight: 800;
-      text-align: center;
-      font-size: clamp(30px, 4.5vw, 44px);
-      color: var(--title);
-    }
-
-    .controls {
-      width: 96vw;
-      max-width: 1600px;
-      background: white;
-      border-radius: 18px;
-      padding: 20px 30px;
-      box-shadow: 0 10px 28px rgba(107, 92, 165, 0.1);
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .date-selector {
-      display: flex;
-      gap: 15px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .date-group {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-
-    .date-group label {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--ink);
-    }
-
-    .date-group input {
-      padding: 10px 15px;
-      border: 2px solid #E0D5FF;
-      border-radius: 10px;
-      font-family: "Poppins", sans-serif;
-      font-size: 14px;
-      color: var(--ink);
-      background: white;
-      transition: all 0.3s;
-    }
-
-    .date-group input:focus {
-      outline: none;
-      border-color: var(--bar);
-      box-shadow: 0 0 0 3px rgba(169, 152, 255, 0.2);
-    }
-
-    .week-nav {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .week-nav button {
-      width: 44px;
-      height: 44px;
-      border: none;
-      background: var(--bar);
-      color: white;
-      border-radius: 12px;
-      font-size: 20px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.3s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .week-nav button:hover {
-      background: #9585f5;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(169, 152, 255, 0.4);
-    }
-
-    .week-nav button:active {
-      transform: translateY(0);
-    }
-
-    .week-nav button:disabled {
-      background: #E0D5FF;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .week-info {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--ink);
-      min-width: 140px;
-      text-align: center;
-    }
-
-    .chart-block {
-      width: 96vw;
-      max-width: 1600px;
-      background: white;
-      border-radius: 18px;
-      padding: 24px 30px 12px;
-      box-shadow: 0 10px 28px rgba(107, 92, 165, 0.1);
-    }
-
-    .chart-box {
-      position: relative;
-      width: 100%;
-      height: clamp(420px, 70vh, 800px);
-    }
-
-    canvas { position: absolute; inset: 0; }
-
-    #statusMsg {
-      text-align: center;
-      font-weight: 600;
-      margin-top: 10px;
-    }
-
-    @media (max-width: 768px) {
-      .controls {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      
-      .date-selector {
-        flex-direction: column;
-      }
-      
-      .week-nav {
-        justify-content: center;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="../styles/historial-grafico.css" />
 </head>
 <body>
   <section class="stage">
+      <canvas id="lavaCanvas" width="2048" height="1024" style="position:fixed; top:0; left:0; width:100%; height:100%;
+         z-index:-1; pointer-events:none;"></canvas>
     <h1 class="title" id="pageTitle">Nivel *</h1>
 
     <div class="controls">
@@ -205,7 +39,6 @@
       <p id="statusMsg"></p>
     </div>
   </section>
-
   <script>
   const API_BASE = 'http://localhost:4000';
 
@@ -533,6 +366,8 @@
     }
   })();
 </script>
-<script src="/pages/logout.js"></script>
+<script src="./js/logout.js"></script>
+<script src="./js/home-icon.js"></script>
+<script src="./js/fondo-lava.js"></script>
 </body>
 </html>

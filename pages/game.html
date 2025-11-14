@@ -5,197 +5,104 @@
     <title>Selector de Escenario VR</title>
     <meta name="description" content="WebXR VR Level Selector">
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <link rel="stylesheet" href="../styles/game.css" />
   </head>
-    <div id="result-modal" class="result-overlay" style="display:none;">
-      <div class="result-card">
-        <h3 class="result-title">Resultados</h3>
-        <p id="result-message" class="result-text">¡Buen trabajo! Sigue intentándolo.</p>
-        <div id="result-stars" class="result-stars"></div>
-        <button id="result-ok" class="result-ok">Aceptar</button>
+  <body>
+    <div id="dom-overlay" style="position:fixed; inset:0; pointer-events:none;  z-index:10000">
+      <div class="top-left-container" style="pointer-events:auto">
+        <div id="timer-display">00:00</div>
+        <button id="action-btn">INICIAR</button>
+      </div>
+
+      <div id="loading-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+           background:rgba(0,0,0,0.9); z-index:1000; justify-content:center; align-items:center; pointer-events:auto;">
+        <div style="background:white; padding:60px 80px; border-radius:20px; text-align:center; max-width:500px;">
+          <h2 style="margin:0 0 20px; color:#333; font-size:28px;">Generando tus resultados,<br>no salgas de esta vista</h2>
+          <div class="spinner" style="margin:30px auto; width:60px; height:60px; border:6px solid #f3f3f3;
+               border-top:6px solid #9b59b6; border-radius:50%; animation:spin 1s linear infinite;"></div>
+          <style>@keyframes spin {0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}</style>
+        </div>
+      </div>
+
+      <div id="result-modal" class="result-overlay" style="display:none; pointer-events:auto;">
+        <div class="result-card">
+          <h3 class="result-title">Resultados</h3>
+          <p id="result-message" class="result-text">¡Buen trabajo! Sigue intentándolo.</p>
+          <div id="result-stars" class="result-stars"></div>
+          <button id="result-ok" class="result-ok">Aceptar</button>
+        </div>
       </div>
     </div>
-    <style>
-      body, h1, h2, h3, h4, h5, h6, p, button {
-        font-family: 'Poppins', sans-serif;
-        color: #3b2e6d;
-        margin: 0;
-        padding: 0;
-      }
-      
-      body {
-        overflow: hidden;
-      }
-      
-      #loading-modal h2 {
-        font-size: 26px;
-        font-weight: 400;
-        line-height: 1.4;
-        color: #3b2e6d;
-      }
-    
-      #loading-modal .spinner {
-        border-top-color: #746aa6 !important; 
-      }
-      .result-overlay{
-        position:fixed; inset:0; display:none; align-items:center; justify-content:center;
-        background:rgba(20, 16, 39, 0.65); z-index:9999;
-      }
-      .result-card{
-        width:min(540px, 92vw);;background:#fff; border-radius:24px;
-        box-shadow:0 16px 40px rgba(0,0,0,.35); padding:28px 28px 24px; text-align:center;
-      }
-      .result-title{
-        margin:0 0 6px; font-size:32px; color:#3d356f; font-weight:800;
-      }
-      .result-text{
-        margin:8px 0 18px; color:#4c4a63; font-size:20px; line-height:1.5;
-      }
-      .result-stars{ display:flex; gap:14px; align-items:center; justify-content:center; margin:6px 0 22px; }
-      .result-stars .star{
-        font-size:40px; color:#7c3aed; /* morado vivo */
-        text-shadow:0 2px 10px rgba(124,58,237,.3);
-      }
-      .result-ok{
-        background:#a78bfa; border:none; color:#fff; font-weight:700;
-        padding:12px 28px; border-radius:12px; cursor:pointer; font-size:18px;
-        box-shadow:0 10px 24px rgba(124,58,237,.35);
-      }
-      .result-ok:hover{ filter:brightness(.95); }
-      
-      /* Contenedor superior izquierdo para temporizador y botón */
-      .top-left-container {
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        z-index: 999;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        align-items: flex-start;
-      }
-      
-      /* Estilos del temporizador */
-      #timer-display {
-        background: rgba(255, 255, 255, 0.95);
-        padding: 16px 24px;
-        border-radius: 12px;
-        font-size: 24px;
-        font-weight: 700;
-        color: #3b2e6d;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-        border: 2px solid #a78bfa;
-        min-width: 120px;
-        text-align: center;
-      }
-      
-      /* Estilos del botón de acción */
-      #action-btn {
-        background: #a48cf0;
-        color: #fff;
-        border: none;
-        border-radius: 12px;
-        padding: 16px 32px;
-        font-weight: 700;
-        font-size: 18px;
-        cursor: pointer;
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-        transition: all 0.2s ease;
-      }
-      
-      #action-btn:hover {
-        background: #8f6ed4;
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-      }
-      
-      #action-btn:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-        transform: none;
-      }
-    </style>
-  <body>
-    <div class="top-left-container">
-      <div id="timer-display">00:00</div>
-      <button id="action-btn">INICIAR</button>
-    </div>
 
-    <a-scene id="escena-vr" vr-mode-ui="enabled: true" shadow="type: pcfsoft" renderer="colorManagement: true; physicallyCorrectLights: true">
-        <a-assets>
-          <a-asset-item id="modelo-facil" src="../models/facil/easyscenario.glb"></a-asset-item>
-          <a-asset-item id="modelo-inter" src="../models/inter/clasroom-medium.glb"></a-asset-item>
-          <a-asset-item id="modelo-dificil" src="../models/dif/lecture hall.glb"></a-asset-item>
-        </a-assets>
-        
-        <a-entity id="contenedor-modelo" position="0 0 -3"></a-entity>
-      
-        <a-entity camera look-controls wasd-controls position="0 1.6 0">
-          <a-entity 
-            cursor="fuse: true; fuseTimeout: 1000" 
-            position="0 0 -1"
-            geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
-            material="color: black; shader: flat">
-          </a-entity>
+    <a-scene id="escena-vr" vr-mode-ui="enabled: true" shadow="type: pcfsoft" webxr="optionalFeatures: dom-overlay, hit-test; overlayElement: #dom-overlay"
+             renderer="colorManagement: true; physicallyCorrectLights: true">
+      <a-assets>
+        <a-asset-item id="modelo-facil" src="../models/facil/easyscenario.glb"></a-asset-item>
+        <a-asset-item id="modelo-inter" src="../models/inter/clasroom-medium.glb"></a-asset-item>
+        <a-asset-item id="modelo-dificil" src="../models/dif/lecture hall.glb"></a-asset-item>
+
+        <audio id="snd-murmur" src="../audios/Murmur.mp3" preload="auto"></audio>
+        <audio id="snd-yawn"   src="../audios/Yawn.mp3"   preload="auto"></audio>
+        <audio id="snd-laugh"  src="../audios/Laugh.mp3"  preload="auto"></audio>
+      </a-assets>
+
+      <a-entity id="contenedor-modelo" position="0 0 -3"></a-entity>
+
+      <a-entity id="fx-murmur" sound="src: #snd-murmur; autoplay: false; loop: false; positional: false; volume: 1"></a-entity>
+      <a-entity id="fx-yawn"   sound="src: #snd-yawn;   autoplay: false; loop: false; positional: false; volume: 0.8"></a-entity>
+      <a-entity id="fx-laugh"  sound="src: #snd-laugh;  autoplay: false; loop: false; positional: false; volume: "></a-entity>
+
+      <a-entity camera look-controls wasd-controls position="0 1.6 0">
+        <a-entity cursor="fuse: true; fuseTimeout: 1000" position="0 0 -1"
+          geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
+          material="color: black; shader: flat">
         </a-entity>
-      </a-scene>
-       <div id="loading-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center;">
-        <div style="background: white; padding: 60px 80px; border-radius: 20px; text-align: center; max-width: 500px;">
-          <h2 style="margin: 0 0 20px 0; color: #333; font-size: 28px;">Generando tus resultados,<br>no salgas de esta vista</h2>
-          <div class="spinner" style="margin: 30px auto; width: 60px; height: 60px; border: 6px solid #f3f3f3; border-top: 6px solid #9b59b6; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-          <style>
-            @keyframes spin {
-              0% { transform: rotate(0deg); }
-              100% { transform: rotate(360deg); }
-            }
-          </style>
-        </div>
-    </div>
-    <script src="/pages/config.js"></script>
-    <script src="/pages/global.js"></script>
-    
+      </a-entity>
+    </a-scene>
+
+    <script src="./js/config.js"></script>
+    <script src="./js/global.js"></script>
+
     <script>
       let timerInterval;
       let isTimerRunning = false;
       let countdownSeconds = 0;
-      let initialSeconds = 0; 
+      let initialSeconds = 0;
 
       window.countdownSeconds = countdownSeconds;
       window.initialSeconds = initialSeconds;
-    
+
       const timerDisplay = document.getElementById('timer-display');
       const actionBtn = document.getElementById('action-btn');
-    
+
       function formatTime(seconds) {
-        const minutes = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
       }
-    
+
       function updateTimer() {
         if (countdownSeconds > 0) {
           countdownSeconds--;
           timerDisplay.textContent = formatTime(countdownSeconds);
-          
           window.countdownSeconds = countdownSeconds;
           window.initialSeconds = initialSeconds;
-
           if (window.segundosTranscurridos !== undefined) {
-          window.segundosTranscurridos = initialSeconds - countdownSeconds;
+            window.segundosTranscurridos = initialSeconds - countdownSeconds;
           }
         } else {
+          stopEmojis();
+          stopAudioCues();
           stopTimer();
-          if (typeof finalizarSesion === 'function') {
-            finalizarSesion(true);
-          }
+          if (typeof finalizarSesion === 'function') finalizarSesion(true);
         }
       }
-    
+
       function startCountdown() {
         if (!isTimerRunning) {
           const minutos = parseInt(localStorage.getItem('tiempoSeleccionado'), 10) || 1;
           countdownSeconds = minutos * 60;
           initialSeconds = countdownSeconds;
-
           window.countdownSeconds = countdownSeconds;
           window.initialSeconds = initialSeconds;
 
@@ -203,16 +110,16 @@
           timerInterval = setInterval(updateTimer, 1000);
           isTimerRunning = true;
           actionBtn.textContent = 'ENVIAR';
+
+          startAudioCues();
+          startEmojis();
         }
       }
-    
+
       function stopTimer() {
-        if (isTimerRunning) {
-          clearInterval(timerInterval);
-          isTimerRunning = false;
-        }
+        if (isTimerRunning) { clearInterval(timerInterval); isTimerRunning = false; }
       }
-    
+
       function showInitialTime() {
         const minutos = parseInt(localStorage.getItem('tiempoSeleccionado'), 10) || 1;
         countdownSeconds = minutos * 60;
@@ -220,7 +127,7 @@
         actionBtn.textContent = 'INICIAR';
         actionBtn.disabled = false;
       }
-    
+
       function resetTimer() {
         stopTimer();
         countdownSeconds = 0;
@@ -228,62 +135,304 @@
         actionBtn.textContent = 'INICIAR';
         actionBtn.disabled = false;
       }
-    
+
       window.finalizarSesionWrapper = function(subir) {
+        stopEmojis();
+        stopAudioCues();
         stopTimer();
-        if (typeof finalizarSesion === 'function') {
-          finalizarSesion(subir);
-        }
+        if (typeof finalizarSesion === 'function') finalizarSesion(subir);
       };
-    
-      /*actionBtn.addEventListener('click', function() {
-        if (typeof estadoSesion === 'undefined') {
-          console.warn('Esperando a que global.js cargue...');
+
+      window.addEventListener('load', showInitialTime);
+      document.addEventListener('DOMContentLoaded', showInitialTime);
+
+      const sceneEl = document.querySelector('#escena-vr');
+      const fxMurmurEl = document.querySelector('#fx-murmur');
+      const fxYawnEl   = document.querySelector('#fx-yawn');
+      const fxLaughEl  = document.querySelector('#fx-laugh');
+
+      function comp(el){ return el?.components?.sound ?? null; }
+
+      const PH2_MIN_GAP = 10, PH2_MAX_GAP = 20;
+      let audioUnlocked = false;
+      let runningPhase2 = false;
+      let scheduledTimers = [];
+      let phase2Timer = null;
+      let lastCueAt = -Infinity;
+      const MIN_SEP_MS = 4000;
+
+      const NAME_MAP = { 'fx-murmur':'Murmur', 'fx-yawn':'Yawn', 'fx-laugh':'Laugh' };
+      function logCue(el){
+        const name = NAME_MAP[el.id] || el.id;
+        const t = new Date().toLocaleTimeString();
+        const remaining = typeof window.countdownSeconds === 'number' ? window.countdownSeconds : 0;
+        console.log(`[AudioCue] ${name} @ ${t} | restante: ${formatTime(Math.max(0, remaining))}`);
+      }
+
+      async function unlockAudio() {
+        try {
+          const ctx = AFRAME.audioContext;
+          if (ctx && ctx.state !== 'running') await ctx.resume();
+          for (const id of ['snd-murmur','snd-yawn','snd-laugh']) {
+            const el = document.getElementById(id);
+            try { const v=el.volume; el.volume=0; await el.play(); el.pause(); el.currentTime=0; el.volume=v; } catch {}
+          }
+          audioUnlocked = true;
+        } catch(e){ console.warn('[Audio] unlock fail', e); }
+      }
+
+      function now(){ return performance.now(); }
+
+      function playEl(el){
+        const c = comp(el);
+        if (!c) { el.addEventListener('sound-loaded', ()=>playEl(el), {once:true}); return; }
+        const t = now();
+        if (t - lastCueAt < MIN_SEP_MS) {
+          const id = setTimeout(()=>playEl(el), MIN_SEP_MS - (t - lastCueAt) + 50);
+          scheduledTimers.push(id);
           return;
         }
+        lastCueAt = t;
+        c.stopSound();
+        c.playSound();
+        logCue(el);
+        triggerEmojiBurst(el.id);
+      }
+
+      function clearScheduled(){
+        for (const id of scheduledTimers) clearTimeout(id);
+        scheduledTimers = [];
+        if (phase2Timer) { clearTimeout(phase2Timer); phase2Timer = null; }
+      }
+
+      function schedulePhase1(){
+        const D = window.initialSeconds || 60;
+        const startFrac = 0.20, endFrac = 0.85;
+        const bins = 3;
+        const ids = shuffle(['fx-murmur','fx-yawn','fx-laugh']);
+        for (let i=0;i<bins;i++){
+          const centerFrac = startFrac + (i + 0.5) * ((endFrac - startFrac) / bins);
+          const jitter = (Math.random()*0.14 - 0.07);
+          const whenS = Math.max(0, Math.min(1, centerFrac + jitter)) * D;
+          const delayMs = Math.max(0, Math.round(whenS*1000));
+          const el = document.getElementById(ids[i]);
+          const tid = setTimeout(()=>playEl(el), delayMs);
+          scheduledTimers.push(tid);
+        }
+        const phase2StartMs = Math.round((endFrac*D)*1000) + 500;
+        const ph2Tid = setTimeout(()=>startPhase2(), phase2StartMs);
+        scheduledTimers.push(ph2Tid);
+      }
+
+      function startPhase2(){
+        runningPhase2 = true;
+        scheduleNextPhase2();
+      }
+      function scheduleNextPhase2(){
+        if (!runningPhase2) return;
+        const gap = PH2_MIN_GAP + Math.random()*(PH2_MAX_GAP - PH2_MIN_GAP);
+        phase2Timer = setTimeout(()=>{
+          const pick = Math.random();
+          const el = pick < 1/3 ? fxMurmurEl : (pick < 2/3 ? fxYawnEl : fxLaughEl);
+          playEl(el);
+          scheduleNextPhase2();
+        }, gap*1000);
+      }
+
+      function stopAudioCues(){
+        runningPhase2 = false;
+        clearScheduled();
+        for (const el of [fxMurmurEl, fxYawnEl, fxLaughEl]) {
+          const c = comp(el); if (c?.isPlaying) c.stopSound();
+        }
+      }
+
+      function shuffle(arr){
+        for (let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; }
+        return arr;
+      }
+
+      async function startAudioCues(){
+        await unlockAudio();
+        stopAudioCues(); 
+        lastCueAt = -Infinity;
+        schedulePhase1();
+      }
+
+      actionBtn.addEventListener('click', () => {
+        if (actionBtn.textContent === 'ENVIAR') {
+          stopEmojis();
+          stopAudioCues();
+        }
+      });
+
+      sceneEl.addEventListener('enter-vr', () => { if (isTimerRunning) { startAudioCues(); startEmojis(); } });
+      sceneEl.addEventListener('exit-vr',  () => { stopEmojis(); stopAudioCues(); });
+      sceneEl.addEventListener('enter-ar', () => { if (isTimerRunning) { startAudioCues(); startEmojis(); } });
+      sceneEl.addEventListener('exit-ar',  () => { stopEmojis(); stopAudioCues(); });
+
+      function computeXRANGE() {
+        const ar = Math.max(1, window.innerWidth / Math.max(1, window.innerHeight));
+        return Math.min(4.4, Math.max(2.4, 2.6 * ar)); 
+      }
+
+      let X_RANGE = computeXRANGE();     
+      const Y_MIN_BAND = 0.20;           
+      const Y_MAX_BAND = 1.25;           
+      const EDGE_BIAS   = 0.6;           
+      const EDGE_PAD    = 0.25;          
+      const EMOJI_DIST_Z = -1.4;
+
+      const EMOJI_SIZE_MIN = 0.09;
+      const EMOJI_SIZE_MAX = 0.14;
+      const MIN_SEPARATION = 0.25;
+      const MAX_ONSCREEN   = 6;
+      const LIFE_MS        = 2500;
+      const BG_MIN_GAP_MS  = 6000;
+      const BG_MAX_GAP_MS  = 11000;
+
+      let emojiInterval = null;
+      const ACTIVE_EMOJIS = new Set();
+
+      const EMOJIS_RANDOM = ["😄","😢","😠","😐","😂","🤔","🥱","😳","😎","🤯"];
+      const EMOJI_MAP = {
+        'fx-laugh': ["😂","🤣","😆"],
+        'fx-yawn' : ["🥱","😪","😴"],
+        'fx-murmur':["😐","🤔","😶"]
+      };
+
+      function getCameraEl() {
+        const scene = document.querySelector('a-scene');
+        return scene?.camera?.el || scene?.querySelector('[camera]');
+      }
+      function emojiDataURL(face, sizePx = 256) {
+        const c = document.createElement('canvas');
+        c.width = c.height = sizePx;
+        const ctx = c.getContext('2d');
+        ctx.clearRect(0, 0, sizePx, sizePx);
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = `${Math.floor(sizePx*0.82)}px "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji","EmojiOne Color","Twemoji Mozilla",sans-serif`;
+        ctx.fillText(face, sizePx/2, sizePx/2);
+        return c.toDataURL('image/png');
+      }
+
+      function emojiCanvas(face, sizePx = 256) {
+        const c = document.createElement('canvas');
+        c.width = c.height = sizePx;
+        const ctx = c.getContext('2d');
+        ctx.clearRect(0, 0, sizePx, sizePx);
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = `${Math.floor(sizePx*0.82)}px "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji","EmojiOne Color","Twemoji Mozilla",sans-serif`;
+        ctx.fillText(face, sizePx/2, sizePx/2);
+        return c;
+      }
+
+      function sampleX() {
+        const half = X_RANGE / 2;
+        if (Math.random() < EDGE_BIAS) {
+          const sign = Math.random() < 0.5 ? -1 : 1;
+          return sign * (half - EDGE_PAD - Math.random() * 0.6); 
+        }
+        return (Math.random() - 0.5) * (X_RANGE * 0.65);
+      }
+      function sampleY() {
+        return Y_MIN_BAND + Math.random() * (Y_MAX_BAND - Y_MIN_BAND);
+      }
+
+      function findFreePosition(size) {
+        const halfDiag = Math.hypot(size, size) / 2;
+        for (let tries = 0; tries < 18; tries++) {
+          const x = sampleX();
+          const y = sampleY();
+          let ok = true;
+          for (const meta of ACTIVE_EMOJIS) {
+            const dx = x - meta.x, dy = y - meta.y;
+            if (Math.hypot(dx, dy) < (MIN_SEPARATION + halfDiag + meta.halfDiag)) { ok = false; break; }
+          }
+          if (ok) return { x, y };
+        }
+        return { x: sampleX(), y: sampleY() };
+      }
+
+      async function spawnEmoji(face) {
+        const camEl = getCameraEl();
+        if (!camEl) return;
+        if (ACTIVE_EMOJIS.size >= MAX_ONSCREEN) return;
       
-        if (!isTimerRunning && estadoSesion === 'idle') {
-          actionBtn.disabled = true;
-          actionBtn.textContent = 'Iniciando...';
-
-          if (typeof startImmersion === 'function') {
-            startImmersion()
-              .then(() => {
-                actionBtn.disabled = false;
-                actionBtn.textContent = 'ENVIAR';
-                startCountdown();
-              })
-              .catch((err) => {
-                console.error('Error al iniciar inmersión:', err);
-                actionBtn.disabled = false;
-                actionBtn.textContent = 'INICIAR';
-                showInitialTime();
-              });
-          }
-        } else if (isTimerRunning && estadoSesion === 'recording') {
-          const elapsed = Math.max(0, initialSeconds - countdownSeconds);
-          console.log('Tiempo transcurrido:', elapsed, 'segundos'); 
-          stopTimer();
-
-          if (window.segundosTranscurridos !== undefined) {
-          window.segundosTranscurridos = elapsed;
-          }
-          if (elapsed < 30) {
-            window.finalizarSesionWrapper(false);
-          } else {
-            window.finalizarSesionWrapper(true); 
+        const chosen = face || EMOJIS_RANDOM[Math.floor(Math.random() * EMOJIS_RANDOM.length)];
+        const size = EMOJI_SIZE_MIN + Math.random() * (EMOJI_SIZE_MAX - EMOJI_SIZE_MIN);
+        const { x, y } = findFreePosition(size);
+      
+        const canvas = emojiCanvas(chosen, 256);
+        const tex = new THREE.CanvasTexture(canvas);
+        tex.needsUpdate = true;
+      
+        const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 1, depthTest: true });
+        const sprite = new THREE.Sprite(mat);
+      
+        sprite.scale.set(size, size, 1);
+        sprite.position.set(x, y, EMOJI_DIST_Z);
+      
+        camEl.object3D.add(sprite);
+      
+        const meta = { el: sprite, x, y, halfDiag: Math.hypot(size, size)/2, _tex: tex, _mat: mat };
+        ACTIVE_EMOJIS.add(meta);
+      
+        console.log(`[Emojis] ${chosen} | pos=(${x.toFixed(2)},${y.toFixed(2)})`);
+      
+        const start = performance.now();
+        const dur = LIFE_MS;
+        function tick(t) {
+          const k = Math.min(1, (t - start) / dur);
+          mat.opacity = 1 - k;
+          if (k < 1 && sprite.parent) requestAnimationFrame(tick);
+          else {
+            if (sprite.parent) camEl.object3D.remove(sprite);
+            tex.dispose(); mat.dispose();
+            ACTIVE_EMOJIS.delete(meta);
           }
         }
-      });*/
-    
-      window.addEventListener('load', function() {
-        showInitialTime(); 
-        console.log('Temporizador inicializado con tiempo:', timerDisplay.textContent);
-      });
-    
-      document.addEventListener('DOMContentLoaded', function() {
-        showInitialTime(); 
-      });
+        requestAnimationFrame(tick);
+      }
+
+
+      function triggerEmojiBurst(audioId) {
+        const set = EMOJI_MAP[audioId];
+        if (!set) return;
+        const slots = Math.max(0, MAX_ONSCREEN - ACTIVE_EMOJIS.size);
+        if (slots === 0) return;
+        const n = Math.min(slots, 3 + Math.floor(Math.random() * 3));
+        console.log(`[Emojis] burst ${audioId} (${n})`);
+        for (let i = 0; i < n; i++) {
+          const face = set[Math.floor(Math.random() * set.length)];
+          setTimeout(() => spawnEmoji(face), i * 120);
+        }
+      }
+
+      function startEmojis() {
+        stopEmojis();
+        X_RANGE = computeXRANGE();
+        spawnEmoji();
+        const gap = BG_MIN_GAP_MS + Math.random() * (BG_MAX_GAP_MS - BG_MIN_GAP_MS);
+        emojiInterval = setInterval(() => spawnEmoji(), gap);
+        console.log(`[Emojis] ON | X_RANGE=${X_RANGE.toFixed(2)}, Y=[${Y_MIN_BAND},${Y_MAX_BAND}]`);
+      }
+
+      function stopEmojis() {
+        if (emojiInterval) { clearInterval(emojiInterval); emojiInterval = null; }
+        for (const meta of Array.from(ACTIVE_EMOJIS)) {
+          if (meta.el && meta.el.parent) meta.el.parent.remove(meta.el);
+          if (meta._tex) meta._tex.dispose();
+          if (meta._mat) meta._mat.dispose();
+          ACTIVE_EMOJIS.delete(meta);
+        }
+        console.log('[Emojis] OFF');
+      }
+
+      window.addEventListener('resize', () => { X_RANGE = computeXRANGE(); });
     </script>
   </body>
 </html>
+
