@@ -1,0 +1,45 @@
+body, h1, h2, h3, h4, h5, h6, p, button {
+  font-family: 'Poppins', sans-serif;
+  color: #3b2e6d;
+  margin: 0; padding: 0;
+}
+body { overflow: hidden; }
+
+ #loading-modal h2 { font-size: 26px; font-weight: 400; line-height: 1.4; color: #3b2e6d; }
+#loading-modal .spinner { border-top-color: #746aa6 !important; }
+
+ .result-overlay{
+  position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+  background:rgba(20, 16, 39, 0.65); z-index:9999;
+}
+.result-card{
+  width:min(540px, 92vw); background:#fff; border-radius:24px;
+  box-shadow:0 16px 40px rgba(0,0,0,.35); padding:28px 28px 24px; text-align:center;
+}
+.result-title{ margin:0 0 6px; font-size:32px; color:#3d356f; font-weight:800; }
+.result-text{ margin:8px 0 18px; color:#4c4a63; font-size:20px; line-height:1.5; }
+.result-stars{ display:flex; gap:14px; align-items:center; justify-content:center; margin:6px 0 22px; }
+.result-stars .star{ font-size:40px; color:#7c3aed; text-shadow:0 2px 10px rgba(124,58,237,.3); }
+.result-ok{
+  background:#a78bfa; border:none; color:#fff; font-weight:700;
+  padding:12px 28px; border-radius:12px; cursor:pointer; font-size:18px;
+  box-shadow:0 10px 24px rgba(124,58,237,.35);
+}
+.result-ok:hover{ filter:brightness(.95); }
+
+ .top-left-container {
+  position: fixed; top: 20px; left: 20px; z-index: 999;
+  display: flex; flex-direction: column; gap: 12px; align-items: flex-start;
+}
+#timer-display {
+  background: rgba(255,255,255,0.95);
+  padding: 16px 24px; border-radius: 12px; font-size: 24px; font-weight: 700; color: #3b2e6d;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15); border: 2px solid #a78bfa; min-width: 120px; text-align: center;
+}
+#action-btn {
+  background: #a48cf0; color: #fff; border: none; border-radius: 12px; padding: 16px 32px;
+  font-weight: 700; font-size: 18px; cursor: pointer; box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+  transition: all 0.2s ease;
+}
+#action-btn:hover { background: #8f6ed4; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); }
+#action-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
