@@ -16,9 +16,11 @@
 
         <div id="loginFields">
           <div class="input-container">
-            <input type="email" id="email" required 
+            <input type="text" id="email" required 
             inputmode="email"
-            pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" />
+            autocomplete="email"
+            oninvalid="this.setCustomValidity(this.value ? 'Ingresa un correo válido (ejemplo: usuario@dominio.com).' : 'Por favor ingresa tu correo electrónico.')"
+            oninput="this.setCustomValidity('')"/>
             <label class="label" for="email">Email</label>
             <div class="underline"></div>
           </div>
@@ -32,9 +34,11 @@
 
         <div id="registerFields" class="form-grid hidden">
           <div class="input-container">
-            <input type="email" id="rEmail" required 
+            <input type="text" id="rEmail" required 
             inputmode="email"
-            pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$"/>
+            autocomplete="email"
+            oninvalid="this.setCustomValidity(this.value ? 'Ingresa un correo válido (ejemplo: usuario@dominio.com).' : 'Por favor ingresa tu correo electrónico.')"
+            oninput="this.setCustomValidity('')"/>
             <label class="label" for="rEmail">Email</label>
             <div class="underline"></div>
           </div>
@@ -100,8 +104,11 @@
         <h1>Recuperar contraseña</h1>
       
         <div class="input-container">
-          <input type="email" id="forgotEmail" required
-                 inputmode="email" />
+          <input type="text" id="forgotEmail" required
+                 inputmode="email" 
+                 autocomplete="email"
+                 oninvalid="this.setCustomValidity(this.value ? 'Ingresa un correo válido (ejemplo: usuario@dominio.com).' : 'Por favor ingresa tu correo electrónico.')"
+                  oninput="this.setCustomValidity('')"/>
           <label class="label" for="forgotEmail">Email registrado</label>
           <div class="underline"></div>
         </div>
@@ -129,6 +136,42 @@
   const registerFields = document.getElementById("registerFields");
   const forgotPasswordContainer = document.getElementById("forgotPasswordContainer");
 
+  const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
+  function assertValidEmail(inputEl) {
+    const v = (inputEl.value || "").trim();
+  
+    if (!emailRe.test(v)) {
+      inputEl.setCustomValidity("Ingresa un correo válido (ej. usuario@dominio.com).");
+      inputEl.reportValidity();   
+      inputEl.focus();            
+      return false;               
+    }
+  
+    inputEl.setCustomValidity("");
+    return true;
+  }
+
+  function setModeRequirements() {
+    const loginEmail = document.getElementById("email");
+    const loginPass  = document.getElementById("password");
+  
+    const rEmail = document.getElementById("rEmail");
+    const rPass  = document.getElementById("rPass");
+    const rUser  = document.getElementById("rUser");
+    const rInst  = document.getElementById("rInst");
+    const rGenero= document.getElementById("rGenero");
+    const rFecha = document.getElementById("rFecha");
+  
+    if (isRegistering) {
+      [loginEmail, loginPass].forEach(el => { el.required = false; el.disabled = true; });
+      [rEmail, rPass, rUser, rInst, rGenero, rFecha].forEach(el => { el.disabled = false; el.required = true; });
+    } else {
+      [loginEmail, loginPass].forEach(el => { el.required = true; el.disabled = false; });
+      [rEmail, rPass, rUser, rInst, rGenero, rFecha].forEach(el => { el.required = false; el.disabled = true; });
+    }
+  }
+
   function updateToggleText() {
     document.getElementById("toggleText").innerHTML = isRegistering
       ? '¿Ya tienes cuenta? <a href="#" id="toggleMode">Inicia sesión</a>'
@@ -142,6 +185,9 @@
 
     document.getElementById("formTitle").textContent = isRegistering ? "Registrarse" : "Iniciar sesión";
     document.getElementById("submitButtonText").textContent = isRegistering ? "Registrar" : "Ingresar";
+
+    setModeRequirements();
+
 
     if (isRegistering) {
       loginFields.classList.add("hidden");
@@ -171,12 +217,18 @@
     e.preventDefault();
     try {
       if (isRegistering) {
-        // === Registro ===
-        const email = document.getElementById("rEmail").value.trim();
+        // Registro 
+        const rEmailEl = document.getElementById("rEmail");
+        if (!assertValidEmail(rEmailEl)) return;
+        const email = rEmailEl.value.trim();
         const gender = document.getElementById("rGenero").value || null;
         const password = document.getElementById("rPass").value;
         const username = document.getElementById("rUser").value.trim();
-        const college  = document.getElementById("rInst").value.trim() || null;
+
+        const instSelect = document.getElementById("rInst");
+        const college_id = instSelect.value ? Number(instSelect.value) : null;
+        const college = instSelect.options[instSelect.selectedIndex]?.text || null;
+
         const birthdate = document.getElementById("rFecha").value || null;
 
         if (!email || !password || !username) {
@@ -187,7 +239,7 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
-          body: JSON.stringify({ email, password, username, college, birthdate,gender })
+          body: JSON.stringify({ email, password, username, college, college_id,birthdate,gender })
         });
         const data = await resp.json();
         if (!resp.ok) throw new Error(data.error || 'Error de registro');
@@ -196,8 +248,10 @@
         localStorage.setItem('username', data.username);
         window.location.href = "pages/onboarding-intro.html?onboarding=1";
       } else {
-        // === Login ===
-        const email = document.getElementById("email").value.trim();
+        // Login 
+        const emailEl = document.getElementById("email");
+        if (!assertValidEmail(emailEl)) return;
+        const email = emailEl.value.trim();
         const password = document.getElementById("password").value;
         if (!email || !password) { alert("Completa email y contraseña."); return; }
 
@@ -229,7 +283,7 @@
 
       colleges.forEach(col => {
         const opt = document.createElement('option');
-        opt.value = col.college_name;
+        opt.value = col.college_id; 
         opt.textContent = col.college_name;
         select.appendChild(opt);
       });
@@ -241,6 +295,8 @@
   }
 
   document.addEventListener('DOMContentLoaded', loadColleges);
+  document.addEventListener('DOMContentLoaded', setModeRequirements);
+
 
   document.getElementById("forgotPasswordLink").addEventListener("click", (e) => {
     e.preventDefault();
@@ -249,7 +305,6 @@
     forgotForm.classList.remove("hidden");
   });
 
-  // Volver a login
   document.getElementById("backToLogin").addEventListener("click", (e) => {
     e.preventDefault();
     forgotForm.reset();
@@ -257,10 +312,13 @@
     loginForm.classList.remove("hidden");
   });
 
-  // --- Enviar correo de recuperación ---
+  // Enviar correo de recuperación 
   forgotForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const email = document.getElementById("forgotEmail").value.trim();
+    const emailEl = document.getElementById("forgotEmail");
+    if (!assertValidEmail(emailEl)) return;
+    const email = emailEl.value.trim();
+
     if (!email) { alert("Ingresa tu email."); return; }
   
     try {
