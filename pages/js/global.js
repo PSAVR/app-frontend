@@ -42,7 +42,72 @@ function renderStars(container, n) {
   }
 }
 
-function showResultModal({ stars = 0, promoted = false, toLevelId = null }) {
+function capitalizarNivel(n) {
+  const map = {
+    1: "Fácil",
+    2: "Intermedio",
+    3: "Difícil",
+    "facil": "Fácil",
+    "intermedio": "Intermedio",
+    "dificil": "Difícil"
+  };
+  return map[n] || n;
+}
+
+function buildFeedbackMessage({
+  band,
+  promoted,
+  toLevelId,
+  stars,
+  currentLevelName,
+  pauseCount = null,
+  pauseRatio = null,
+  pausesPerMin = null
+}) {
+  let texto = "";
+
+  if (promoted && toLevelId) {
+    texto = `¡Excelente trabajo! Esta sesión fue lo suficientemente buena como para llevarte al <span style="font-weight:700; color:#7c3aed;">nivel ${capitalizarNivel(toLevelId)}</span>. `;
+  } else if (stars === 2) {
+    texto = `Lo estás haciendo bien, se nota el esfuerzo por mejorar. `;
+  } else {
+    texto = `Gracias por intentarlo, cada sesion te ayuda a mejorar. `;
+  }
+
+  if (band === "baja") {
+    texto += "Lograste mantener la calma, sigue mejorando. ";
+  } else if (band === "media") {
+    texto += "Hubieron momentos donde los nervios te ganaron pero diste tu mejor esfuerzo. ";
+  } else if (band === "alta") {
+    texto += "Se notó más tensión durante la sesión, pero eso es parte del proceso. ";
+  }
+
+  if (pauseRatio !== null) {
+    if (pauseRatio > 0.45) {
+      texto += "Notamos que hiciste bastantes pausas largas; con práctica puedes hacer que tu discurso suene más fluido. ";
+    } else if (pauseRatio > 0.25) {
+      texto += "Hiciste algunas pausas naturales al hablar, aunque a veces cortaron un poco el ritmo. ";
+    } else {
+      texto += "Mantuviste un ritmo continuo y tu mensaje fluyó bien. ";
+    }
+  }
+
+  if (!promoted) {
+    texto += `Te mantienes en el <span style="font-weight:700; color:#7c3aed;">nivel ${capitalizarNivel(currentLevelName)}</span>.`;
+  }
+
+  return texto.trim();
+}
+
+function showResultModal({
+  stars = 0,
+  promoted = false,
+  toLevelId = null,
+  band = null,
+  pauseCount = null,
+  pauseRatio = null,
+  pausesPerMin = null
+}) {
   const overlay = document.getElementById('result-modal');
   const msgEl = document.getElementById('result-message');
   const starsEl = document.getElementById('result-stars');
@@ -52,11 +117,20 @@ function showResultModal({ stars = 0, promoted = false, toLevelId = null }) {
     return;
   }
 
-  if (promoted && toLevelId) {
-    msgEl.textContent = `¡Excelente! Estás en el nivel ${toLevelId}.`;
-  } else {
-    msgEl.textContent = '¡Buen trabajo! Sigue intentándolo.';
-  }
+  const nivelActual = getNivelDesdeURL();
+
+  const mensaje = buildFeedbackMessage({
+    band,
+    promoted,
+    toLevelId,
+    stars,
+    currentLevelName: nivelActual,
+    pauseCount,
+    pauseRatio,
+    pausesPerMin
+  });
+
+  msgEl.innerHTML = mensaje;
 
   renderStars(starsEl, stars);
   overlay.style.display = 'flex';
@@ -65,6 +139,8 @@ function showResultModal({ stars = 0, promoted = false, toLevelId = null }) {
     window.location.href = '/pages/main.html';
   };
 }
+
+
 
 function showMicBanner(message, color = "#842029", bg = "#f8d7da", border = "#f5c2c7") {
   let bar = document.getElementById("mic-banner");
@@ -179,11 +255,19 @@ async function enviarAudioYMostrarResultados(blobWebm) {
       credentials: 'include'
     });
 
-    const data = await r.json();
+  const data = await r.json();
 
-    const ansiedadRaw = data?.model?.anxiety_pct;
-    const ansiedadNum = Number(ansiedadRaw);
-    const ansiedadValida = Number.isFinite(ansiedadNum);
+  const payload = data?.result || data;
+    
+  const ansiedadRaw = payload?.model?.anxiety_pct ?? payload?.anxiety_pct;
+  const ansiedadNum = Number(ansiedadRaw);
+  const ansiedadValida = Number.isFinite(ansiedadNum);
+    
+  const band         = payload?.model?.band          ?? payload?.band          ?? null;
+  const pauseCount   = payload?.model?.pause_count   ?? payload?.pause_count   ?? null;
+  const pauseRatio   = payload?.model?.pause_ratio   ?? payload?.pause_ratio   ?? null;
+  const pausesPerMin = payload?.model?.pauses_per_min?? payload?.pauses_per_min?? null;
+
 
     if (!ansiedadValida) {
       console.warn('Ansiedad inválida recibida desde el backend:', ansiedadRaw);
@@ -199,13 +283,27 @@ async function enviarAudioYMostrarResultados(blobWebm) {
 
     if (loading) loading.style.display = 'none';
 
-    const star_rating = Number(data?.detail?.star_rating ?? data?.model?.stars ?? 0);
+    const star_rating = Number(
+      data?.detail?.star_rating ??
+      payload?.detail?.star_rating ??
+      payload?.model?.stars ??
+      0
+    );
+
     const LEVEL_ID = { facil: 1, intermedio: 2, dificil: 3 };
     const currentId = LEVEL_ID[nivel] || 1;
     const promoted = star_rating >= 3 && currentId < 3;
     const toLevelId = promoted ? currentId + 1 : null;
 
-    showResultModal({ stars: star_rating, promoted, toLevelId });
+    showResultModal({
+      stars: star_rating,
+      promoted,
+      toLevelId,
+      band,
+      pauseCount,
+      pauseRatio,
+      pausesPerMin
+    });
 
   } catch (err) {
     console.error('Error al enviar audio:', err);
@@ -357,7 +455,7 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.disabled = false;
             btn.textContent = 'INICIAR';
           });
-      } else if (estadoSesion === 'recording') {
+      }  else if (estadoSesion === 'recording') {
         let elapsed = 0;
 
         if (window.initialSeconds !== undefined && window.countdownSeconds !== undefined) {
@@ -367,15 +465,17 @@ document.addEventListener('DOMContentLoaded', () => {
           elapsed = segundosTranscurridos;
           console.log('Tiempo transcurrido (fallback):', elapsed, 'segundos');
         }
-
-        if (typeof stopTimer === 'function') stopTimer();
-
-        if (elapsed < 30) {
-          console.log('Menos de 30 segundos - NO enviar al modelo');
-          finalizarSesion(false);
+      
+        const debeSubir = elapsed >= 30;
+        console.log(debeSubir
+          ? '30+ segundos - ENVIAR al modelo'
+          : 'Menos de 30 segundos - NO enviar al modelo');
+        
+        if (typeof window.finalizarSesionWrapper === 'function') {
+          window.finalizarSesionWrapper(debeSubir);
         } else {
-          console.log('30+ segundos - ENVIAR al modelo');
-          finalizarSesion(true);
+          if (typeof stopTimer === 'function') stopTimer();
+          finalizarSesion(debeSubir);
         }
       }
     });
