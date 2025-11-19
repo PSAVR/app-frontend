@@ -224,7 +224,7 @@
         const gender = document.getElementById("rGenero").value || null;
         const password = document.getElementById("rPass").value;
         const username = document.getElementById("rUser").value.trim();
-
+        
         const instSelect = document.getElementById("rInst");
         const college_id = instSelect.value ? Number(instSelect.value) : null;
         const college = instSelect.options[instSelect.selectedIndex]?.text || null;
@@ -239,7 +239,7 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
-          body: JSON.stringify({ email, password, username, college, college_id,birthdate,gender })
+          body: JSON.stringify({ email, password, username, college, birthdate,gender })
         });
         const data = await resp.json();
         if (!resp.ok) throw new Error(data.error || 'Error de registro');
@@ -329,7 +329,14 @@
         body: JSON.stringify({ email })
       });
       const data = await resp.json();
-      if (!resp.ok) throw new Error(data.error || "No se pudo enviar el correo");
+        if (!resp.ok) {
+        if (resp.status === 404) {
+          alert("El correo ingresado no está asociado a ninguna cuenta.");
+          return;
+        }
+        throw new Error(data.error || "No se pudo enviar el correo");
+      }
+
     
       alert("Te enviamos un enlace para restablecer tu contraseña. Revisa tu bandeja de entrada.");
       forgotForm.classList.add("hidden");
