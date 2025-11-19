@@ -53,6 +53,17 @@
     </div>
   </div>
 
+  <div class="modal" id="finalConfirmModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="dialog">
+      <h2>¿Estás seguro que quieres eliminar tu cuenta?</h2>
+      <p>Esta acción no se puede deshacer y perderás todo tu progreso.</p>
+      <div class="buttons">
+        <button id="finalNo" class="btn btn-outline">Cancelar</button>
+        <button id="finalYes" class="btn btn-danger">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const API_BASE = `${location.protocol}//${location.hostname}:4000`;
     console.log('[cuenta] API_BASE =', API_BASE);
@@ -70,9 +81,15 @@
       } catch { return '—'; }
     }
 
+    
+
     const modal = $('#confirmModal');
     const modalYes = $('#modalYes');
     const modalNo  = $('#modalNo');
+
+    const finalModal = $('#finalConfirmModal');
+    const finalYes   = $('#finalYes');
+    const finalNo    = $('#finalNo');
 
     function openModal() {
       modal.setAttribute('aria-hidden', 'false');
@@ -84,6 +101,17 @@
       modal.setAttribute('aria-hidden','true');
     }
 
+    function openFinalModal() {
+      finalModal.setAttribute('aria-hidden', 'false');
+      finalModal.classList.add('open');
+      finalYes.focus();
+    }
+    function closeFinalModal() {
+      finalModal.classList.remove('open');
+      finalModal.setAttribute('aria-hidden','true');
+    }
+
+
     let me = null;
 
     async function fetchMe(){
@@ -93,8 +121,8 @@
     }
 
     const safeLogout = typeof logout === 'function'
-  ? logout
-  : () => {
+    ? logout
+    : () => {
       try { fetch(`${API_BASE}/api/auth/logout`, { method:'POST', credentials:'include' }); } catch {}
       localStorage.removeItem('user_id');
       window.location.replace('../index.html');
@@ -120,19 +148,28 @@
     }
 
     $('#btnDelete').addEventListener('click', openModal);
+
     modalNo.addEventListener('click', closeModal);
     modal.addEventListener('click', (e)=>{ if(e.target === modal) closeModal(); });
 
-    modalYes.addEventListener('click', async ()=>{
-      modalYes.disabled = true;
-      try{
-        closeModal();
-        await handleDelete(me?.user_id ?? me?.id);
-      } finally {
-        modalYes.disabled = false;
-      }
+    modalYes.addEventListener('click', () => {
+      closeModal();
+      openFinalModal();
     });
 
+    finalNo.addEventListener('click', closeFinalModal);
+    finalModal.addEventListener('click', (e)=>{ if(e.target === finalModal) closeFinalModal(); });
+
+    finalYes.addEventListener('click', async () => {
+      finalYes.disabled = true;
+      try{
+        closeFinalModal();
+        await handleDelete(me?.user_id ?? me?.id);
+      } finally {
+        finalYes.disabled = false;
+      }
+    });
+    
     (async function init(){
       me = await fetchMe();
       if (!me || !me.user_id) {

@@ -6,9 +6,42 @@
   <meta name="description" content="WebXR VR Evaluation System">
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
   <link rel="stylesheet" href="../styles/evaluacion-inicial.css" />
+  <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
   </head>
+  
   <body>
   <div id="dom-overlay" style="position:fixed; inset:0; pointer-events:none; z-index:10000;">
+    <div id="loader-escena"
+       style="
+          position:fixed; inset:0;
+          background:white;
+          z-index:9999;
+          opacity:1;
+          display:flex;
+          justify-content:center;
+          align-items:center;
+          flex-direction:column;
+          transition: opacity 0.8s ease-in-out;
+       ">
+    <div class="spinner"
+         style="
+            width:65px;
+            height:65px;
+            border:6px solid #e1e1e1;
+            border-top:6px solid #9b59b6;
+            border-radius:50%;
+            animation:spin 1s linear infinite;
+         ">
+    </div>
+    <p style="
+          margin-top:18px;
+          font-size:18px;
+          color:#4b3b74;
+          font-weight:600;
+       ">
+      Cargando inmersión...
+    </p>
+  </div>
 
     <div class="top-left-container" style="pointer-events:auto">
       <div id="timer-display">00:30</div>
@@ -28,41 +61,91 @@
       </div>
     </div>
 
-    <div id="progreso-modal" class="result-overlay" style="pointer-events:auto;">
-      <div class="modal-content result-card" style="max-width: 400px;">
-        <h2 id="titulo-progreso" class="result-title" style="font-size: 32px; margin-bottom: 10px;">Resultados</h2>
-        <p class="subtitle result-text" id="resumen-progreso" style="font-size: 18px; margin-bottom: 30px;">¡Buen trabajo! Sigue intentándolo.</p>
-        
-        <div class="stars-row result-stars" id="estrellas-ultima-sesion" style="font-size: 48px; margin: 20px 0;"></div>
-        
-        <div class="modal-actions" style="margin-top: 30px;">
-          <button class="result-ok" id="btn-salir" style="padding: 15px 50px; font-size: 18px;">Aceptar</button>
-        </div>
-      </div>
-    </div>
+    <div id="progreso-modal" class="result-overlay" style="display:none; pointer-events:auto;">
+  <div class="result-card">
+    <h3 class="result-title">Resultados</h3>
+
+    <p id="resumen-progreso" class="result-text">
+      ¡Buen trabajo! Sigue intentándolo.
+    </p>
+
+    <div id="estrellas-ultima-sesion" class="result-stars"></div>
+
+    <button id="btn-salir" class="result-ok">Aceptar</button>
+  </div>
+</div>
+
   </div>
 
-    <a-scene id="escena-vr" vr-mode-ui="enabled: true" shadow="type: pcfsoft" renderer="colorManagement: true; physicallyCorrectLights: true"          webxr="optionalFeatures: dom-overlay, hit-test; overlayElement: #dom-overlay">
+    <a-scene id="escena-vr" style="opacity:0;" lvl1-visitor-event="enabled:true" lvl2-visitor-event="enabled:false" lvl3-visitor-event="enabled:false" vr-mode-ui="enabled: true" shadow="type: pcfsoft" renderer="colorManagement: true; physicallyCorrectLights: true"          webxr="optionalFeatures: dom-overlay, hit-test; overlayElement: #dom-overlay">
       <a-assets>
-        <a-asset-item id="modelo-facil" src="../models/facil/easyscenario.glb"></a-asset-item>
-        <a-asset-item id="modelo-inter" src="../models/inter/clasroom-medium.glb"></a-asset-item>
-        <a-asset-item id="modelo-dificil" src="../models/dif/lecture hall.glb"></a-asset-item>
+        <a-asset-item id="modelo-facil" src="../models/facil/easy-scenario2.glb"></a-asset-item>
+        <a-asset-item id="modelo-inter" src="../models/inter/classmedium.glb"></a-asset-item>
+        <a-asset-item id="modelo-dificil" src="../models/dif/lecturehall.glb"></a-asset-item>
+
+        <a-asset-item id="lvl1-visitor" src="../models/people/m1sitted.glb" ></a-asset-item>
+        <a-asset-item id="lvl1-visitor2" src="../models/people/p1.glb" ></a-asset-item>
+        <a-asset-item id="lvl1-visitor3" src="../models/people/exit.glb" ></a-asset-item>
+        <a-asset-item id="lvl1-visitor4" src="../models/people/womanclapping.glb" ></a-asset-item>
+        
+        <a-asset-item id="lvl2-visitor" src="../models/people/mansitted.glb" ></a-asset-item>
+        <a-asset-item id="lvl2-visitor2" src="../models/people/p12bored.glb" ></a-asset-item>
+        <a-asset-item id="lvl2-visitor3" src="../models/people/p9.glb" ></a-asset-item>
+        <a-asset-item id="lvl2-visitor4" src="../models/people/exit.glb" ></a-asset-item>
+        <a-asset-item id="lvl2-visitor5" src="../models/people/p5.glb" ></a-asset-item>
+
+        <a-asset-item id="lvl3-visitor" src="../models/people/mansitted.glb" ></a-asset-item>
+        <a-asset-item id="lvl3-visitor-1" src="../models/people/womanclapping.glb" ></a-asset-item>
+        <a-asset-item id="lvl3-visitor-2" src="../models/people/p12bored.glb" ></a-asset-item>
+        <a-asset-item id="lvl3-visitor-3" src="../models/people/p5.glb" ></a-asset-item>
+        <a-asset-item id="lvl3-visitor-4" src="../models/people/p9.glb" ></a-asset-item>
+        <a-asset-item id="lvl3-visitor-5" src="../models/people/m1sitted.glb"></a-asset-item>
 
         <audio id="snd-murmur" src="../audios/Murmur.mp3" preload="auto"></audio>
+        <audio id="snd-door" src="../audios/door.mp3" preload="auto"></audio>
         <audio id="snd-yawn"   src="../audios/Yawn.mp3"   preload="auto"></audio>
         <audio id="snd-laugh"  src="../audios/Laugh.mp3"  preload="auto"></audio>
+        <audio id="snd-caugh" src="../audios/cough.wav" preload="auto"></audio>
+        <audio id="snd-wthought" src="../audios/WThought.mp3" preload="auto"></audio>
+        <audio id="snd-cough" src="../audios/cough2.mp3" preload="auto"></audio>
       </a-assets>
-    
+
       <a-sky id="sky" rotation="0 -130 0" color="#87CEEB"></a-sky>
       
       <a-entity id="contador-texto" visible="false"></a-entity>
       
-      <a-entity id="contenedor-modelo" position="0 0 0"></a-entity>
+      <a-entity id="contenedor-modelo" position="0 0 -3"></a-entity>
 
-      <a-entity id="fx-murmur" sound="src: #snd-murmur; autoplay: false; loop: false; positional: false; volume: 0.9"></a-entity>
-      <a-entity id="fx-yawn"   sound="src: #snd-yawn;   autoplay: false; loop: false; positional: false; volume: 0.7"></a-entity>
-      <a-entity id="fx-laugh"  sound="src: #snd-laugh;  autoplay: false; loop: false; positional: false; volume: 0.55"></a-entity>
-          
+      <!-- VISITANTES NIVEL 1 -->
+      <a-entity id="static-visitor"   gltf-model="#lvl1-visitor"  idle-pose position="-15 -9 -35" scale="4.5 4 4.5"></a-entity>
+      <a-entity id="static-visitor2"  gltf-model="#lvl1-visitor2" idle-pose position="-21 -9 -20" scale="3 3 3"></a-entity>
+      <a-entity id="static-visitor3"  gltf-model="#lvl1-visitor3" idle-pose visible="false" rotation="0 90 0" position="-30 -8 -50" scale="7 7 7"></a-entity>
+      <a-entity id="static-visitor4"  gltf-model="#lvl1-visitor4" idle-pose position="8 -9.5 -53" scale="9 9 9"></a-entity>
+
+      <!-- VISITANTES NIVEL 2 -->
+      <a-entity id="static-visitor2_1" gltf-model="#lvl2-visitor" idle-pose position="-62 -20 -95" scale="20 17 19"></a-entity>
+      <a-entity id="static-visitor2_2" gltf-model="#lvl2-visitor2" idle-pose position="-60 -20 -50" scale="5.5 5.5 5.5"></a-entity>
+      <a-entity id="static-visitor2_3" gltf-model="#lvl2-visitor3" idle-pose position="13.5 -20 -14" scale="6 6 6"></a-entity>
+      <a-entity id="static-visitor2_4" gltf-model="#lvl2-visitor4" visible="false" rotation="0 90 0" position="-80 -22 -20" scale="19 19 19"></a-entity>
+      <a-entity id="static-visitor2_5" gltf-model="#lvl2-visitor5" idle-pose position="-64 -22 -75" scale="6 6 6"></a-entity>
+
+      <!-- VISITANTES NIVEL 3 -->
+      <a-entity id="static-visitor-3"   gltf-model="#lvl3-visitor"   idle-pose position="-13 2.6 -25" scale="2 2 2"></a-entity>
+      <a-entity id="static-visitor-3_1" gltf-model="#lvl3-visitor-1" idle-pose position="-20 0.3 -15" scale="2 2 2"></a-entity>
+      <a-entity id="static-visitor-3_2" gltf-model="#lvl3-visitor-2" idle-pose position="-3.4 -1.8 -2" scale="0.5 0.5 0.5"></a-entity>
+      <a-entity id="static-visitor-3_3" gltf-model="#lvl3-visitor-3" idle-pose position="-10 -5 -20" scale="5 5 5"></a-entity>
+      <a-entity id="static-visitor-3_4" gltf-model="#lvl3-visitor-4" idle-pose position="7 -1.8 -5" scale="0.6 0.6 0.6"></a-entity>
+      <a-entity id="static-visitor-3_5" gltf-model="#lvl3-visitor-5" idle-pose position="-1.7 0.4 -15.6" scale="1 1 1"></a-entity>
+
+      <a-entity id="fx-murmur" sound="src: #snd-murmur; autoplay: false; loop: false; positional: false; volume: 5"></a-entity>
+      <a-entity id="fx-door" sound="src: #snd-door; autoplay: false; loop: false; positional: false; volume: 1"></a-entity>
+      <a-entity id="fx-yawn"   sound="src: #snd-yawn;   autoplay: false; loop: false; positional: false; volume: 0.8"></a-entity>
+      <a-entity id="fx-laugh"  sound="src: #snd-laugh;  autoplay: false; loop: false; positional: false; volume: "></a-entity>
+      <a-entity id="fx-cough" sound="src: #snd-caugh; autoplay: false; loop: false; positional: false; volume: 0.1"></a-entity>
+      <a-entity id="fx-wthought" sound="src: #snd-wthought; autoplay: false; loop: false; positional: false; volume: 0.3"></a-entity>
+      <a-entity id="fx-cough2" sound="src: #snd-cough; autoplay: false; loop: false; positional: false; volume: 0.5"></a-entity>
+      <a-entity id="visitor-container"></a-entity>
+   
       <a-entity camera look-controls wasd-controls position="0 1.6 0">
         <a-entity 
           cursor="fuse: true; fuseTimeout: 1000" 
@@ -73,7 +156,61 @@
       </a-entity>
     </a-scene>
     <script src="./js/config.js"></script>
+    <script src="./js/easycontroller.js"></script>
+    <script src="./js/intercontroller.js"></script>
+    <script src="./js/difcontroller.js"></script>
+
     <script>
+      const VISITORS_BY_LEVEL = {
+        0: ["#static-visitor","#static-visitor2","#static-visitor4"],
+        1: ["#static-visitor2_1","#static-visitor2_2","#static-visitor2_3","#static-visitor2_5"],
+        2: ["#static-visitor-3","#static-visitor-3_1","#static-visitor-3_2","#static-visitor-3_3","#static-visitor-3_4","#static-visitor-3_5"]
+      };
+
+      const VISITOR_COMPONENTS = [
+        "lvl1-visitor-event",
+        "lvl2-visitor-event",
+        "lvl3-visitor-event"
+      ];
+
+      function setVisible(list, visible) {
+        list?.forEach(id => {
+          const el = document.querySelector(id);
+          el?.setAttribute("visible", visible);
+        });
+      }
+
+      function resetVisitorSystems(targetLevel) {
+        const scene = document.querySelector("a-scene");
+        if (!scene) return console.error("⛔ No <a-scene> found");
+
+        VISITOR_COMPONENTS.forEach((name, i) => {
+          if (scene.hasAttribute(name)) scene.removeAttribute(name);
+          if (i === targetLevel) {
+            scene.setAttribute(name, "enabled: true");
+            console.log(`⚡ Restarted Visitor Controller → ${name}`);
+          }
+        });
+      }
+
+      document.addEventListener("escenario-cambiado", e => {
+        const idx = Number(e.detail.indice);
+        console.log(`🔄 ESCENARIO CAMBIADO → ${idx}`);
+
+        Object.values(VISITORS_BY_LEVEL).flat().forEach(id => {
+          document.querySelector(id)?.setAttribute("visible", false);
+        });
+
+        resetVisitorSystems(idx);
+
+        VISITORS_BY_LEVEL[idx].forEach(id => {
+          document.querySelector(id)?.setAttribute("visible", true);
+        });
+
+        
+      });
+
+
       const CONFIG_EVAL = {
         duracionPorEscenario: 30,
         escenarios: [
@@ -100,6 +237,34 @@
           }
         ]
       };
+
+      window.CONFIG_ESCENARIOS = {
+        facil: {
+          modelo: {
+            position: "0 0 -3",
+            scale: "1 1 1",
+            rotation: "0 0 0"
+          },
+          luces: []
+        },
+        intermedio: {
+          modelo: {
+            position: "0 0 -3",
+            scale: "1 1 1",
+            rotation: "0 0 0"
+          },
+          luces: []
+        },
+        dificil: {
+          modelo: {
+            position: "0 0 -3",
+            scale: "1 1 1",
+            rotation: "0 0 0"
+          },
+          luces: []
+        }
+      }
+
 
       const estado = {
         escenarioActual: 0,
@@ -128,7 +293,8 @@
         resumenProgreso: document.querySelector('#resumen-progreso'),
         btnSalir: document.querySelector('#btn-salir'),
         timerDisplay: document.getElementById('timer-display'),
-        actionBtn: document.getElementById('action-btn')
+        actionBtn: document.getElementById('action-btn'),
+        loaderEscena: document.getElementById('loader-escena')
       };
 
       function showMicBanner(message, color = "#842029", bg = "#f8d7da", border = "#f5c2c7") {
@@ -246,6 +412,32 @@
       }
     }
 
+     function buildEvalFeedbackMessage({ nivelNombre, band, pauseRatio }) {
+        let texto = `Tu nivel asignado es: <span style="font-weight:700; color:#7c3aed;">nivel ${nivelNombre}</span>. `;
+
+        if (band === "baja") {
+          texto += "Mostraste buen control emocional durante la evaluación. ";
+        } else if (band === "media") {
+          texto += "Hubieron momentos de calma y otros donde los nervios se hicieron notar, algo normal en este tipo de ejercicios. ";
+        } else if (band === "alta") {
+          texto += "Se notó bastante tensión durante la evaluación, pero lo importante es que te animaste a intentarlo. ";
+        }
+      
+        if (typeof pauseRatio === "number" && !Number.isNaN(pauseRatio)) {
+          if (pauseRatio > 0.45) {
+            texto += "Hiciste varias pausas largas; con práctica puedes hacer que tu discurso suene más fluido. ";
+          } else if (pauseRatio > 0.25) {
+            texto += "Hiciste algunas pausas naturales al hablar, aunque a veces cortaron un poco el ritmo. ";
+          } else {
+            texto += "Mantuviste un ritmo bastante continuo y tu mensaje fluyó bien. ";
+          }
+        }
+      
+        texto += "Este resultado es un punto de partida para seguir creciendo paso a paso.";
+      
+        return texto.trim();
+      }
+
       function obtenerNivelPorAnsiedad(ansiedadPct) {
         if (ansiedadPct >= 66) return { nombre: 'Fácil', color: '#4CAF50' };
         if (ansiedadPct >= 33) return { nombre: 'Intermedio', color: '#FF9800' };
@@ -258,6 +450,8 @@
 
       elementos.escena.addEventListener('loaded', () => {
         console.log('Escena VR cargada');
+        window.evalMode = true;
+        window.visitorEventEnabled = true;
         showInitialTime();
         setTimeout(() => {
           estado.escenarioActual = 0;
@@ -267,6 +461,7 @@
 
       elementos.actionBtn.addEventListener('click', function() {
         if (estado.esperandoInicio && estado.escenarioActual === 0 && estado.modeloCargado) {
+          window.evalMode = true;    
           estado.esperandoInicio = false;
           elementos.actionBtn.style.display = 'none';
           iniciarEscenarioActual();
@@ -274,6 +469,14 @@
       });
 
       async function cambiarEscenario(indice) {
+        window.visitorEventEnabled = false;
+        Object.values(VISITORS_BY_LEVEL).flat().forEach(id => {
+          document.querySelector(id)?.setAttribute("visible", false);
+          if (elementos.loaderEscena) {
+            elementos.loaderEscena.style.display = 'flex';
+            elementos.loaderEscena.style.opacity = '1';
+          }
+        });
         if (indice >= CONFIG_EVAL.escenarios.length) {
           await finalizarEvaluacion();
           return;
@@ -281,9 +484,11 @@
 
         estado.escenarioActual = indice;
         estado.modeloCargado = false;
+        elementos.escena.style.opacity = 0;
         const escenario = CONFIG_EVAL.escenarios[indice];
         
         console.log(`Cambiando a escenario ${indice + 1}: ${escenario.nombre}`);
+        
         
         while (elementos.contenedor.firstChild) {
           elementos.contenedor.removeChild(elementos.contenedor.firstChild);
@@ -295,7 +500,16 @@
         modeloEntity.addEventListener('model-loaded', () => {
           console.log(`Modelo ${escenario.nombre} cargado completamente`);
           estado.modeloCargado = true;
-          
+        
+          if (elementos.loaderEscena) {
+            elementos.loaderEscena.style.opacity = '0';
+            setTimeout(() => {
+              elementos.loaderEscena.style.display = 'none';
+            }, 800);
+          }
+        
+          elementos.escena.style.opacity = 1;
+
           if (indice === 0) {
             elementos.actionBtn.disabled = false;
             elementos.actionBtn.textContent = 'INICIAR';
@@ -307,7 +521,15 @@
         modeloEntity.addEventListener('model-error', () => {
           console.error(`Error cargando modelo ${escenario.nombre}`);
           estado.modeloCargado = true;
+
+          if (elementos.loaderEscena) {
+            elementos.loaderEscena.style.opacity = '0';
+            setTimeout(() => {
+              elementos.loaderEscena.style.display = 'none';
+            }, 800);
+          }
         });
+
         
         if (typeof CONFIG_ESCENARIOS !== 'undefined') {
           const config = CONFIG_ESCENARIOS[escenario.immersion_level_name];
@@ -342,9 +564,11 @@
         } else {
           elementos.actionBtn.style.display = 'none';
         }
+        document.dispatchEvent(new CustomEvent("escenario-cambiado", { detail:{ indice } }));
       }
 
       async function iniciarEscenarioActual() {
+        window.visitorEventEnabled = true;
         const escenario = CONFIG_EVAL.escenarios[estado.escenarioActual];
         console.log(`Iniciando escenario: ${escenario.nombre}`);
 
@@ -402,13 +626,15 @@
 
               estado.mediaRecorder.stream.getTracks().forEach(track => track.stop());
               estado.grabando = false;
-              console.log('🎧 Grabación detenida completamente');
+              elementos.escena.style.opacity = 0;
+              window.visitorEventEnabled = false;
+
+              await esperarSegundos(0.25);
 
               if (estado.escenarioActual < CONFIG_EVAL.escenarios.length - 1) {
-                await esperarSegundos(1);
                 cambiarEscenario(estado.escenarioActual + 1);
               } else {
-                await finalizarEvaluacion();
+                finalizarEvaluacion();
               }
 
               resolve();
@@ -433,9 +659,13 @@
           if (estado.tiempoRestante <= 0) {
             clearInterval(estado.intervalo);
             
-            detenerGrabacion().then(() => {
-              console.log('Grabación terminada, procesando audio...');
+            detenerGrabacion().then(async () => {
+              elementos.escena.style.opacity = 0;
+              window.visitorEventEnabled = false;
+
+              await esperarSegundos(0.15);   // ahora sí funciona
             });
+
           }
         }, 1000);
       }
@@ -469,8 +699,13 @@
               try { const e = await response.json(); err = e.error || err; } catch {}
               throw new Error(err);
             }
+
             const data = await response.json();
-            const ansiedadRaw = data?.model?.anxiety_pct;
+            const payload = data?.result || data;
+            const model  = payload?.model || payload;
+            const detail = payload?.detail || data?.detail || {};
+
+            const ansiedadRaw = model?.anxiety_pct;
             const ansiedadNum = Number(ansiedadRaw);
             const ansiedadValida = Number.isFinite(ansiedadNum);
 
@@ -488,15 +723,25 @@
                 escenario: escenario.nombre,
                 nivel: escenario.nivel,
                 ansiedad: ansiedadNum,
-                estrellas: data?.detail?.star_rating ?? null,
-                progreso: data?.detail?.progress_percentage ?? null,
+                estrellas: detail?.star_rating ?? null,
+                progreso: detail?.progress_percentage ?? null,
+                band: model?.band ?? null,
+                pauseRatio: model?.pause_ratio ?? null,
+                pauseCount: model?.pause_count ?? null,
+                pausesPerMin: model?.pauses_per_min ?? null,
+                audioSeconds: model?.audio_seconds ?? null,
+                silenceSeconds: model?.silence_seconds ?? null,
                 error: false
               };
+            
               estado.resultados[indiceEscenario] = resultado;
             
               console.log(`✅ Audio ${indiceEscenario + 1}/${CONFIG_EVAL.escenarios.length} procesado correctamente.`);
-              console.log(`   → Ansiedad: ${resultado.ansiedad ?? 'N/A'} | Estrellas: ${resultado.estrellas ?? 'N/A'} | Progreso: ${resultado.progreso ?? 'N/A'}`);
+              console.log(
+                `   → Ansiedad: ${resultado.ansiedad ?? 'N/A'} | Estrellas: ${resultado.estrellas ?? 'N/A'} | Progreso: ${resultado.progreso ?? 'N/A'}`
+              );
             }
+
 
           })
           .catch((error) => {
@@ -557,25 +802,45 @@
           return;
         }
 
-      
         const ansiedadMaxima = Math.max(...resultadosValidos.map(r => r.ansiedad || 0));
         console.log(`Ansiedad máxima detectada: ${ansiedadMaxima}%`);
-      
+
         const nivelAsignado = obtenerNivelPorAnsiedad(ansiedadMaxima);
         console.log(`Nivel asignado: ${nivelAsignado.nombre}`);
-      
-        const estrellast = resultadosValidos.reduce((sum, r) => sum + (r.estrellas || 0), 0);
-        const estrellasPromedio = Math.round(estrellast / resultadosValidos.length);
-      
+
+        const refResultado = resultadosValidos.reduce((best, r) => {
+          if (!best) return r;
+          return (r.ansiedad || 0) > (best.ansiedad || 0) ? r : best;
+        }, null);
+
         await asignarNivelInicial(ansiedadMaxima);
-      
+
         elementos.loadingModal.style.display = 'none';
-        elementos.resumenProgreso.textContent = `Tu nivel asignado es: ${nivelAsignado.nombre}`;
-        elementos.resumenProgreso.style.fontSize = '24px';
-        drawStars(estrellasPromedio);
-      
+
+        const starsByLevel = {
+          "Fácil": 1,
+          "Intermedio": 2,
+          "Difícil": 3
+        };
+        const estrellasNivel = starsByLevel[nivelAsignado.nombre] || 0;
+
+        // 🔹 Texto del modal (con nivel morado y feedback por banda/pausas)
+        const feedbackHtml = buildEvalFeedbackMessage({
+          nivelNombre: nivelAsignado.nombre,
+          band: refResultado?.band ?? null,
+          pauseRatio: refResultado?.pauseRatio ?? null
+        });
+
+        // Usamos innerHTML porque feedbackHtml trae <span> para el nivel
+        elementos.resumenProgreso.innerHTML = feedbackHtml;
+        elementos.resumenProgreso.style.fontSize = '22px';
+        
+        // Estrellas según nivel asignado
+        drawStars(estrellasNivel);
+        
         elementos.modal.style.display = 'flex';
         elementos.modal.classList.add('active');
+        
       }
 
 
@@ -613,8 +878,6 @@
 
       const sceneEl = document.querySelector('#escena-vr');
       const fxMurmurEl = document.querySelector('#fx-murmur');
-      const fxYawnEl   = document.querySelector('#fx-yawn');
-      const fxLaughEl  = document.querySelector('#fx-laugh');
 
       function comp(el){ return el?.components?.sound ?? null; }
 
@@ -627,7 +890,7 @@
       let cueTimer = null;
       let lastCueAt = -Infinity;
 
-      const NAME_MAP = { 'fx-murmur':'Murmur', 'fx-yawn':'Yawn', 'fx-laugh':'Laugh' };
+      const NAME_MAP = { 'fx-murmur':'Murmur' };
       function logCue(el){
         const name = NAME_MAP[el.id] || el.id;
         const t = new Date().toLocaleTimeString();
@@ -665,9 +928,7 @@
         const gap = CUE_MIN_GAP + Math.random()*(CUE_MAX_GAP - CUE_MIN_GAP);
         cueTimer = setTimeout(()=>{
           if (Math.random() < CUE_FIRE_PROB) {
-            const pick = Math.random();
-            const el = pick < 1/3 ? fxMurmurEl : (pick < 2/3 ? fxYawnEl : fxLaughEl);
-            playEl(el);
+            playEl(fxMurmurEl);
           }
           scheduleNextCue();
         }, gap*1000);
@@ -683,9 +944,7 @@
 
       function stopAudioCues(){
         if (cueTimer) { clearTimeout(cueTimer); cueTimer = null; }
-        for (const el of [fxMurmurEl, fxYawnEl, fxLaughEl]) {
-          const c = comp(el); if (c?.isPlaying) c.stopSound();
-        }
+        const c = comp(fxMurmurEl); if (c?.isPlaying) c.stopSound();
         console.log('[Audio] OFF');
       }
 
@@ -712,12 +971,6 @@
       const ACTIVE_EMOJIS = new Set();
 
       const EMOJIS_RANDOM = ["😄","😢","😠","😐","😂","🤔","🥱","😳","😎","🤯"];
-      const EMOJI_MAP = {
-        'fx-laugh': ["😂","🤣","😆"],
-        'fx-yawn' : ["🥱","😪","😴"],
-        'fx-murmur':["😐","🤔","😶"]
-      };
-
       function getCameraEl() {
         const scene = document.querySelector('a-scene');
         return scene?.camera?.el || scene?.querySelector('[camera]');

@@ -32,12 +32,17 @@
       </div>
     </div>
 
-    <div class="chart-block">
+    <div class="chart-block chart-has-data" id="chartWithData">
       <div class="chart-box">
         <canvas id="histChart"></canvas>
       </div>
+      <p id="periodMsg" class="chart-period-msg"></p>
+    </div>
+
+    <div class="chart-block chart-no-data" id="chartNoData">
       <p id="statusMsg"></p>
     </div>
+
   </section>
   <script>
   const API_BASE = 'http://localhost:4000';
@@ -67,6 +72,20 @@
     const r = await fetch(`${API_BASE}/api/users/${userId}/history/level/${levelId}?start=${start}&end=${end}`, { credentials:'include' });
     if(!r.ok) throw new Error('No se pudo cargar historial');
     return r.json();
+  }
+
+  async function hasAnySessionForLevel(userId, levelId) {
+    const r = await fetch(`${API_BASE}/api/users/${userId}/progress`, {
+      credentials: 'include'
+    });
+    if (!r.ok) {
+      console.error('No se pudo obtener progreso');
+      return false;
+    }
+    const rows = await r.json();
+    const lvl = rows.find(x => x.level_id === levelId);
+    if (!lvl) return false;
+    return Number(lvl.attempts || 0) > 0;
   }
 
   function localDateKey(d) {
@@ -257,6 +276,7 @@
   let currentEndDate;
   let userData;
   let levelData;
+  let hasAnySessionsForThisLevel = true;
 
   function updateWeekInfo() {
     const weekInfo = document.getElementById('weekInfo');
@@ -290,18 +310,32 @@
   }
 
   async function loadData() {
-    const status = document.getElementById('statusMsg');
-    try {
-      status.textContent = 'Cargando…';
-      const rows = await fetchHistory(userData.user_id, levelData.level_id, currentStartDate, currentEndDate);
-      const ds = buildDataset(rows, currentStartDate, currentEndDate);
-      renderChart(ds);
-      status.textContent = rows.length ? '' : 'No hay sesiones en este período.';
-    } catch(err) {
-      console.error(err);
-      status.textContent = 'No se pudo cargar el historial.';
-    }
+  const periodMsg = document.getElementById('periodMsg');
+
+  if (!hasAnySessionsForThisLevel) return;
+
+  try {
+    periodMsg.textContent = 'Cargando…';
+    const rows = await fetchHistory(
+      userData.user_id,
+      levelData.level_id,
+      currentStartDate,
+      currentEndDate
+    );
+
+    const ds = buildDataset(rows, currentStartDate, currentEndDate);
+    renderChart(ds);
+
+    document.getElementById('chartWithData').style.display = 'block';
+    document.getElementById('chartNoData').style.display = 'none';
+
+    periodMsg.textContent = rows.length ? '' : 'No hay sesiones en este período.';
+  } catch (err) {
+    console.error(err);
+    periodMsg.textContent = 'No se pudo cargar el historial.';
   }
+}
+
 
   document.getElementById('prevWeek').addEventListener('click', () => {
     const newStart = new Date(currentStartDate);
@@ -349,6 +383,19 @@
       if(!userData) return;
       
       levelData = await fetchLevelIdByName(level);
+
+      hasAnySessionsForThisLevel = await hasAnySessionForLevel(
+        userData.user_id,
+        levelData.level_id
+      );
+
+      if (!hasAnySessionsForThisLevel) {
+        document.getElementById('chartWithData').style.display = 'none';
+        document.getElementById('chartNoData').style.display = 'flex';
+
+        status.textContent = 'Aún no tienes registros de simulaciones. Realiza tu primera práctica para comenzar a ver tu progreso';
+        return;
+      }
       
       const today = new Date();
       today.setHours(0, 0, 0, 0);
