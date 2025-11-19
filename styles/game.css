@@ -5,6 +5,18 @@ body, h1, h2, h3, h4, h5, h6, p, button {
 }
 body { overflow: hidden; }
 
+html, body {
+  background: white;
+  margin: 0;
+  overflow: hidden;
+}
+
+
+#escena-vr {
+    opacity: 0;
+    transition: opacity 0.6s ease-in-out;
+  }
+
  #loading-modal h2 { font-size: 26px; font-weight: 400; line-height: 1.4; color: #3b2e6d; }
 #loading-modal .spinner { border-top-color: #746aa6 !important; }
 
@@ -12,12 +24,32 @@ body { overflow: hidden; }
   position:fixed; inset:0; display:none; align-items:center; justify-content:center;
   background:rgba(20, 16, 39, 0.65); z-index:9999;
 }
+
 .result-card{
-  width:min(540px, 92vw); background:#fff; border-radius:24px;
-  box-shadow:0 16px 40px rgba(0,0,0,.35); padding:28px 28px 24px; text-align:center;
+  width: min(620px, 92vw);     /* más chico (760px → 620px) */
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 18px 45px rgba(0,0,0,.30);
+  padding: 36px 40px 28px;     /* menos padding */
+  text-align: center;
 }
-.result-title{ margin:0 0 6px; font-size:32px; color:#3d356f; font-weight:800; }
-.result-text{ margin:8px 0 18px; color:#4c4a63; font-size:20px; line-height:1.5; }
+
+.result-title{
+  margin: 0 0 22px;            /* espacio ideal entre título y texto */
+  font-size: 32px;             /* un poco más chico */
+  color: #3d356f;
+  font-weight: 800;
+}
+
+.result-text{
+  margin: 10px 0 26px;
+  color: #3a3a45;
+  font-size: 20px;             /* más compacto pero legible */
+  line-height: 1.55;
+}
+
+
+
 .result-stars{ display:flex; gap:14px; align-items:center; justify-content:center; margin:6px 0 22px; }
 .result-stars .star{ font-size:40px; color:#7c3aed; text-shadow:0 2px 10px rgba(124,58,237,.3); }
 .result-ok{
