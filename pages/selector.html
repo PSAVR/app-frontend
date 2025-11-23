@@ -26,6 +26,17 @@
               material="color: #6b5ca5; shader: flat">
     </a-entity>
   </a-entity>
+    
+  <a-entity id="logoutHUD" position=" 1 2 -2 ">
+        <a-image
+        id="logoutHUD"
+        src="./logout.png"
+        position="1.5 1 -1.2"
+        width="0.90"
+        height="0.35"
+        class="clickable">
+      </a-image>
+  </a-entity>
 
   <a-entity id="selector">
     <a-text id="welcomeText" value="Bienvenido" position="0 2.3 -3" align="center" color="#3d3560" width="6"></a-text>
@@ -88,8 +99,23 @@
       window.location.href = 'profile.html';
     });
   });
+
+  const logoutHUD = document.getElementById('logoutHUD');
+
+  logoutHUD.addEventListener('click', async () => {
+    try {
+      await fetch(`${API_BASE}/api/auth/logout`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+    } catch (e) {
+      console.warn("Logout error:", e);
+    } finally {
+      localStorage.clear();
+      window.location.href = "/index.html";
+    }
+  });
 </script>
-<script src="./js/logout.js"></script>
 <script src="./js/onboarding-gate1.js"></script>
 <script src="./js/fondo-lava.js"></script>
 </body>

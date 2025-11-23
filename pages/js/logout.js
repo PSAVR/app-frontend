@@ -28,17 +28,17 @@ function createLogoutButton(){
   btn.style.fontFamily = '"Poppins", sans-serif';
   btn.style.cursor = 'pointer';
 
-  btn.style.backgroundColor = '#7666b0ff';
+  btn.style.backgroundColor = '#9488cf';
   btn.style.color = '#ffffff';
   btn.style.boxShadow = '0 4px 12px rgba(116,106,166,0.3)';
   btn.style.transition = 'background-color 0.2s ease, transform 0.1s ease';
 
   btn.addEventListener('mouseenter', () => {
-    btn.style.backgroundColor = '#7666b0ff';
+    btn.style.backgroundColor = '#9488cf';
     btn.style.transform = 'scale(1.05)';
   });
   btn.addEventListener('mouseleave', () => {
-    btn.style.backgroundColor = '#7666b0ff';
+    btn.style.backgroundColor = '#9488cf';
     btn.style.transform = 'scale(1)';
   });
 
@@ -53,8 +53,7 @@ function createLogoutButton(){
     }
   });
 
-  const parent = document.getElementById('dom-overlay') || document.body;
-parent.appendChild(btn);
+  document.body.appendChild(btn);
   console.log('[logout.js] botón añadido al DOM');
 }
 

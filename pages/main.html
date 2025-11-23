@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="../styles/main.css" />
 </head>
 <body>
-<div id="progress-overlay" role="dialog" aria-modal="true" aria-labelledby="progress-title">
+<div id="progress-overlay" role="dialog" aria-modal="true" aria-labelledby="progress-title" style="display:none">
   <div id="progress-card">
     <h3 id="progress-title">Progreso</h3>
     <div id="progress-stars" style="font-size:32px; color:#7a36ff; text-align:center; letter-spacing:6px; margin:8px 0 14px">—</div>
@@ -25,11 +25,8 @@
     <button id="progress-close" type="button">CONTINUAR</button>
   </div>
 </div>
-<div id="dom-overlay" style="position:fixed; inset:0; pointer-events:none; z-index:10000">
-  <div style="pointer-events:auto"> </div>
-</div>
 
-  <a-scene webxr="optionalFeatures: dom-overlay, hit-test; overlayElement: #dom-overlay" 
+  <a-scene webxr="requiredFeatures: dom-overlay; optionalFeatures: hit-test; overlayElement: #dom-overlay"
   vr-mode-ui="enabled: true">
     <a-assets>
       <canvas id="lavaCanvas" width="1024" height="1024"></canvas>
@@ -43,7 +40,29 @@
         geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
         material="color: #6b5ca5; shader: flat">
       </a-entity>
-    </a-entity>
+  </a-entity>
+  <a-entity id="homeHUD" position=" -1 2 -2 ">
+        <a-image
+        id="homeHUD"
+        src="./home.png"
+        position="-1.5 1 -1.2"
+        width="0.3"
+        height="0.3"
+        class="clickable">
+      </a-image>
+   </a-entity>
+
+   <a-entity id="logoutHUD" position=" 1 2 -2 ">
+        <a-image
+        id="logoutHUD"
+        src="./logout.png"
+        position="1.5 1 -1.2"
+        width="0.90"
+        height="0.35"
+        class="clickable">
+      </a-image>
+   </a-entity>
+
     <a-entity id="menu-dificultad">
       <a-text value="Inicia tu inmersion" position="0 2.3 -3" align="center" color="#4a4a6a" width="6"></a-text>
       <a-text id="micReminder" value="Recuerda revisar tu microfono!" position="0 2.0 -3" align="center" color="#746aa6" width="3" wrap-count="40" scale="0.8 0.8 0.8"></a-text>
@@ -72,8 +91,82 @@
       <a-box id="boton-3min" class="clickable" position="2 1.2 -3" color="#6A0DAD" depth="0.3" height="0.6" width="1.8"></a-box>
       <a-text value="3 minutos" position="2 1.2 -2.8" align="center" color="white" width="3"></a-text>
     </a-entity>
-  </a-scene>
 
+    <a-entity id="progress-modal" visible="false" position="0 1.6 -2" scale="0.8 0.8 0.8">
+
+    <a-rounded id="progress-bg" width="2.6" height="1.7" radius="0.22" color="#ffffff" opacity="0.98"> </a-rounded>
+  
+    <a-text id="progress-title-3d"
+          value="Progreso : Nivel 1"
+          position="0 0.63 0.03"
+          align="center"
+          color="#4a4a6a"
+          width="3"
+          wrap-count="26">
+    </a-text>
+
+    <a-entity id="progress-stars-3d" position="0 0.38 0.03"></a-entity>
+
+    <a-rounded id="progress-inner"
+               width="2.1" height="0.82" radius="0.25"
+               color="#f6ecff" opacity="1"
+               position="0 -0.02 0.02">
+    </a-rounded>
+
+    <a-text id="progress-attempts-3d"
+            value="intentos: —"
+            position="-0.95 0.18 0.04"
+            color="#4a4a6a"
+            width="2.2"
+            wrap-count="32">
+    </a-text>
+
+    <a-text id="progress-date-3d"
+            value="fecha: —"
+            position="-0.95 -0.02 0.04"
+            color="#4a4a6a"
+            width="2.2"
+            wrap-count="32">
+    </a-text>
+
+    <a-rounded id="progress-bar-track"
+               position="0 -0.25 0.04"
+               width="1.2" height="0.10" radius="0.09"
+               color="#e2d3ff">
+    </a-rounded>
+
+    <a-rounded id="progress-bar-fill"
+               position="0 -0.25 0.05"
+               width="1.2" height="0.10" radius="0.09"
+               color="#9B8FD4">
+    </a-rounded>
+
+    <a-text id="progress-pct-3d"
+            value="0%"
+            position="0.75 -0.25 0.05"
+            align="center"
+            color="#4a4a6a"
+            width="1.8"
+          scale="1.4 1.4 1">
+    </a-text>
+
+    <a-rounded id="progress-close-3d"
+               class="clickable"
+               position="0 -0.63 0.05"
+               width="0.8" height="0.25" radius="0.11"
+               color="#9B8FD4"
+               opacity="1">
+    </a-rounded>
+
+    <a-text id="progress-btn-text"
+            value="CONTINUAR"
+            align="center"
+            color="#ffffff"
+            position="0 -0.63 0.06"
+            width="2">
+    </a-text>
+  </a-entity>
+</a-scene>
   <script>
     const API_BASE = 'http://localhost:4000';
 
@@ -87,34 +180,97 @@
 
     const fmtDate = iso => (!iso ? '—' : (isNaN(new Date(iso)) ? '—' : new Date(iso).toLocaleString()));
 
-function computePct(row){
-  const stars = Math.round(Number(row?.max_stars || 0));
-  if (stars >= 3) return 100;
-  const raw = Number(row?.max_progress || 0);
-  return Math.max(0, Math.min(100, Math.round(raw)));
-}
+    function computePct(row){
+      const stars = Math.round(Number(row?.max_stars || 0));
+      if (stars >= 3) return 100;
+      const raw = Number(row?.max_progress || 0);
+      return Math.max(0, Math.min(100, Math.round(raw)));
+    }
 
-function openProgressModal(row){
-  const title = row.level_name || row.name || ('Nivel ' + row.level_id);
-  document.getElementById('progress-title').textContent = `Progreso : ${title}`;
+    function openProgressModal3D(row) {
+      window.MODAL_OPEN = true;
 
+      const modal = document.getElementById("progress-modal");
+      modal.setAttribute("visible", true);
 
-  const stars = Math.max(0, Math.round(row.max_stars || 0));
-  document.getElementById('progress-stars').textContent = '★'.repeat(stars) || '—';
-  document.getElementById('progress-attempts').textContent = row.attempts ?? 0;
-  document.getElementById('progress-date').textContent = fmtDate(row.last_update || row.date);
-  const pct = computePct(row);
-  document.getElementById('progress-fill').style.width = `${pct}%`;
-  document.getElementById('progress-pct').textContent = `${pct}%`;
+      const menuD = document.getElementById('menu-dificultad');
+      const menuT = document.getElementById('menu-tiempo');
 
-  document.getElementById('progress-overlay').style.display = 'flex';
-}
+      if (menuD) menuD.setAttribute('visible', false);
+      if (menuT) menuT.setAttribute('visible', false);
 
+      if (typeof setStarsVisible === 'function') {
+        setStarsVisible(false);
+      }
+    
+      const title = row.level_name || row.name || ("Nivel " + row.level_id);
+      document.getElementById("progress-title-3d").setAttribute("value", "Progreso : " + title);
+    
+      const starsContainer = document.getElementById("progress-stars-3d");
+      while (starsContainer.firstChild) starsContainer.removeChild(starsContainer.firstChild);
+    
+      const stars = Math.max(0, Math.round(row.max_stars || 0));
+      const spacing = 0.35, size = 0.22;
+      const totalW = (stars - 1) * spacing;
+      const x0 = -totalW / 2;
+    
+      for (let i = 0; i < stars; i++) {
+        const star = document.createElement("a-image");
+        star.setAttribute("src", STAR_SRC);
+        star.setAttribute("width", size);
+        star.setAttribute("height", size);
+        star.setAttribute("transparent", true);
+        star.setAttribute("position", `${x0 + i*spacing} 0 0.02`);
+        star.setAttribute("material", "transparent:true; alphaTest:0.5; side:front");
+      
+        starsContainer.appendChild(star);
+      }
+    
+      document.getElementById("progress-attempts-3d")
+        .setAttribute("value", "intentos: " + (row.attempts ?? 0));
+    
+      const fmt = iso =>
+        (!iso ? "—" : (isNaN(new Date(iso)) ? "—" : new Date(iso).toLocaleString()));
+      document.getElementById("progress-date-3d")
+        .setAttribute("value", "fecha: " + fmt(row.last_update || row.date));
+    
+      const pct = computePct(row);
+    
+      const maxWidth = 1.2;
+      const minScale = 0.05;
+      const s = Math.max(minScale, pct / 100);
+    
+      const barFill  = document.getElementById("progress-bar-fill");
+      const barTrack = document.getElementById("progress-bar-track");
+    
+      barFill.object3D.scale.set(s, 1, 1);
+    
+      const trackX = barTrack.object3D.position.x; 
+      const left   = trackX - maxWidth / 2;        
+      const centerX = left + (maxWidth * s) / 2; 
+    
+      barFill.object3D.position.x = centerX;
+    
+      document.getElementById("progress-pct-3d")
+        .setAttribute("value", pct + "%");
+    }   
 
-
-    document.getElementById('progress-close').onclick = () => {
-      document.getElementById('progress-overlay').style.display = 'none';
-    };
+    document.getElementById("progress-close-3d")
+      .addEventListener("click", () => {
+        window.MODAL_OPEN = false;
+      
+        document.getElementById("progress-modal").setAttribute("visible", false);
+      
+        const menuD = document.getElementById('menu-dificultad');
+        const menuT = document.getElementById('menu-tiempo');
+      
+        if (menuD) menuD.setAttribute('visible', true);
+        if (menuT) menuT.setAttribute('visible', false);
+      
+        if (typeof setStarsVisible === 'function') {
+          setStarsVisible(true);
+        }
+    });
 
     const ID_TO_SLOT = { 1: 'stars-facil', 2: 'stars-intermedio', 3: 'stars-dificil' };
 
@@ -147,7 +303,7 @@ function openProgressModal(row){
       hit.setAttribute('height','0.35');
       hit.setAttribute('material','transparent:true; opacity:0.001; color:#fff');
       hit.classList.add('clickable');
-      hit.addEventListener('click', () => openProgressModal(row));
+      hit.addEventListener('click', () => openProgressModal3D(row));
       slot.appendChild(hit);
 
       const spacing = 0.3, size = 0.22, totalW = (n-1)*spacing, x0 = -totalW/2;
@@ -158,7 +314,7 @@ function openProgressModal(row){
         star.setAttribute('height', String(size));
         star.setAttribute('position', `${x0 + i*spacing} 0 0.01`);
         star.classList.add('clickable');
-        star.addEventListener('click', () => openProgressModal(row));
+        star.addEventListener('click', () => openProgressModal3D(row));
         slot.appendChild(star);
       }
     }
@@ -226,10 +382,76 @@ function openProgressModal(row){
       });
       setStarsVisible(!menuTiempo.getAttribute('visible'));
     });
+
+    document.getElementById('homeHUD').addEventListener('click', () => {
+      window.location.href = '/pages/selector.html';
+    });
+
+    const logoutHUD = document.getElementById('logoutHUD');
+
+    logoutHUD.addEventListener('click', async () => {
+      try {
+        await fetch(`${API_BASE}/api/auth/logout`, {
+          method: 'POST',
+          credentials: 'include'
+        });
+      } catch (e) {
+        console.warn("Logout error:", e);
+      } finally {
+        localStorage.clear();
+        window.location.href = "/index.html";
+      }
+    });
+
   </script>
+  <script>
+    AFRAME.registerGeometry('rounded', {
+      schema: {
+        width:  { default: 1, min: 0 },
+        height: { default: 1, min: 0 },
+        radius: { default: 0.1, min: 0 }
+      },
+      init: function (data) {
+        const w = data.width;
+        const h = data.height;
+        const r = Math.min(data.radius, Math.min(w, h) / 2);
+      
+        const shape = new THREE.Shape();
+        const x = -w / 2;
+        const y = -h / 2;
+      
+        shape.moveTo(x + r, y);
+        shape.lineTo(x + w - r, y);
+        shape.quadraticCurveTo(x + w, y, x + w, y + r);
+        shape.lineTo(x + w, y + h - r);
+        shape.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        shape.lineTo(x + r, y + h);
+        shape.quadraticCurveTo(x, y + h, x, y + h - r);
+        shape.lineTo(x, y + r);
+        shape.quadraticCurveTo(x, y, x + r, y);
+      
+        this.geometry = new THREE.ShapeGeometry(shape);
+      }
+    });
+  
+    AFRAME.registerPrimitive('a-rounded', {
+      defaultComponents: {
+        geometry: { primitive: 'rounded' },
+        material: {}
+      },
+      mappings: {
+        width:  'geometry.width',
+        height: 'geometry.height',
+        radius: 'geometry.radius',
+        color:  'material.color',
+        opacity:'material.opacity'
+      }
+    });
+</script>
+<script>
+window.MODAL_OPEN = false;
+</script>
   <script src="./js/fondo-lava.js"></script>
-  <script src="./js/logout.js"></script>
-  <script src="./js/home-icon.js"></script>
   <script src="./js/logic.js" defer></script>
 </body>
 </html>

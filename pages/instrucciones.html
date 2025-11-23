@@ -1,53 +1,194 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="utf-8" />
-  <title>Instrucciones</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="../styles/instrucciones.css" />
-</head>
-<body>
-  <canvas id="lavaCanvas"
-  width="2048" height="1024"
-  style="position:fixed; top:0; left:0; width:100%; height:100%;
-         z-index:-1; pointer-events:none;"></canvas>
+<!DOCTYPE html> 
+<html lang="es"> 
+<head> 
+  <meta charset="utf-8" /> 
+  <title>Instrucciones 3D</title> 
+  <meta name="viewport" content="width=device-width, initial-scale=1" /> 
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script> 
+</head> 
+<body> 
+  <div id="dom-overlay" style="position:fixed; inset:0; pointer-events:none; z-index:10000"> 
+    <div style="pointer-events:auto"></div> 
+  </div> 
+  
+  <a-scene webxr="optionalFeatures: dom-overlay, hit-test; overlayElement: #dom-overlay" vr-mode-ui="enabled: true"> 
+    <a-assets>
+      <canvas id="lavaCanvas" width="1024" height="1024"></canvas>
+      <canvas id="roundedCard" width="512" height="512"></canvas>
+    </a-assets> 
+    
+    <a-sky id="sky" material="shader: flat; src: #lavaCanvas"></a-sky> 
+    
+    <a-entity camera look-controls position="0 1.6 0">
+      <a-entity 
+        cursor="fuse: true; fuseTimeout: 1000" 
+        position="0 0 -1"
+        geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
+        material="color: #6b5ca5; shader: flat">
+      </a-entity>
+    </a-entity> 
 
-  <div class="shell">
-    <div class="card">
-      <h1>Instrucciones</h1>
-      <ul>
-        <li>Prepara tu discurso para la exposición a continuación</li>
-        <li>El silencio es penalizado</li>
-        <li>Puedes finalizar la sesión antes, pero mínimamente debes exponer 30 segundos. Si la duración es menor, no se analizará la exposición</li>
-      </ul>
-      <button class="cta" id="continue-btn">CONTINUAR</button>
-    </div>
-  </div>
+    <a-entity id="homeHUD" position=" -1 2 -2 ">
+      <a-image
+        id="homeHUD"
+        src="./home.png"
+        position="-1.5 1 -1.2"
+        width="0.3"
+        height="0.3"
+        class="clickable">
+      </a-image>
+    </a-entity>
 
+    <a-entity id="logoutHUD" position=" 1 2 -2 ">
+        <a-image
+        id="logoutHUD"
+        src="./logout.png"
+        position="1.5 1 -1.2"
+        width="0.90"
+        height="0.35"
+        class="clickable">
+      </a-image>
+   </a-entity>
+    
+    <a-entity id="card" position="0 1.6 -2"> 
+      <a-plane id="card-bg" width="2.4" height="1.4" 
+               material="shader: flat; src: #roundedCard; transparent: true"> 
+      </a-plane> 
+      
+      <a-entity position="0 0.55 0.01" 
+                text="value: Instrucciones; color: #4A4A6A;; align: center; width: 2; wrapCount: 24; font: https://cdn.aframe.io/fonts/Roboto-msdf.json;"> 
+      </a-entity> 
+      
+      <a-entity position="0 0.03 0.01" 
+          text="value: - Prepara tu discurso para la exposicion a continuacion.\n \n - El silencio es penalizado.\n \n- Puedes finalizar la sesion antes, pero minimamente debes exponer 30 segundos. Si la duracion es menor, no se analizara la exposicion.; color: #4A4A6A; align: left; width: 2; wrapCount: 50; font: https://cdn.aframe.io/fonts/Roboto-msdf.json;">  
+      </a-entity> 
+
+      <a-entity id="continue-btn-3d" class="clickable" position="0 -0.45 0.02"> 
+        <a-rounded id="continue-btn-bg" width="0.7" height="0.24" radius="0.025" 
+                   color="#9b5de5" opacity="1"> 
+        </a-rounded> 
+        <a-entity position="0 0 0.01" 
+                  text="value: CONTINUAR; color: #ffffff; align: center; width: 0.8; wrapCount: 18; font: https://cdn.aframe.io/fonts/Roboto-msdf.json;"> 
+        </a-entity> 
+      </a-entity> 
+    </a-entity> 
+  </a-scene> 
+
+  <script src="./js/fondo-lava.js"></script> 
+  <script src="./js/logic.js" defer></script> 
+  
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
+    function createRoundedRect(canvasId, width, height, radius, color) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext('2d');
+      
+      ctx.clearRect(0, 0, width, height);
+      
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(radius, 0);
+      ctx.lineTo(width - radius, 0);
+      ctx.quadraticCurveTo(width, 0, width, radius);
+      ctx.lineTo(width, height - radius);
+      ctx.quadraticCurveTo(width, height, width - radius, height);
+      ctx.lineTo(radius, height);
+      ctx.quadraticCurveTo(0, height, 0, height - radius);
+      ctx.lineTo(0, radius);
+      ctx.quadraticCurveTo(0, 0, radius, 0);
+      ctx.closePath();
+      ctx.fill();
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      createRoundedRect('roundedCard', 512, 512, 40, '#fcf7ff');
+      
       const qs = new URLSearchParams(location.search);
-      const levelId = parseInt(qs.get("level_id"), 10) || 1;    
-      const seconds = parseInt(qs.get("seconds"), 10) || 60;   
+      const levelId = parseInt(qs.get('level_id'), 10) || 1;
+      const seconds = parseInt(qs.get('seconds'), 10) || 60;
       const minutes = Math.round(seconds / 60);
-
-      const LEVEL_SLUG = { 1:'facil', 2:'intermedio', 3:'dificil' };
-
-      document.getElementById("continue-btn").addEventListener("click", () => {
-        if (typeof setSeleccion === "function") {
-          setSeleccion(LEVEL_SLUG[levelId] || 'facil', minutes);
+      const LEVEL_SLUG = {
+        1: 'facil',
+        2: 'intermedio',
+        3: 'dificil'
+      };
+      
+      const btn = document.querySelector('#continue-btn-3d');
+      btn.addEventListener('click', () => {
+        const slug = LEVEL_SLUG[levelId] || 'facil';
+        if (typeof setSeleccion === 'function') {
+          setSeleccion(slug, minutes);
         }
-        if (typeof irAJuego === "function") {
+        if (typeof irAJuego === 'function') {
           irAJuego();
         } else {
-          console.error("irAJuego() no está definida — revisa que logic.js cargó bien");
+          console.error('irAJuego() no está definida — revisa que logic.js cargó bien');
         }
       });
     });
+  </script> 
+  <script>
+    AFRAME.registerGeometry('rounded', {
+      schema: {
+        width: {default: 1, min: 0},
+        height: {default: 1, min: 0},
+        radius: {default: 0.1, min: 0}
+      },
+      init: function(data) {
+        const w = data.width;
+        const h = data.height;
+        const r = Math.min(data.radius, Math.min(w, h) / 2);
+        
+        const shape = new THREE.Shape();
+        const x = -w / 2;
+        const y = -h / 2;
+        
+        shape.moveTo(x + r, y);
+        shape.lineTo(x + w - r, y);
+        shape.quadraticCurveTo(x + w, y, x + w, y + r);
+        shape.lineTo(x + w, y + h - r);
+        shape.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        shape.lineTo(x + r, y + h);
+        shape.quadraticCurveTo(x, y + h, x, y + h - r);
+        shape.lineTo(x, y + r);
+        shape.quadraticCurveTo(x, y, x + r, y);
+        
+        const geometry = new THREE.ShapeGeometry(shape);
+        this.geometry = geometry;
+      }
+    });
+
+    AFRAME.registerPrimitive('a-rounded', {
+      defaultComponents: {
+        geometry: {primitive: 'rounded'},
+        material: {}
+      },
+      mappings: {
+        width: 'geometry.width',
+        height: 'geometry.height',
+        radius: 'geometry.radius',
+        color: 'material.color',
+        opacity: 'material.opacity'
+      }
+    });
+
+    document.getElementById('homeHUD').addEventListener('click', () => {
+      window.location.href = '/pages/selector.html';
+    });
+    const logoutHUD = document.getElementById('logoutHUD');
+
+    logoutHUD.addEventListener('click', async () => {
+      try {
+        await fetch(`${API_BASE}/api/auth/logout`, {
+          method: 'POST',
+          credentials: 'include'
+        });
+      } catch (e) {
+        console.warn("Logout error:", e);
+      } finally {
+        localStorage.clear();
+        window.location.href = "/index.html";
+      }
+    });
   </script>
-  <script src="./js/fondo-lava.js"></script>
-  <script src="./js/logout.js"></script>
-  <script src="./js/home-icon.js"></script>
-  <script src="./js/logic.js" defer></script>
-</body>
+</body> 
 </html>

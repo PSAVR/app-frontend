@@ -56,6 +56,7 @@ async function irAJuego() {
 }
 
 function setClickable(menuEl, enabled) {
+  if (window.MODAL_OPEN) return;
   if (!menuEl) return;
   const boxes = menuEl.querySelectorAll('a-box');
   boxes.forEach(el => {
@@ -65,6 +66,7 @@ function setClickable(menuEl, enabled) {
 }
 
 function mostrarMenu(mostrarDificultad) {
+  if (window.MODAL_OPEN) return;
   const menuD = document.querySelector('#menu-dificultad');
   const menuT = document.querySelector('#menu-tiempo');
 
@@ -126,6 +128,7 @@ window.openInstructionsPage = openInstructionsPage;
 }
 
   setTimeout(() => {
+    if (window.MODAL_OPEN) return;
     const btnFacil = document.querySelector('#boton-facil');
     const btnIntermedio = document.querySelector('#boton-intermedio');
     const btnDificil = document.querySelector('#boton-dificil');

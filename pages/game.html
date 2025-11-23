@@ -6,10 +6,8 @@
     <meta name="description" content="WebXR VR Level Selector">
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
-
     <link rel="stylesheet" href="../styles/game.css" />
   </head>
-
   <body>
   <div id="loader"
       style="
@@ -25,13 +23,13 @@
           ">
 
     <div class="spinner"
-        style="
-          width:65px;
-          height:65px;
-          border:6px solid #e1e1e1;
-          border-top:6px solid #9b59b6;
-          border-radius:50%;
-          animation:spin 1s linear infinite;">
+         style="
+           width:65px;
+           height:65px;
+           border:6px solid #e1e1e1;
+           border-top:6px solid #9b5de5; 
+           border-radius:50%;
+           animation:spin 1s linear infinite;">
     </div>
     <p style="
           margin-top:18px;
@@ -42,17 +40,11 @@
       Cargando inmersión...
     </p>
   </div>  
-
     <div id="dom-overlay" style="position:fixed; inset:0; pointer-events:none;  z-index:10000">
-      <div class="top-left-container" style="pointer-events:auto">
-        <div id="timer-display">00:00</div>
-        <button id="action-btn">INICIAR</button>
-      </div>
-
       <div id="loading-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
            background:rgba(0,0,0,0.9); z-index:1000; justify-content:center; align-items:center; pointer-events:auto;">
         <div style="background:white; padding:60px 80px; border-radius:20px; text-align:center; max-width:500px;">
-          <h2 style="margin:0 0 20px; color:#333; font-size:28px;">Generando tus resultados,<br>no salgas de esta vista</h2>
+          <h2 style="margin:0 0 20px; color:#333; font-size:28px;">Generando tus resultados,no salgas de esta vista</h2>
           <div class="spinner" style="margin:30px auto; width:60px; height:60px; border:6px solid #f3f3f3;
                border-top:6px solid #9b59b6; border-radius:50%; animation:spin 1s linear infinite;"></div>
           <style>@keyframes spin {0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}</style>
@@ -62,7 +54,7 @@
       <div id="result-modal" class="result-overlay" style="display:none; pointer-events:auto;">
         <div class="result-card">
           <h3 class="result-title">Resultados</h3>
-          <p id="result-message" class="result-text">¡Buen trabajo! Sigue intentándolo.</p>
+          <p id="result-message" class="result-text">¡Buen trabajo! Sigue intentandolo.</p>
           <div id="result-stars" class="result-stars"></div>
           <button id="result-ok" class="result-ok">Aceptar</button>
         </div>
@@ -102,6 +94,9 @@
         <audio id="snd-caugh" src="../audios/cough.wav" preload="auto"></audio>
         <audio id="snd-wthought" src="../audios/WThought.mp3" preload="auto"></audio>
         <audio id="snd-cough" src="../audios/cough2.mp3" preload="auto"></audio>
+
+        <img id="star-texture" src="../images/star.png" alt="star">
+        <img id="star-texture-fallback" src="estrellas.png" alt="star">
       </a-assets>
 
       <a-entity id="contenedor-modelo" position="0 0 -3"></a-entity>
@@ -132,12 +127,150 @@
       <a-entity id="fx-cough2" sound="src: #snd-cough; autoplay: false; loop: false; positional: false; volume: 0.5"></a-entity>
       <a-entity id="visitor-container"></a-entity>
 
+      <a-entity id="ui-3d-container" position="-1.8 2.8 -2.5">
+        <a-rounded id="timer-3d-bg" width="0.6" height="0.16" radius="0.03" color="#FFFFFF" opacity="0.95" 
+                 position="0 0.19 0" material="shader: flat">
+          <a-text id="timer-3d-text" value="00:00" color="#3b2e6d" align="center" 
+                  width="1.2" position="0 0 0.01" font="roboto" letter-spacing="0"></a-text>
+      </a-rounded>
+        
+      <a-rounded id="action-btn-3d" width="0.5" height="0.14" radius="0.025" color="#a48cf0" 
+                 position="0 0 0" 
+                 class="clickable"
+                 material="shader: flat">
+        <a-text id="action-btn-text"
+                value="INICIAR"
+                color="#FFFFFF"
+                align="center"
+                width="1.0"
+                position="0 0 0.03"
+                font="roboto"
+                letter-spacing="0"></a-text>
+      </a-rounded>
+
+      </a-entity>
+
       <a-entity camera look-controls wasd-controls position="0 1.6 0">
         <a-entity cursor="fuse: true; fuseTimeout: 1000" position="0 0 -1"
           geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
-          material="color: black; shader: flat">
+          material="color: black; shader: flat"
+          raycaster="objects: .clickable">
         </a-entity>
       </a-entity>
+
+      <a-entity id="loading-panel-3d"
+                position="0 0 -2"
+                visible="false"
+                loading-modal-3d
+                follow-camera>
+
+        <a-plane width="50" height="50"
+                 color="#000000"
+                 opacity="0.75" 
+                 position="0 0 0"
+                 material="shader: flat"></a-plane>
+
+        <a-rounded width="2.0"
+                   height="0.8"
+                   radius="0.08"
+                   color="#FFFFFF"
+                   opacity="0.98"
+                   position="0 0 0.01"
+                   material="shader: flat">
+        </a-rounded>
+      
+        <a-text value="Generando tus resultados,"
+                align="center"
+                width="1.8"
+                color="#4A4A6A"
+                position="0 0.2 0.02"
+                font="https://cdn.aframe.io/fonts/Roboto-msdf.json"
+                scale="0.9 0.9 1"></a-text>
+      
+        <a-text value="no salgas de esta vista"
+                align="center"
+                width="1.8"
+                color="#4A4A6A"
+                position="0 0 0.02"
+                font="https://cdn.aframe.io/fonts/Roboto-msdf.json"
+                scale="0.9 0.9 1"></a-text>
+      
+        <a-ring radius-inner="0.03"
+                radius-outer="0.05"
+                color="#f3f3f3"
+                position="0 -0.25 0.02"
+                material="shader: flat"></a-ring>
+      
+        <a-ring radius-inner="0.03"
+                radius-outer="0.05"
+                theta-length="270"
+                color="#9b5de5"
+                position="0 -0.25 0.03"
+                material="shader: flat"
+                animation="property: rotation; to: 0 0 360; loop: true; dur: 1000; easing: linear">
+          </a-ring>
+        </a-entity>
+            
+        <a-entity id="result-panel-3d"
+                  position="0 0 -2"
+                  visible="false"
+                  result-modal-3d
+                  follow-camera>
+            
+          <a-plane width="50" height="50"
+                   color="#000000"
+                   opacity="0.75" 
+                   position="0 0 0"
+                   material="shader: flat"></a-plane>
+            
+          <a-rounded width="2.4"
+                     height="1.6"
+                     radius="0.08"
+                     color="#FFFFFF"
+                     opacity="0.98"
+                     position="0 0 0.01"
+                     material="shader: flat">
+          </a-rounded>
+        
+          <a-text id="result-title-3d"
+                  value="Resultados"
+                  align="center"
+                  width="2.2"
+                  color="#4A4A6A"
+                  position="0 0.55 0.02"
+                  font="https://cdn.aframe.io/fonts/Roboto-msdf.json"
+                  scale="1.2 1.2 1"></a-text>
+        
+          <a-text id="result-message-3d"
+                  value=""
+                  align="center"
+                  width="2.1"
+                  color="#4A4A6A"
+                  position="0 0.15 0.02"
+                  font="https://cdn.aframe.io/fonts/Roboto-msdf.json"
+                  wrap-count="35"
+                  baseline="center"
+                  scale="0.9 0.9 1"></a-text>
+        
+          <a-entity id="result-stars-container-3d" position="0 -0.15 0.02"></a-entity>
+        
+          <a-rounded id="result-ok-3d"
+                     class="clickable"
+                     width="0.8"
+                     height="0.18"
+                     radius="0.04"
+                     color="#9b5de5"
+                     position="0 -0.55 0.02"
+                     material="shader: flat">
+            <a-text value="Aceptar"
+                    align="center"
+                    width="1.6"
+                    color="#FFFFFF"
+                    position="0 0 0.03"
+                    font="roboto"></a-text>
+          </a-rounded>
+        </a-entity>
+
     </a-scene>
 
     <script src="./js/config.js"></script>
@@ -147,12 +280,352 @@
     <script src="./js/difcontroller.js"></script>
     
     <script>
+      AFRAME.registerComponent('follow-camera', {
+        init: function () {
+          this.camera = document.querySelector('[camera]');
+        },
+        tick: function () {
+          if (this.camera) {
+            const cameraPos = this.camera.getAttribute('position');
+            const cameraRot = this.camera.getAttribute('rotation');
+
+            this.el.setAttribute('position', {
+              x: cameraPos.x,
+              y: cameraPos.y,
+              z: cameraPos.z - 2 
+            });
+
+            this.el.setAttribute('rotation', {
+              x: 0,
+              y: cameraRot.y,
+              z: 0
+            });
+          }
+        }
+      });
+
+      AFRAME.registerGeometry('rounded', {
+        schema: {
+          width: {default: 1, min: 0},
+          height: {default: 1, min: 0},
+          radius: {default: 0.1, min: 0}
+        },
+        init: function(data) {
+          const w = data.width;
+          const h = data.height;
+          const r = Math.min(data.radius, Math.min(w, h) / 2);
+          
+          const shape = new THREE.Shape();
+          const x = -w / 2;
+          const y = -h / 2;
+          
+          shape.moveTo(x + r, y);
+          shape.lineTo(x + w - r, y);
+          shape.quadraticCurveTo(x + w, y, x + w, y + r);
+          shape.lineTo(x + w, y + h - r);
+          shape.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+          shape.lineTo(x + r, y + h);
+          shape.quadraticCurveTo(x, y + h, x, y + h - r);
+          shape.lineTo(x, y + r);
+          shape.quadraticCurveTo(x, y, x + r, y);
+          
+          const geometry = new THREE.ShapeGeometry(shape);
+          this.geometry = geometry;
+        }
+      });
+
+      AFRAME.registerPrimitive('a-rounded', {
+        defaultComponents: {
+          geometry: {primitive: 'rounded'},
+          material: {}
+        },
+        mappings: {
+          width: 'geometry.width',
+          height: 'geometry.height',
+          radius: 'geometry.radius',
+          color: 'material.color',
+          opacity: 'material.opacity'
+        }
+      });
+    </script>
+
+    <script>
+      AFRAME.registerComponent('loading-modal-3d', {
+        init: function () {
+        },
+        show: function () {
+          this.el.setAttribute('visible', true);
+        },
+        hide: function () {
+          this.el.setAttribute('visible', false);
+        }
+      });
+
+      AFRAME.registerComponent('result-modal-3d', {
+        init: function () {
+          this.titleEl = this.el.querySelector('#result-title-3d');
+          this.msgEl = this.el.querySelector('#result-message-3d');
+          this.starsContainer = this.el.querySelector('#result-stars-container-3d');
+        
+          const okBtn = this.el.querySelector('#result-ok-3d');
+          if (okBtn) {
+            okBtn.addEventListener('click', () => {
+              this.hide();
+              setCameraControlsEnabled(true);
+
+              if (typeof window.onResultOk === 'function') {
+                window.onResultOk();
+              }
+            });
+          }
+        },
+      
+        show: function (message, stars, title) {
+          this.clearStars();
+
+          if (this.titleEl && title) {
+            this.titleEl.setAttribute('value', title);
+          }
+          if (this.msgEl && message) {
+            this.msgEl.setAttribute('value', message);
+          }
+
+          this.renderStars(stars);
+
+          this.el.setAttribute('visible', true);
+          setCameraControlsEnabled(false);
+        },
+      
+        hide: function () {
+          this.el.setAttribute('visible', false);
+          setCameraControlsEnabled(true);
+        },
+      
+        clearStars: function() {
+          if (this.starsContainer) {
+            this.starsContainer.innerHTML = '';
+          }
+        },
+      
+      renderStars: function(stars) {
+        if (!this.starsContainer) return;
+
+        let starCount = 0;
+
+        if (typeof stars === "number") {
+          starCount = Math.max(0, Math.min(3, stars));
+        } else if (typeof stars === "string") {
+          starCount = parseInt(stars, 10) || 0;
+        }
+
+        starCount = Math.max(0, Math.min(3, starCount));
+        console.log("Mostrando estrellas:", starCount);
+
+        if (starCount === 0) {
+          this.starsContainer.setAttribute('visible', 'false');
+          return;
+        }
+
+        this.starsContainer.setAttribute('visible', 'true');
+        this.clearStars();
+
+        const starSpacing = 0.3;
+        const startX = -((starCount - 1) * starSpacing) / 2;
+
+        for (let i = 0; i < starCount; i++) {
+          const star = this.createPurpleStar();
+          star.setAttribute('position', {
+            x: startX + (i * starSpacing),
+            y: -0.15,
+            z: 0.02
+          });
+          this.starsContainer.appendChild(star);
+        }
+      },
+
+      createPurpleStar: function() {
+        const star = document.createElement('a-entity');
+
+        const starShape = new THREE.Shape();
+        const spikes = 5;
+        const outerRadius = 0.07;
+        const innerRadius = 0.035;
+
+        let rot = (Math.PI / 2) * 3;
+        starShape.moveTo(0, -outerRadius);
+
+        for (let i = 0; i < spikes; i++) {
+          const x1 = Math.cos(rot) * outerRadius;
+          const y1 = Math.sin(rot) * outerRadius;
+          starShape.lineTo(x1, y1);
+          rot += Math.PI / spikes;
+
+          const x2 = Math.cos(rot) * innerRadius;
+          const y2 = Math.sin(rot) * innerRadius;
+          starShape.lineTo(x2, y2);
+          rot += Math.PI / spikes;
+        }
+
+        starShape.lineTo(0, -outerRadius);
+
+        const geometry = new THREE.ShapeGeometry(starShape);
+        const material = new THREE.MeshBasicMaterial({
+          color: 0x7A3FBF,
+          transparent: false,
+          side: THREE.DoubleSide
+        });
+
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.rotation.x = Math.PI;
+        mesh.scale.set(1.2, 1.2, 1.2);
+
+        star.object3D.add(mesh);
+
+        return star;
+      },
+
+      drawStar: function(ctx, cx, cy, spikes, outerRadius, innerRadius) {
+        let rot = Math.PI / 2 * 3;
+        let x = cx;
+        let y = cy;
+        let step = Math.PI / spikes;
+      
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - outerRadius);
+      
+        for (let i = 0; i < spikes; i++) {
+          x = cx + Math.cos(rot) * outerRadius;
+          y = cy + Math.sin(rot) * outerRadius;
+          ctx.lineTo(x, y);
+          rot += step;
+        
+          x = cx + Math.cos(rot) * innerRadius;
+          y = cy + Math.sin(rot) * innerRadius;
+          ctx.lineTo(x, y);
+          rot += step;
+        }
+      
+        ctx.lineTo(cx, cy - outerRadius);
+        ctx.closePath();
+
+        ctx.fillStyle = '#9b59b6';
+        ctx.fill();
+
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#8e44ad';
+        ctx.stroke();
+      },
+
+      drawStar: function(ctx, cx, cy, spikes, outerRadius, innerRadius) {
+        let rot = Math.PI / 2 * 3;
+        let x = cx;
+        let y = cy;
+        let step = Math.PI / spikes;
+      
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - outerRadius);
+      
+        for (let i = 0; i < spikes; i++) {
+          x = cx + Math.cos(rot) * outerRadius;
+          y = cy + Math.sin(rot) * outerRadius;
+          ctx.lineTo(x, y);
+          rot += step;
+        
+          x = cx + Math.cos(rot) * innerRadius;
+          y = cy + Math.sin(rot) * innerRadius;
+          ctx.lineTo(x, y);
+          rot += step;
+        }
+      
+        ctx.lineTo(cx, cy - outerRadius);
+        ctx.closePath();
+        ctx.fill();
+      }
+    });
+
+    function setCameraControlsEnabled(enabled) {
+      const cam = document.querySelector('[camera]');
+      if (!cam || !cam.components) return;
+
+      const wasd = cam.components['wasd-controls'];
+      if (wasd && typeof wasd.pause === 'function' && typeof wasd.play === 'function') {
+        if (enabled) {
+          wasd.play();
+        } else {
+          wasd.pause();
+        }
+      }
+
+      const look = cam.components['look-controls'];
+      if (look && typeof look.play === 'function') {
+        look.play(); 
+      }
+
+      const cursor = document.querySelector('[cursor]');
+      if (cursor) {
+        cursor.setAttribute('visible', true);
+      }
+    }
+
+    function getCmp(id, name) {
+      const el = document.querySelector(id);
+      if (!el) return null;
+      const cmp = el.components[name];
+      return cmp ? cmp : null;
+    }
+
+    window.showLoading3D = function () {
+      const cmp = getCmp('#loading-panel-3d', 'loading-modal-3d');
+      if (cmp) cmp.show();
+    
+      const timerUI = document.getElementById('ui-3d-container');
+      if (timerUI) timerUI.setAttribute('visible', 'false');
+
+      if (typeof stopTimer === 'function') stopTimer();
+      if (typeof stopAudioCues === 'function') stopAudioCues();
+      if (typeof stopEmojis === 'function') stopEmojis();
+      setCameraControlsEnabled(false);
+    };
+
+    window.hideLoading3D = function () {
+      const cmp = getCmp('#loading-panel-3d', 'loading-modal-3d');
+      if (cmp) cmp.hide();
+    
+      const timerUI = document.getElementById('ui-3d-container');
+      if (timerUI) timerUI.setAttribute('visible', 'true');
+    };
+
+    window.showResult3D = function (message, stars, title) {
+      console.log("showResult3D llamado:", { message, stars, title });
+      const cmp = getCmp('#result-panel-3d', 'result-modal-3d');
+      if (cmp) cmp.show(message, stars, title);
+    
+      const timerUI = document.getElementById('ui-3d-container');
+      if (timerUI) timerUI.setAttribute('visible', 'false');
+    
+      if (typeof stopTimer === 'function') stopTimer();
+      if (typeof stopAudioCues === 'function') stopAudioCues();
+      if (typeof stopEmojis === 'function') stopEmojis();
+      setCameraControlsEnabled(false);
+    };
+
+    window.hideResult3D = function () {
+      const cmp = getCmp('#result-panel-3d', 'result-modal-3d');
+      if (cmp) cmp.hide();
+
+      const timerUI = document.getElementById('ui-3d-container');
+      if (timerUI) timerUI.setAttribute('visible', 'true');
+
+      setCameraControlsEnabled(true);
+    };
+  </script>
+    <script>
       document.addEventListener("DOMContentLoaded", () => {
         const nivel = getNivel();
         const scene = document.querySelector("a-scene");
 
         if (nivel === "intermedio") {
-          console.log("💡 Applying bright lighting for INTERMEDIATE level...");
+          console.log("Applying bright lighting for INTERMEDIATE level...");
 
           const ambient = document.createElement("a-entity");
           ambient.setAttribute("light", {
@@ -185,7 +658,6 @@
       });
       </script>
 
-
     <script>
       document.addEventListener("DOMContentLoaded", () => {
         const nivel = getNivel();
@@ -197,7 +669,7 @@
           scene.setAttribute("lvl3-visitor-event", "enabled: false");
           scene.removeAttribute("lvl2-visitor-event");
           scene.removeAttribute("lvl3-visitor-event");
-          console.log("🎮 Nivel FACIL → usando lvl1-visitor-event");
+          console.log("Nivel FACIL usando lvl1-visitor-event");
         }
         else if (nivel === "intermedio") {
           scene.setAttribute("lvl2-visitor-event", "enabled: true");
@@ -205,7 +677,7 @@
           scene.setAttribute("lvl3-visitor-event", "enabled: false");
           scene.removeAttribute("lvl1-visitor-event");
           scene.removeAttribute("lvl3-visitor-event");
-          console.log("🎮 Nivel INTERMEDIO → usando lvl2-visitor-event");
+          console.log("Nivel INTERMEDIO usando lvl2-visitor-event");
         }
         else if (nivel === "dificil") {
           scene.setAttribute("lvl3-visitor-event", "enabled: true");
@@ -213,16 +685,66 @@
           scene.setAttribute("lvl2-visitor-event", "enabled: false");
           scene.removeAttribute("lvl1-visitor-event");
           scene.removeAttribute("lvl2-visitor-event");
-          console.log("🎮 Nivel DIFICIL → usando lvl3-visitor-event");
+          console.log("Nivel DIFICIL usando lvl3-visitor-event");
         }
         else {
-          console.warn("⚠ Nivel desconocido, no se cargaron eventos.");
+          console.warn("Nivel desconocido, no se cargaron eventos.");
         }
       });
     </script>
-
-
     <script>
+      AFRAME.registerComponent('button-3d-handler', {
+        init: function() {
+          this.el.addEventListener('click', () => {
+            const btn3d = document.getElementById('action-btn-3d');
+            const btnText = document.getElementById('action-btn-text');
+            const currentText = btnText.getAttribute('value');
+            
+            if (estadoSesion === 'idle') {
+              btnText.setAttribute('value', 'Iniciando...');
+              btn3d.setAttribute('color', '#9b7dd4');
+              
+              startImmersion()
+                .then(() => {
+                  btnText.setAttribute('value', 'ENVIAR');
+                  btn3d.setAttribute('color', '#a48cf0');
+                  if (typeof startCountdown === 'function') startCountdown();
+                })
+                .catch((err) => {
+                  console.error(err);
+                  btnText.setAttribute('value', 'INICIAR');
+                  btn3d.setAttribute('color', '#a48cf0');
+                });
+            } else if (estadoSesion === 'recording') {
+              let elapsed = 0;
+              if (window.initialSeconds !== undefined && window.countdownSeconds !== undefined) {
+                elapsed = Math.max(0, window.initialSeconds - window.countdownSeconds);
+              } else {
+                elapsed = segundosTranscurridos;
+              }
+              
+              const debeSubir = elapsed >= 30;
+              
+              if (typeof window.finalizarSesionWrapper === 'function') {
+                window.finalizarSesionWrapper(debeSubir);
+              } else {
+                if (typeof stopTimer === 'function') stopTimer();
+                finalizarSesion(debeSubir);
+              }
+            }
+          });
+        }
+      });
+
+      document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+          const btn3d = document.getElementById('action-btn-3d');
+          if (btn3d) {
+            btn3d.setAttribute('button-3d-handler', '');
+          }
+        }, 500);
+      });
+
       let timerInterval;
       let isTimerRunning = false;
       let countdownSeconds = 0;
@@ -231,8 +753,9 @@
       window.countdownSeconds = countdownSeconds;
       window.initialSeconds = initialSeconds;
 
-      const timerDisplay = document.getElementById('timer-display');
-      const actionBtn = document.getElementById('action-btn');
+      let timerText3d;
+      let actionBtn3d;
+      let actionBtnText;
 
       function formatTime(seconds) {
         const m = Math.floor(seconds / 60);
@@ -243,16 +766,17 @@
       function updateTimer() {
         if (countdownSeconds > 0) {
           countdownSeconds--;
-          timerDisplay.textContent = formatTime(countdownSeconds);
+          const formatted = formatTime(countdownSeconds);
+          if (timerText3d) timerText3d.setAttribute('value', formatted);
           window.countdownSeconds = countdownSeconds;
           window.initialSeconds = initialSeconds;
           if (window.segundosTranscurridos !== undefined) {
             window.segundosTranscurridos = initialSeconds - countdownSeconds;
           }
         } else {
-          stopEmojis();
-          stopAudioCues();
-          stopTimer();
+          if (typeof stopEmojis === 'function') stopEmojis();
+          if (typeof stopAudioCues === 'function') stopAudioCues();
+          if (typeof stopTimer === 'function') stopTimer();
           if (typeof finalizarSesion === 'function') finalizarSesion(true);
         }
       }
@@ -264,50 +788,50 @@
           initialSeconds = countdownSeconds;
           window.countdownSeconds = countdownSeconds;
           window.initialSeconds = initialSeconds;
-
-          timerDisplay.textContent = formatTime(countdownSeconds);
+        
+          if (timerText3d) timerText3d.setAttribute('value', formatTime(countdownSeconds));
           timerInterval = setInterval(updateTimer, 1000);
           isTimerRunning = true;
-          actionBtn.textContent = 'ENVIAR';
-
-          startAudioCues();
-          startEmojis();
+          if (actionBtnText) actionBtnText.setAttribute('value', 'ENVIAR');
+        
+          if (typeof startAudioCues === 'function') startAudioCues();
+          if (typeof startEmojis === 'function') startEmojis();
         }
       }
 
       function stopTimer() {
-        if (isTimerRunning) { clearInterval(timerInterval); isTimerRunning = false; }
+        if (isTimerRunning) {
+          clearInterval(timerInterval);
+          isTimerRunning = false;
+        }
       }
 
       function showInitialTime() {
         const minutos = parseInt(localStorage.getItem('tiempoSeleccionado'), 10) || 1;
         countdownSeconds = minutos * 60;
-        timerDisplay.textContent = formatTime(countdownSeconds);
-        actionBtn.textContent = 'INICIAR';
-        actionBtn.disabled = false;
+        if (timerText3d) timerText3d.setAttribute('value', formatTime(countdownSeconds));
+        if (actionBtnText) actionBtnText.setAttribute('value', 'INICIAR');
       }
 
       function resetTimer() {
         stopTimer();
         countdownSeconds = 0;
-        timerDisplay.textContent = '00:00';
-        actionBtn.textContent = 'INICIAR';
-        actionBtn.disabled = false;
+        if (timerText3d) timerText3d.setAttribute('value', '00:00');
+        if (actionBtnText) actionBtnText.setAttribute('value', 'INICIAR');
       }
 
-      window.finalizarSesionWrapper = function (subir) {
-        window.visitorEventEnabled = false;
+      window.addEventListener('load', () => {
+        timerText3d  = document.getElementById('timer-3d-text');
+        actionBtn3d  = document.getElementById('action-btn-3d');
+        actionBtnText = document.getElementById('action-btn-text');
+      
+        if (actionBtn3d && !actionBtn3d.hasAttribute('button-3d-handler')) {
+          actionBtn3d.setAttribute('button-3d-handler', '');
+        }
+      
+        setTimeout(showInitialTime, 100);
+      });
 
-        if (typeof stopEmojis === 'function') stopEmojis();
-        if (typeof stopAudioCues === 'function') stopAudioCues();
-        if (typeof stopTimer === 'function') stopTimer();
-
-        if (typeof finalizarSesion === 'function') finalizarSesion(subir);
-      };
-
-
-      window.addEventListener('load', showInitialTime);
-      document.addEventListener('DOMContentLoaded', showInitialTime);
 
       const sceneEl = document.querySelector('#escena-vr');
       const fxMurmurEl = document.querySelector('#fx-murmur');
@@ -421,16 +945,6 @@
         schedulePhase1();
       }
 
-      actionBtn.addEventListener('click', () => {
-        if (actionBtn.textContent === 'INICIAR') {
-          window.visitorEventEnabled = true;
-        } 
-        if (actionBtn.textContent === 'ENVIAR') {
-          stopEmojis();
-          stopAudioCues();
-        }
-      });
-
       sceneEl.addEventListener('enter-vr', () => { if (isTimerRunning) { startAudioCues(); startEmojis(); } });
       sceneEl.addEventListener('exit-vr',  () => { stopEmojis(); stopAudioCues(); });
       sceneEl.addEventListener('enter-ar', () => { if (isTimerRunning) { startAudioCues(); startEmojis(); } });
@@ -464,17 +978,6 @@
       function getCameraEl() {
         const scene = document.querySelector('a-scene');
         return scene?.camera?.el || scene?.querySelector('[camera]');
-      }
-      function emojiDataURL(face, sizePx = 256) {
-        const c = document.createElement('canvas');
-        c.width = c.height = sizePx;
-        const ctx = c.getContext('2d');
-        ctx.clearRect(0, 0, sizePx, sizePx);
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.font = `${Math.floor(sizePx*0.82)}px "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji","EmojiOne Color","Twemoji Mozilla",sans-serif`;
-        ctx.fillText(face, sizePx/2, sizePx/2);
-        return c.toDataURL('image/png');
       }
 
       function emojiCanvas(face, sizePx = 256) {
@@ -521,7 +1024,7 @@
         if (!camEl) return;
         if (ACTIVE_EMOJIS.size >= MAX_ONSCREEN) return;
       
-        const chosen = face || EMOJIS_RANDOM[Math.floor(Math.random() * EMOJIS_RANDOM.length)];
+        const chosen = face || EMOJI_RANDOM[Math.floor(Math.random() * EMOJIS_RANDOM.length)];
         const size = EMOJI_SIZE_MIN + Math.random() * (EMOJI_SIZE_MAX - EMOJI_SIZE_MIN);
         const { x, y } = findFreePosition(size);
       
@@ -638,46 +1141,42 @@
         }
       });
     </script>
-<script>
-function safeShowScene() {
-  const scene  = document.querySelector("#escena-vr");
-  const loader = document.querySelector("#loader");
-  if (!scene) return;
+    <script>
+    function safeShowScene() {
+      const scene  = document.querySelector("#escena-vr");
+      const loader = document.querySelector("#loader");
+      if (!scene) return;
+    
+      console.log("ðŸŒ„ MODELO LISTO â†’ FADE IN");
+    
+      scene.style.opacity = "1";
+      loader.style.opacity = "0";
+    
+      setTimeout(() => loader.remove(), 800);
+    }
 
-  console.log("🌄 MODELO LISTO → FADE IN");
+    function waitUntilModelReady() {
+      const nivel = getNivel();
+      const cont  = document.querySelector("#contenedor-modelo");
+    
+      let target;
+    
+      if (nivel === "facil")      target = "#modelo-facil";
+      else if (nivel === "intermedio") target = "#modelo-inter";
+      else                         target = "#modelo-dificil";
+    
+      console.log("Esperando MODEL-LOADED de", target);
+    
+      cont.addEventListener("model-loaded", safeShowScene, { once:true });
+    
+      setTimeout(() => {
+        console.warn("Fallback no llego model-loaded, forzando fade");
+        safeShowScene();
+      }, 10000);
+    }
 
-  scene.style.opacity = "1";
-  loader.style.opacity = "0";
+    window.addEventListener("DOMContentLoaded", waitUntilModelReady);
 
-  setTimeout(() => loader.remove(), 800);
-}
-
-
-function waitUntilModelReady() {
-  const nivel = getNivel();
-  const cont  = document.querySelector("#contenedor-modelo");
-
-  let target;
-
-  if (nivel === "facil")      target = "#modelo-facil";
-  else if (nivel === "intermedio") target = "#modelo-inter";
-  else                         target = "#modelo-dificil";
-
-  console.log("⏳ Esperando MODEL-LOADED de", target);
-
-  cont.addEventListener("model-loaded", safeShowScene, { once:true });
-
-  // Fallback 5s
-  setTimeout(() => {
-    console.warn("⚠ Fallback → no llegó model-loaded, forzando fade");
-    safeShowScene();
-  }, 10000);
-}
-
-window.addEventListener("DOMContentLoaded", waitUntilModelReady);
-
-</script>
-
+    </script>
   </body>
 </html>
-

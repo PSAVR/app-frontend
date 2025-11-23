@@ -24,6 +24,28 @@
         material="color: #6b5ca5; shader: flat">
       </a-entity>
     </a-entity>
+    
+    <a-entity id="homeHUD" position=" -1 2 -2 ">
+      <a-image
+        id="homeHUD"
+        src="./home.png"
+        position="-1.5 1 -1.2"
+        width="0.3"
+        height="0.3"
+        class="clickable">
+      </a-image>
+    </a-entity>
+
+    <a-entity id="logoutHUD" position=" 1 2 -2 ">
+        <a-image
+        id="logoutHUD"
+        src="./logout.png"
+        position="1.5 1 -1.2"
+        width="0.90"
+        height="0.35"
+        class="clickable">
+      </a-image>
+   </a-entity>
 
     <a-entity id="menu-dificultad">
       <a-text value="Visualiza tu historial" position="0 2.3 -3" align="center" color="#4a4a6a" width="6"></a-text>
@@ -52,10 +74,10 @@
         window.location.href = `historial-grafico.html?level=${encodeURIComponent(level)}`;
       });
     });
+    document.getElementById('homeHUD').addEventListener('click', () => {
+          window.location.href = '/pages/selector.html';
+    });
   </script>
   <script src="./js/fondo-lava.js"></script>
-  <script src="./js/logout.js"></script>
-  <script src="./js/home-icon.js"></script>
-
 </body>
 </html>

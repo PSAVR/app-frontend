@@ -44,12 +44,12 @@ function renderStars(container, n) {
 
 function capitalizarNivel(n) {
   const map = {
-    1: "Fácil",
+    1: "Facil",
     2: "Intermedio",
-    3: "Difícil",
-    "facil": "Fácil",
+    3: "Dificil",
+    "facil": "Facil",
     "intermedio": "Intermedio",
-    "dificil": "Difícil"
+    "dificil": "Dificil"
   };
   return map[n] || n;
 }
@@ -67,11 +67,13 @@ function buildFeedbackMessage({
   let texto = "";
 
   if (promoted && toLevelId) {
-    texto = `¡Excelente trabajo! Esta sesión fue lo suficientemente buena como para llevarte al <span style="font-weight:700; color:#7c3aed;">nivel ${capitalizarNivel(toLevelId)}</span>. `;
+    texto = `¡Excelente trabajo! Esta sesion fue lo suficientemente buena como para llevarte al nivel ${capitalizarNivel(toLevelId)}. `;
   } else if (stars === 2) {
     texto = `Lo estás haciendo bien, se nota el esfuerzo por mejorar. `;
-  } else {
+  } else if (stars === 1) {
     texto = `Gracias por intentarlo, cada sesion te ayuda a mejorar. `;
+  } else {
+    texto = `Sigue practicando, la mejora llegara con el tiempo. `;
   }
 
   if (band === "baja") {
@@ -79,25 +81,26 @@ function buildFeedbackMessage({
   } else if (band === "media") {
     texto += "Hubieron momentos donde los nervios te ganaron pero diste tu mejor esfuerzo. ";
   } else if (band === "alta") {
-    texto += "Se notó más tensión durante la sesión, pero eso es parte del proceso. ";
+    texto += "Se noto más tensión durante la sesion, pero eso es parte del proceso. ";
   }
 
   if (pauseRatio !== null) {
     if (pauseRatio > 0.45) {
-      texto += "Notamos que hiciste bastantes pausas largas; con práctica puedes hacer que tu discurso suene más fluido. ";
+      texto += "Notamos que hiciste bastantes pausas largas; con practica puedes hacer que tu discurso suene mas fluido. ";
     } else if (pauseRatio > 0.25) {
       texto += "Hiciste algunas pausas naturales al hablar, aunque a veces cortaron un poco el ritmo. ";
     } else {
-      texto += "Mantuviste un ritmo continuo y tu mensaje fluyó bien. ";
+      texto += "Mantuviste un ritmo continuo y tu mensaje fluyo bien. ";
     }
   }
 
   if (!promoted) {
-    texto += `Te mantienes en el <span style="font-weight:700; color:#7c3aed;">nivel ${capitalizarNivel(currentLevelName)}</span>.`;
+    texto += `Te mantienes en el nivel ${capitalizarNivel(currentLevelName)}.`;
   }
 
   return texto.trim();
 }
+
 
 function showResultModal({
   stars = 0,
@@ -108,36 +111,37 @@ function showResultModal({
   pauseRatio = null,
   pausesPerMin = null
 }) {
-  const overlay = document.getElementById('result-modal');
-  const msgEl = document.getElementById('result-message');
-  const starsEl = document.getElementById('result-stars');
-  const okBtn = document.getElementById('result-ok');
-  if (!overlay || !msgEl || !starsEl || !okBtn) {
-    console.warn('Modal de resultados no encontrado');
-    return;
-  }
+  const currentLevelName = getNivelDesdeURL();
 
-  const nivelActual = getNivelDesdeURL();
-
-  const mensaje = buildFeedbackMessage({
+  const mensajeHtml = buildFeedbackMessage({
     band,
     promoted,
     toLevelId,
     stars,
-    currentLevelName: nivelActual,
+    currentLevelName,
     pauseCount,
     pauseRatio,
     pausesPerMin
   });
 
-  msgEl.innerHTML = mensaje;
+  const mensajePlano = mensajeHtml.replace(/<[^>]+>/g, '');
 
-  renderStars(starsEl, stars);
-  overlay.style.display = 'flex';
-  okBtn.onclick = () => {
-    overlay.style.display = 'none';
-    window.location.href = '/pages/main.html';
-  };
+  if (typeof showResult3D === 'function') {
+    showResult3D(mensajePlano, stars, 'Resultados');
+  } else {
+    alert(mensajePlano);
+  }
+}
+
+
+function showNoVoiceModal() {
+  const mensaje = 'No se detectó ninguna voz, por favor intentar de nuevo.';
+
+  if (typeof showResult3D === 'function') {
+    showResult3D(mensaje, 0, 'Resultados');
+  } else {
+    alert(mensaje);
+  }
 }
 
 
@@ -163,30 +167,49 @@ function showMicBanner(message, color = "#842029", bg = "#f8d7da", border = "#f5
   setTimeout(() => bar?.remove?.(), 9000);
 }
 
+function setMainButtonLabel(label) {
+  const domBtn =
+    document.getElementById('action-btn') ||
+    document.getElementById('start-btn');
+
+  if (domBtn) {
+    domBtn.textContent = label;
+  }
+
+  const text3d = document.getElementById('action-btn-text');
+  if (text3d) {
+    text3d.setAttribute('value', label.toUpperCase());
+  }
+}
+
+
 function handleMicError(err) {
-  let msg = "No pudimos acceder al micrófono.";
+  let msg = "No pudimos acceder al microfono.";
   let color = "#842029", bg = "#f8d7da", border = "#f5c2c7"; 
 
   switch (err?.name) {
     case "NotAllowedError":
-      msg = "El micrófono está bloqueado. Actívalo en Configuración > Privacidad > Micrófono o permite el acceso desde el navegador.";
+      msg = "El microfono esta bloqueado. Activalo en Configuracion > Privacidad > Microfono o permite el acceso desde el navegador.";
       break;
     case "NotFoundError":
-      msg = "No se detectó ningún micrófono conectado o está apagado en los ajustes del sistema.";
+      msg = "No se detecto ningun microfono conectado o esta apagado en los ajustes del sistema.";
       break;
     case "NotReadableError":
-      msg = "Otro programa está usando el micrófono. Ciérralo e inténtalo nuevamente.";
+      msg = "Otro programa esta usando el microfono. Cierralo e intentalo nuevamente.";
       break;
     default:
-      msg = `Error de micrófono: ${err?.name || "desconocido"}`;
+      msg = `Error de microfono: ${err?.name || "desconocido"}`;
   }
 
   showMicBanner(msg, color, bg, border);
   console.warn("Mic error:", err);
 
   try { if (typeof window.stopTimer === 'function') window.stopTimer(); } catch {}
-  const btn = document.getElementById('action-btn') || document.getElementById('start-btn');
-  if (btn) { btn.disabled = false; btn.textContent = 'INICIAR'; }
+  const btn =
+  document.getElementById('action-btn') ||
+  document.getElementById('start-btn') ||
+  document.getElementById('action-btn-3d');
+  if (btn) { btn.disabled = false; setMainButtonLabel('INICIAR');}
 }
 
 async function ensureMicReady() {
@@ -210,28 +233,8 @@ async function ensureMicReady() {
   }
 }
 
-function showNoVoiceModal() {
-  const overlay = document.getElementById('result-modal');
-  const msgEl   = document.getElementById('result-message');
-  const starsEl = document.getElementById('result-stars');
-  const okBtn   = document.getElementById('result-ok');
-
-  if (overlay && msgEl && starsEl && okBtn) {
-    msgEl.textContent = 'No se detectó ninguna voz, por favor intentar de nuevo.';
-    starsEl.innerHTML = '';
-    overlay.style.display = 'flex';
-    okBtn.onclick = () => {
-      overlay.style.display = 'none';
-      window.location.href = '/pages/main.html';
-    };
-  } else {
-    alert('No se detectó ninguna voz, por favor intentar de nuevo.');
-  }
-}
-
-
 async function enviarAudioYMostrarResultados(blobWebm) {
-  const loading = document.getElementById('loading-modal');
+  showLoading3D();
 
   try {
     const base = window.API_BASE || 'http://localhost:4000';
@@ -247,7 +250,6 @@ async function enviarAudioYMostrarResultados(blobWebm) {
     form.append('user_id', String(user_id));
     form.append('immersion_level_name', nivel);
 
-    if (loading) loading.style.display = 'flex';
 
     const r = await fetch(`${base}/api/sessions/audio`, {
       method: 'POST',
@@ -255,33 +257,33 @@ async function enviarAudioYMostrarResultados(blobWebm) {
       credentials: 'include'
     });
 
-  const data = await r.json();
+    const data = await r.json();
 
-  const payload = data?.result || data;
+    const payload = data?.result || data;
     
-  const ansiedadRaw = payload?.model?.anxiety_pct ?? payload?.anxiety_pct;
-  const ansiedadNum = Number(ansiedadRaw);
-  const ansiedadValida = Number.isFinite(ansiedadNum);
+    const ansiedadRaw = payload?.model?.anxiety_pct ?? payload?.anxiety_pct;
+    const ansiedadNum = Number(ansiedadRaw);
+    const ansiedadValida = Number.isFinite(ansiedadNum);
     
-  const band         = payload?.model?.band          ?? payload?.band          ?? null;
-  const pauseCount   = payload?.model?.pause_count   ?? payload?.pause_count   ?? null;
-  const pauseRatio   = payload?.model?.pause_ratio   ?? payload?.pause_ratio   ?? null;
-  const pausesPerMin = payload?.model?.pauses_per_min?? payload?.pauses_per_min?? null;
+    const band         = payload?.model?.band          ?? payload?.band          ?? null;
+    const pauseCount   = payload?.model?.pause_count   ?? payload?.pause_count   ?? null;
+    const pauseRatio   = payload?.model?.pause_ratio   ?? payload?.pause_ratio   ?? null;
+    const pausesPerMin = payload?.model?.pauses_per_min?? payload?.pauses_per_min?? null;
 
 
     if (!ansiedadValida) {
       console.warn('Ansiedad inválida recibida desde el backend:', ansiedadRaw);
-      if (loading) loading.style.display = 'none';
+      hideLoading3D();
       showNoVoiceModal();
       return;
     }
 
     if (!r.ok) {
-      if (loading) loading.style.display = 'none';
+      hideLoading3D();
       throw new Error(data.error || 'Fallo procesando audio');
     }
 
-    if (loading) loading.style.display = 'none';
+    hideLoading3D();
 
     const star_rating = Number(
       data?.detail?.star_rating ??
@@ -307,10 +309,15 @@ async function enviarAudioYMostrarResultados(blobWebm) {
 
   } catch (err) {
     console.error('Error al enviar audio:', err);
-    if (loading) loading.style.display = 'none';
+    if (typeof hideLoading3D === 'function') hideLoading3D();
     showNoVoiceModal();
   }
 }
+
+window.onResultOk = function () {
+  window.location.href = '/pages/main.html';
+};
+
 
 async function iniciarGrabacion() {
   try {
@@ -359,10 +366,14 @@ function restablecerUI() {
   segundosRestantes = 0;
   if (intervaloContador) clearInterval(intervaloContador);
 
-  const btn = document.getElementById('action-btn') || document.getElementById('start-btn');
+  const btn =
+  document.getElementById('action-btn') ||
+  document.getElementById('start-btn') ||
+  document.getElementById('action-btn-3d');
+
   if (btn) {
     btn.disabled = false;
-    btn.textContent = 'INICIAR';
+    setMainButtonLabel('INICIAR');
   }
 
   const textoContador = document.querySelector('#contador-texto');
@@ -390,10 +401,14 @@ async function startImmersion() {
   uploadOnStop = false;
   estadoSesion = 'recording';
 
-  const btn = document.getElementById('action-btn') || document.getElementById('start-btn');
+  const btn =
+  document.getElementById('action-btn') ||
+  document.getElementById('start-btn') ||
+  document.getElementById('action-btn-3d');
+
   if (btn) {
     btn.disabled = false;
-    btn.textContent = 'ENVIAR';
+    setMainButtonLabel('ENVIAR');
   }
 
   try {
@@ -407,7 +422,11 @@ async function startImmersion() {
 function finalizarSesion(subir) {
   console.log('finalizarSesion llamado - subir:', subir);
   uploadOnStop = !!subir;
-  const btn = document.getElementById('action-btn') || document.getElementById('start-btn');
+  const btn =
+  document.getElementById('action-btn') ||
+  document.getElementById('start-btn') ||
+  document.getElementById('action-btn-3d');
+
   if (btn) btn.disabled = true;
   if (intervaloContador) clearInterval(intervaloContador);
   detenerGrabacion();
@@ -436,24 +455,28 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  const btn = document.getElementById('action-btn') || document.getElementById('start-btn');
+  const btn =
+  document.getElementById('action-btn') ||
+  document.getElementById('start-btn') ||
+  document.getElementById('action-btn-3d');
+
   if (btn) {
     btn.disabled = false;
-    btn.textContent = 'INICIAR';
+    setMainButtonLabel('INICIAR');
     btn.addEventListener('click', () => {
       if (estadoSesion === 'idle') {
         btn.disabled = true;
-        btn.textContent = 'Iniciando...';
+        setMainButtonLabel('Iniciando...');
         startImmersion()
           .then(() => {
             btn.disabled = false;
-            btn.textContent = 'ENVIAR';
+            setMainButtonLabel('ENVIAR');
             if (typeof startCountdown === 'function') startCountdown();
           })
           .catch((err) => {
             console.error(err);
             btn.disabled = false;
-            btn.textContent = 'INICIAR';
+            setMainButtonLabel('INICIAR');
           });
       }  else if (estadoSesion === 'recording') {
         let elapsed = 0;
@@ -480,7 +503,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   } else {
-    console.warn('No se encontró #action-btn / #start-btn');
+    console.warn('No se encontró #action-btn / #start-btn / #action-btn-3d');
   }
 });
 
