@@ -76,9 +76,11 @@
 
   <script src="./js/fondo-lava.js"></script> 
   <script src="./js/logic.js" defer></script> 
+  <script src="./js/api-base.js"></script>
   
   <script>
-    function createRoundedRect(canvasId, width, height, radius, color) {
+    const API_BASE = window.API_BASE || 'http://localhost:4000';
+    function cartaRedondeada(canvasId, width, height, radius, color) {
       const canvas = document.getElementById(canvasId);
       const ctx = canvas.getContext('2d');
       
@@ -100,7 +102,7 @@
     }
     
     document.addEventListener('DOMContentLoaded', () => {
-      createRoundedRect('roundedCard', 512, 512, 40, '#fcf7ff');
+      cartaRedondeada('roundedCard', 512, 512, 40, '#fcf7ff');
       
       const qs = new URLSearchParams(location.search);
       const levelId = parseInt(qs.get('level_id'), 10) || 1;
@@ -121,12 +123,11 @@
         if (typeof irAJuego === 'function') {
           irAJuego();
         } else {
-          console.error('irAJuego() no está definida — revisa que logic.js cargó bien');
+          console.error('irAJuego() no está definida');
         }
       });
     });
-  </script> 
-  <script>
+
     AFRAME.registerGeometry('rounded', {
       schema: {
         width: {default: 1, min: 0},

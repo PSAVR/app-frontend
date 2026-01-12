@@ -6,6 +6,8 @@ let segundosRestantes = 0;
 let intervaloContador = null;
 let estadoSesion = 'idle';
 
+const API_BASE = window.API_BASE || 'http://localhost:4000';
+
 function getNivelDesdeURL() {
   const params = new URLSearchParams(window.location.search);
   return params.get('nivel') || localStorage.getItem('nivelSeleccionado') || 'facil';
@@ -20,8 +22,7 @@ async function getUserId() {
   const ls = localStorage.getItem('user_id');
   if (ls) return Number(ls);
   try {
-    const base = window.API_BASE || 'http://localhost:4000';
-    const r = await fetch(`${base}/api/auth/me`, { credentials: 'include' });
+    const r = await fetch(`${API_BASE}/api/auth/me`, { credentials: 'include' });
     if (!r.ok) return null;
     const me = await r.json();
     localStorage.setItem('user_id', me.user_id);

@@ -1,5 +1,7 @@
 console.log('[logout.js] cargado. path =', window.location.pathname);
 
+const API_BASE = window.API_BASE || 'http://localhost:4000';
+
 function createLogoutButton(){
   const path = window.location.pathname.toLowerCase();
 

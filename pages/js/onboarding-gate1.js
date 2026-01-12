@@ -1,5 +1,5 @@
 (async function(){
-  const API_BASE = 'http://localhost:4000';
+  const API_BASE = window.API_BASE || 'http://localhost:4000';
 
   const ALLOWED_PATHS = [
     '/pages/onboarding-intro.html',
