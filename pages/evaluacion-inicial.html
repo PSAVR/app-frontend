@@ -814,7 +814,7 @@
         const ls = localStorage.getItem('user_id');
         if (ls) return Number(ls);
         try {
-          const base = (window.API_BASE || 'http://localhost:4000');
+          const base = 'https://vr-backend-api-asdperfqg9a4fncv.canadacentral-01.azurewebsites.net';
           const r = await fetch(`${base}/api/auth/me`, { credentials: 'include' });
           if (!r.ok) return null;
           const me = await r.json();
@@ -1109,7 +1109,7 @@
           });
         }
       
-        const base = (window.API_BASE || 'http://localhost:4000');
+        const base = 'https://vr-backend-api-asdperfqg9a4fncv.canadacentral-01.azurewebsites.net';
         let user_id = null;
       
         try {
@@ -1329,7 +1329,7 @@
 
       async function asignarNivelInicial(ansiedadMaxima) {
         try {
-          const base = (window.API_BASE || 'http://localhost:4000');
+          const base = 'https://vr-backend-api-asdperfqg9a4fncv.canadacentral-01.azurewebsites.net';
           
           const response = await fetch(`${base}/api/users/me/assign-initial-level`, {
             method: 'POST',
@@ -1580,4 +1580,5 @@
       sceneEl.addEventListener('exit-ar',   ()=>{ stopAudioCues(); stopEmojis(); });
     </script>
   </body>
+
 </html>
