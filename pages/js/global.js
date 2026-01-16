@@ -18,11 +18,24 @@ function nivelAId(n) {
   return map[String(n).toLowerCase()] ?? 1;
 }
 
+function getToken() {
+  return localStorage.getItem("access_token");
+}
+
+function authHeaders(extra = {}) {
+  const t = getToken();
+  return t ? { ...extra, Authorization: `Bearer ${t}` } : extra;
+}
+
 async function getUserId() {
   const ls = localStorage.getItem('user_id');
   if (ls) return Number(ls);
+
   try {
-    const r = await fetch(`${API_BASE}/api/auth/me`, { credentials: 'include' });
+    const r = await fetch(`${API_BASE}/api/auth/me`, {
+      method: "GET",
+      headers: authHeaders(),
+    });
     if (!r.ok) return null;
     const me = await r.json();
     localStorage.setItem('user_id', me.user_id);
@@ -31,6 +44,7 @@ async function getUserId() {
     return null;
   }
 }
+
 
 function renderStars(container, n) {
   container.innerHTML = '';
@@ -248,15 +262,15 @@ async function enviarAudioYMostrarResultados(blobWebm) {
     const nivel = getNivelDesdeURL();
     const form = new FormData();
     form.append('audio', blobWebm, 'speech.webm');
-    form.append('user_id', String(user_id));
     form.append('immersion_level_name', nivel);
 
 
     const r = await fetch(`${base}/api/sessions/audio`, {
       method: 'POST',
       body: form,
-      credentials: 'include'
+      headers: authHeaders(),
     });
+
 
     const data = await r.json();
 
