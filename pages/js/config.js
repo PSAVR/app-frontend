@@ -2,6 +2,7 @@ const CONFIG_ESCENARIOS = {
     facil: {
       modelo: {
         src: "#modelo-facil",
+        path: "../models/facil/easy-scenario2.glb",
         rotation: '0 -90 0',
         scale: '8 8 8',
         position: '-33 -10 -55',
@@ -15,6 +16,7 @@ const CONFIG_ESCENARIOS = {
     intermedio: {
       modelo: {
         src: "#modelo-inter",
+        path: "../models/inter/inter-class.glb",
         scale: '12 12 12',
         position: '-25 -20 -80',
         rotation: '0 180 0',
@@ -29,6 +31,7 @@ const CONFIG_ESCENARIOS = {
     dificil: { 
       modelo: {
         src: "#modelo-dificil",
+        path: "../models/dif/lecturehall2.glb",
         position: '-29 -2 9',
         scale: '1.5 1.5 1.5',
         rotation: '0 0 0',

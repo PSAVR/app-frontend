@@ -65,28 +65,7 @@
              renderer="colorManagement: true; physicallyCorrectLights: true; alpha: true" background="color: white" >
 
       <a-assets>
-        <a-asset-item id="modelo-facil" src="../models/facil/easy-scenario2.glb"></a-asset-item>
-        <a-asset-item id="modelo-inter" src="../models/inter/inter-class.glb"></a-asset-item>
-        <a-asset-item id="modelo-dificil" src="../models/dif/lecturehall2.glb"></a-asset-item>
         
-        <a-asset-item id="lvl1-visitor" src="../models/people/m1sitted.glb" ></a-asset-item>
-        <a-asset-item id="lvl1-visitor2" src="../models/people/p1.glb" ></a-asset-item>
-        <a-asset-item id="lvl1-visitor3" src="../models/people/exit.glb" ></a-asset-item>
-        <a-asset-item id="lvl1-visitor4" src="../models/people/womanclapping.glb" ></a-asset-item>
-        
-        <a-asset-item id="lvl2-visitor" src="../models/people/mansitted.glb" ></a-asset-item>
-        <a-asset-item id="lvl2-visitor2" src="../models/people/p12bored.glb" ></a-asset-item>
-        <a-asset-item id="lvl2-visitor3" src="../models/people/p9.glb" ></a-asset-item>
-        <a-asset-item id="lvl2-visitor4" src="../models/people/exit.glb" ></a-asset-item>
-        <a-asset-item id="lvl2-visitor5" src="../models/people/p5.glb" ></a-asset-item>
-
-        <a-asset-item id="lvl3-visitor" src="../models/people/mansitted.glb" ></a-asset-item>
-        <a-asset-item id="lvl3-visitor-1" src="../models/people/womanclapping.glb" ></a-asset-item>
-        <a-asset-item id="lvl3-visitor-2" src="../models/people/p12bored.glb" ></a-asset-item>
-        <a-asset-item id="lvl3-visitor-3" src="../models/people/p5.glb" ></a-asset-item>
-        <a-asset-item id="lvl3-visitor-4" src="../models/people/p9.glb" ></a-asset-item>
-        <a-asset-item id="lvl3-visitor-5" src="../models/people/m1sitted.glb"></a-asset-item>
-
         <audio id="snd-murmur" src="../audios/Murmur.mp3" preload="auto"></audio>
         <audio id="snd-door" src="../audios/door.mp3" preload="auto"></audio>
         <audio id="snd-yawn"   src="../audios/Yawn.mp3"   preload="auto"></audio>
@@ -98,25 +77,25 @@
         <img id="star-texture" src="../images/star.png" alt="star">
         <img id="star-texture-fallback" src="estrellas.png" alt="star">
       </a-assets>
-
+      <a-entity id="world" >
       <a-entity id="contenedor-modelo" position="0 0 -3"></a-entity>
-      <a-entity id="static-visitor" gltf-model="#lvl1-visitor" idle-pose position="-15 -9 -35" scale="4.5 4 4.5"></a-entity>
-      <a-entity id="static-visitor2" gltf-model="#lvl1-visitor2" idle-pose position="-21 -9 -20" scale="3 3 3"></a-entity>
-      <a-entity id="static-visitor3" gltf-model="#lvl1-visitor3" idle-pose visible="false" rotation="0 90 0" position="-30 -8 -50" scale="7 7 7"></a-entity>
-      <a-entity id="static-visitor4" gltf-model="#lvl1-visitor4" idle-pose position="8 -9.5 -53" scale="9 9 9"></a-entity>
+      <a-entity id="static-visitor" ></a-entity>
+      <a-entity id="static-visitor2"></a-entity>
+      <a-entity id="static-visitor3"></a-entity>
+      <a-entity id="static-visitor4"></a-entity>
       
-      <a-entity id="static-visitor2_1" gltf-model="#lvl2-visitor" idle-pose fix-mixamo-shine position="-62 -20 -95" scale="20 17 19"></a-entity>
-      <a-entity id="static-visitor2_2" gltf-model="#lvl2-visitor2" idle-pose position="-60 -20 -50" scale="5.5 5.5 5.5"></a-entity>
-      <a-entity id="static-visitor2_3" gltf-model="#lvl2-visitor3" idle-pose position="13.5 -20 -14" scale="6 6 6"></a-entity>
-      <a-entity id="static-visitor2_4" gltf-model="#lvl2-visitor4" visible="false"  idle-pose fix-mixamo-shine rotation="0 90 0" position="-80 -22 -20" scale="19 19 19"></a-entity>
-      <a-entity id="static-visitor2_5" gltf-model="#lvl2-visitor5" idle-pose position="-64 -22 -75" scale="6 6 6"></a-entity>
+      <a-entity id="static-visitor2_1" ></a-entity>
+      <a-entity id="static-visitor2_2" ></a-entity>
+      <a-entity id="static-visitor2_3" ></a-entity>
+      <a-entity id="static-visitor2_4" ></a-entity>
+      <a-entity id="static-visitor2_5" ></a-entity>
+      <a-entity id="static-visitor-3" ></a-entity>
+      <a-entity id="static-visitor-3_1" ></a-entity>
+      <a-entity id="static-visitor-3_2" ></a-entity>
+      <a-entity id="static-visitor-3_3" ></a-entity>
+      <a-entity id="static-visitor-3_4" ></a-entity>
+      <a-entity id="static-visitor-3_5" ></a-entity>
 
-      <a-entity id="static-visitor-3" gltf-model="#lvl3-visitor" idle-pose position="-13 2.6 -25" scale="2 2 2"></a-entity>
-      <a-entity id="static-visitor-3_1" gltf-model="#lvl3-visitor-1" idle-pose position="-20 0.3 -15" scale="2 2 2"></a-entity>
-      <a-entity id="static-visitor-3_2" gltf-model="#lvl3-visitor-2" idle-pose position="-3.4 -1.8 -2" scale="0.5 0.5 0.5"></a-entity>
-      <a-entity id="static-visitor-3_3" gltf-model="#lvl3-visitor-3" idle-pose position="-10 -5 -20" scale="5 5 5"></a-entity>
-      <a-entity id="static-visitor-3_4" gltf-model="#lvl3-visitor-4" idle-pose position="7 -1.8 -5" scale="0.6 0.6 0.6"></a-entity>
-      <a-entity id="static-visitor-3_5" gltf-model="#lvl3-visitor-5" idle-pose position="-1.7 0.4 -15.6" scale="1 1 1"></a-entity>
 
       <a-entity id="fx-murmur" sound="src: #snd-murmur; autoplay: false; loop: false; positional: false; volume: 5"></a-entity>
       <a-entity id="fx-door" sound="src: #snd-door; autoplay: false; loop: false; positional: false; volume: 1"></a-entity>
@@ -125,8 +104,7 @@
       <a-entity id="fx-cough" sound="src: #snd-caugh; autoplay: false; loop: false; positional: false; volume: 0.1"></a-entity>
       <a-entity id="fx-wthought" sound="src: #snd-wthought; autoplay: false; loop: false; positional: false; volume: 0.3"></a-entity>
       <a-entity id="fx-cough2" sound="src: #snd-cough; autoplay: false; loop: false; positional: false; volume: 0.5"></a-entity>
-      <a-entity id="visitor-container"></a-entity>
-
+      </a-entity>
       <a-entity id="ui-3d-container" position="-1.8 2.8 -2.5">
         <a-rounded id="timer-3d-bg" width="0.6" height="0.16" radius="0.03" color="#FFFFFF" opacity="0.95" 
                  position="0 0.19 0" material="shader: flat">
@@ -270,9 +248,10 @@
                     font="roboto"></a-text>
           </a-rounded>
         </a-entity>
-
+      
     </a-scene>
-
+    <script src="./js/assets-manifest.js"></script>
+    <script src="./js/assets-loader.js"></script>
     <script src="./js/config.js"></script>
     <script src="./js/global.js"></script>
     <script src="./js/easycontroller.js"></script>
@@ -796,6 +775,7 @@
         
           if (typeof startAudioCues === 'function') startAudioCues();
           if (typeof startEmojis === 'function') startEmojis();
+          window.visitorEventEnabled = true;  
         }
       }
 
@@ -803,6 +783,7 @@
         if (isTimerRunning) {
           clearInterval(timerInterval);
           isTimerRunning = false;
+          window.visitorEventEnabled = false;
         }
       }
 
@@ -1024,7 +1005,7 @@
         if (!camEl) return;
         if (ACTIVE_EMOJIS.size >= MAX_ONSCREEN) return;
       
-        const chosen = face || EMOJI_RANDOM[Math.floor(Math.random() * EMOJIS_RANDOM.length)];
+        const chosen = face || EMOJIS_RANDOM[Math.floor(Math.random() * EMOJIS_RANDOM.length)];
         const size = EMOJI_SIZE_MIN + Math.random() * (EMOJI_SIZE_MAX - EMOJI_SIZE_MIN);
         const { x, y } = findFreePosition(size);
       
@@ -1145,37 +1126,14 @@
     function safeShowScene() {
       const scene  = document.querySelector("#escena-vr");
       const loader = document.querySelector("#loader");
-      if (!scene) return;
-    
-      console.log("ðŸŒ„ MODELO LISTO â†’ FADE IN");
-    
-      scene.style.opacity = "1";
-      loader.style.opacity = "0";
-    
-      setTimeout(() => loader.remove(), 800);
-    }
 
-    function waitUntilModelReady() {
-      const nivel = getNivel();
-      const cont  = document.querySelector("#contenedor-modelo");
-    
-      let target;
-    
-      if (nivel === "facil")      target = "#modelo-facil";
-      else if (nivel === "intermedio") target = "#modelo-inter";
-      else                         target = "#modelo-dificil";
-    
-      console.log("Esperando MODEL-LOADED de", target);
-    
-      cont.addEventListener("model-loaded", safeShowScene, { once:true });
-    
-      setTimeout(() => {
-        console.warn("Fallback no llego model-loaded, forzando fade");
-        safeShowScene();
-      }, 10000);
-    }
+      if (scene) scene.style.opacity = "1";
 
-    window.addEventListener("DOMContentLoaded", waitUntilModelReady);
+      if (loader) {
+        loader.style.opacity = "0";
+        setTimeout(() => loader.remove(), 800);
+      }
+    }
 
     </script>
   </body>

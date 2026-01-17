@@ -1,5 +1,5 @@
 (async function(){
-  const API_BASE = window.API_BASE || 'http://localhost:4000';
+  const API_BASE = 'https://vr-backend-api-asdperfqg9a4fncv.canadacentral-01.azurewebsites.net';
 
   const ALLOWED_PATHS = [
     '/pages/onboarding-intro.html',
