@@ -84,7 +84,7 @@ function buildFeedbackMessage({
   if (promoted && toLevelId) {
     texto = `¡Excelente trabajo! Esta sesion fue lo suficientemente buena como para llevarte al nivel ${capitalizarNivel(toLevelId)}. `;
   } else if (stars === 2) {
-    texto = `Lo estás haciendo bien, se nota el esfuerzo por mejorar. `;
+    texto = `Lo estas haciendo bien, se nota el esfuerzo por mejorar. `;
   } else if (stars === 1) {
     texto = `Gracias por intentarlo, cada sesion te ayuda a mejorar. `;
   } else {
@@ -96,7 +96,7 @@ function buildFeedbackMessage({
   } else if (band === "media") {
     texto += "Hubieron momentos donde los nervios te ganaron pero diste tu mejor esfuerzo. ";
   } else if (band === "alta") {
-    texto += "Se noto más tensión durante la sesion, pero eso es parte del proceso. ";
+    texto += "Se noto mas tensión durante la sesion, pero eso es parte del proceso. ";
   }
 
   if (pauseRatio !== null) {
