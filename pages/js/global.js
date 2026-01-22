@@ -248,7 +248,7 @@ async function ensureMicReady() {
   }
 }
 
-async function enviarAudioYMostrarResultados(blobWebm) {
+async function enviarAudioYMostrarResultados(blob, ext='webm') {
   showLoading3D();
 
   try {
@@ -261,7 +261,7 @@ async function enviarAudioYMostrarResultados(blobWebm) {
 
     const nivel = getNivelDesdeURL();
     const form = new FormData();
-    form.append('audio', blobWebm, 'speech.webm');
+    form.append('audio', blob, `speech.${ext}`);
     form.append('immersion_level_name', nivel);
 
 
@@ -336,32 +336,63 @@ window.onResultOk = function () {
 
 async function iniciarGrabacion() {
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+    });
+
     recordedChunks = [];
-    mediaRecorder = new MediaRecorder(stream);
+
+    const preferred = [
+      'audio/mp4',
+      'audio/aac',
+      'audio/webm;codecs=opus',
+      'audio/webm'
+    ];
+    const mimeType = preferred.find(t => window.MediaRecorder && MediaRecorder.isTypeSupported(t)) || '';
+
+    mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+
+    const track = stream.getAudioTracks()[0];
+    track.addEventListener('ended', () => {
+      console.warn('🎤 Track ended (iOS capture failure)');
+      try { finalizarSesion(false); } catch {}
+      showMicBanner("Se perdió el micrófono. Toca INICIAR y vuelve a intentar.");
+    });
 
     mediaRecorder.ondataavailable = (e) => {
       if (e.data && e.data.size > 0) recordedChunks.push(e.data);
     };
 
+    mediaRecorder.onerror = (e) => {
+      console.error("MediaRecorder error:", e);
+      showMicBanner("Error grabando audio en iPhone. Intenta de nuevo.");
+    };
+
     mediaRecorder.onstop = async () => {
       try {
-        const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+        const type = mimeType || recordedChunks?.[0]?.type || 'audio/mp4';
+        const ext  = type.includes('mp4') ? 'mp4'
+                 : type.includes('aac') ? 'aac'
+                 : 'webm';
+    
+        console.log('[REC]', { type, ext, chunks: recordedChunks.length, totalBytes: recordedChunks.reduce((a,c)=>a+(c?.size||0),0) });
+    
+        const blob = new Blob(recordedChunks, { type });
         if (uploadOnStop) {
-          console.log('Enviando audio para procesamiento...');
-          await enviarAudioYMostrarResultados(blob);
+          await enviarAudioYMostrarResultados(blob, ext);
         } else {
-          console.log('Menos de 30 segundos, redirigiendo a main...');
           window.location.href = '/pages/main.html';
         }
       } finally {
-        try { stream.getTracks().forEach((t) => t.stop()); } catch {}
+        try { stream.getTracks().forEach(t => t.stop()); } catch {}
         restablecerUI();
       }
     };
 
-    mediaRecorder.start();
-    console.log('Grabación iniciada');
+
+    // chunks periódicos (menos memoria)
+    mediaRecorder.start(1000); // 1s chunks
+    console.log('Grabación iniciada', { mimeType });
   } catch (err) {
     handleMicError(err);
     throw err;
