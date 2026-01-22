@@ -97,10 +97,10 @@
       <a-entity id="static-visitor-3_5" ></a-entity>
 
 
-      <a-entity id="fx-murmur" sound="src: #snd-murmur; autoplay: false; loop: false; positional: false; volume: 1;"></a-entity>
+      <a-entity id="fx-murmur" sound="src: #snd-murmur; autoplay: false; loop: false; positional: false; volume: 5"></a-entity>
       <a-entity id="fx-door" sound="src: #snd-door; autoplay: false; loop: false; positional: false; volume: 1"></a-entity>
       <a-entity id="fx-yawn"   sound="src: #snd-yawn;   autoplay: false; loop: false; positional: false; volume: 0.8"></a-entity>
-      <a-entity id="fx-laugh"  sound="src: #snd-laugh;  autoplay: false; loop: false; positional: false; volume: 0.7;"></a-entity>
+      <a-entity id="fx-laugh"  sound="src: #snd-laugh;  autoplay: false; loop: false; positional: false; volume: "></a-entity>
       <a-entity id="fx-cough" sound="src: #snd-caugh; autoplay: false; loop: false; positional: false; volume: 0.1"></a-entity>
       <a-entity id="fx-wthought" sound="src: #snd-wthought; autoplay: false; loop: false; positional: false; volume: 0.3"></a-entity>
       <a-entity id="fx-cough2" sound="src: #snd-cough; autoplay: false; loop: false; positional: false; volume: 0.5"></a-entity>
@@ -148,8 +148,8 @@
                  position="0 0 0"
                  material="shader: flat"></a-plane>
 
-        <a-rounded width="1"
-                   height="0.4"
+        <a-rounded width="2.0"
+                   height="0.8"
                    radius="0.08"
                    color="#FFFFFF"
                    opacity="0.98"
@@ -159,31 +159,31 @@
       
         <a-text value="Generando tus resultados,"
                 align="center"
-                width="1"
+                width="1.8"
                 color="#4A4A6A"
-                position="0 0.1 0.02"
+                position="0 0.2 0.02"
                 font="https://cdn.aframe.io/fonts/Roboto-msdf.json"
                 scale="0.9 0.9 1"></a-text>
       
         <a-text value="no salgas de esta vista"
                 align="center"
-                width="1"
+                width="1.8"
                 color="#4A4A6A"
                 position="0 0 0.02"
                 font="https://cdn.aframe.io/fonts/Roboto-msdf.json"
                 scale="0.9 0.9 1"></a-text>
       
-        <a-ring radius-inner="0.02"
-                radius-outer="0.035"
+        <a-ring radius-inner="0.03"
+                radius-outer="0.05"
                 color="#f3f3f3"
-                position="0 -0.10 0.02"
+                position="0 -0.25 0.02"
                 material="shader: flat"></a-ring>
       
-        <a-ring radius-inner="0.02"
-                radius-outer="0.035"
+        <a-ring radius-inner="0.03"
+                radius-outer="0.05"
                 theta-length="270"
                 color="#9b5de5"
-                position="0 -0.10 0.03"
+                position="0 -0.25 0.03"
                 material="shader: flat"
                 animation="property: rotation; to: 0 0 360; loop: true; dur: 1000; easing: linear">
           </a-ring>
@@ -201,8 +201,8 @@
                    position="0 0 0"
                    material="shader: flat"></a-plane>
             
-          <a-rounded width="1.2"
-                     height="0.8"
+          <a-rounded width="2.4"
+                     height="1.6"
                      radius="0.08"
                      color="#FFFFFF"
                      opacity="0.98"
@@ -213,38 +213,38 @@
           <a-text id="result-title-3d"
                   value="Resultados"
                   align="center"
-                  width="1.1"
+                  width="2.2"
                   color="#4A4A6A"
-                  position="0 0.30 0.02"
+                  position="0 0.55 0.02"
                   font="https://cdn.aframe.io/fonts/Roboto-msdf.json"
                   scale="1.2 1.2 1"></a-text>
         
           <a-text id="result-message-3d"
                   value=""
                   align="center"
-                  width="1.05"
+                  width="2.1"
                   color="#4A4A6A"
-                  position="0 0.10 0.02"
+                  position="0 0.15 0.02"
                   font="https://cdn.aframe.io/fonts/Roboto-msdf.json"
                   wrap-count="35"
                   baseline="center"
                   scale="0.9 0.9 1"></a-text>
         
-          <a-entity id="result-stars-container-3d" position="0 -0 0.02"></a-entity>
+          <a-entity id="result-stars-container-3d" position="0 -0.15 0.02"></a-entity>
         
           <a-rounded id="result-ok-3d"
                      class="clickable"
-                     width="0.4"
-                     height="0.09"
+                     width="0.8"
+                     height="0.18"
                      radius="0.04"
                      color="#9b5de5"
-                     position="0 -0.30 0.02"
+                     position="0 -0.55 0.02"
                      material="shader: flat">
             <a-text value="Aceptar"
                     align="center"
-                    width="0.8"
+                    width="1.6"
                     color="#FFFFFF"
-                    position="0 0.01 0.03"
+                    position="0 0 0.03"
                     font="roboto"></a-text>
           </a-rounded>
         </a-entity>
@@ -271,7 +271,7 @@
             this.el.setAttribute('position', {
               x: cameraPos.x,
               y: cameraPos.y,
-              z: cameraPos.z - 1 
+              z: cameraPos.z - 2 
             });
 
             this.el.setAttribute('rotation', {
@@ -408,7 +408,7 @@
         this.starsContainer.setAttribute('visible', 'true');
         this.clearStars();
 
-        const starSpacing = 0.2;
+        const starSpacing = 0.3;
         const startX = -((starCount - 1) * starSpacing) / 2;
 
         for (let i = 0; i < starCount; i++) {
@@ -456,7 +456,7 @@
 
         const mesh = new THREE.Mesh(geometry, material);
         mesh.rotation.x = Math.PI;
-        mesh.scale.set(0.8, 0.8, 0.8);
+        mesh.scale.set(1.2, 1.2, 1.2);
 
         star.object3D.add(mesh);
 
@@ -850,38 +850,21 @@
 
       function now(){ return performance.now(); }
 
-      function stopAllCues() {
-        for (const el of [fxMurmurEl, fxLaughEl]) {
-          const c = el?.components?.sound;
-          if (c?.isPlaying) c.stopSound();
-        }
-      }
-      
       function playEl(el){
         const c = comp(el);
         if (!c) { el.addEventListener('sound-loaded', ()=>playEl(el), {once:true}); return; }
-      
         const t = now();
-      
-        // ✅ anti-spam: evita cues demasiado seguidos
         if (t - lastCueAt < MIN_SEP_MS) {
           const id = setTimeout(()=>playEl(el), MIN_SEP_MS - (t - lastCueAt) + 50);
           scheduledTimers.push(id);
           return;
         }
-      
         lastCueAt = t;
-      
-        // evita simultáneo
-        stopAllCues();
-        // (opcional) por seguridad, también detén el mismo
         c.stopSound();
-      
         c.playSound();
         logCue(el);
         triggerEmojiBurst(el.id);
       }
-
 
       function clearScheduled(){
         for (const id of scheduledTimers) clearTimeout(id);
