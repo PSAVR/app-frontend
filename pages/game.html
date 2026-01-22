@@ -97,10 +97,10 @@
       <a-entity id="static-visitor-3_5" ></a-entity>
 
 
-      <a-entity id="fx-murmur" sound="src: #snd-murmur; autoplay: false; loop: false; positional: false; volume: 5"></a-entity>
+      <a-entity id="fx-murmur" sound="src: #snd-murmur; autoplay: false; loop: false; positional: false; volume: 1.5"></a-entity>
       <a-entity id="fx-door" sound="src: #snd-door; autoplay: false; loop: false; positional: false; volume: 1"></a-entity>
       <a-entity id="fx-yawn"   sound="src: #snd-yawn;   autoplay: false; loop: false; positional: false; volume: 0.8"></a-entity>
-      <a-entity id="fx-laugh"  sound="src: #snd-laugh;  autoplay: false; loop: false; positional: false; volume: "></a-entity>
+      <a-entity id="fx-laugh"  sound="src: #snd-laugh;  autoplay: false; loop: false; positional: false; volume: 0.8"></a-entity>
       <a-entity id="fx-cough" sound="src: #snd-caugh; autoplay: false; loop: false; positional: false; volume: 0.1"></a-entity>
       <a-entity id="fx-wthought" sound="src: #snd-wthought; autoplay: false; loop: false; positional: false; volume: 0.3"></a-entity>
       <a-entity id="fx-cough2" sound="src: #snd-cough; autoplay: false; loop: false; positional: false; volume: 0.5"></a-entity>
@@ -851,6 +851,7 @@
       function now(){ return performance.now(); }
 
       function playEl(el){
+        if (!el) return;
         const c = comp(el);
         if (!c) { el.addEventListener('sound-loaded', ()=>playEl(el), {once:true}); return; }
         const t = now();
@@ -875,8 +876,8 @@
       function schedulePhase1(){
         const D = window.initialSeconds || 60;
         const startFrac = 0.20, endFrac = 0.85;
-        const bins = 3;
         const ids = shuffle(['fx-murmur','fx-laugh']);
+        const bins = ids.length;
         for (let i=0;i<bins;i++){
           const centerFrac = startFrac + (i + 0.5) * ((endFrac - startFrac) / bins);
           const jitter = (Math.random()*0.14 - 0.07);
