@@ -97,10 +97,10 @@
       <a-entity id="static-visitor-3_5" ></a-entity>
 
 
-      <a-entity id="fx-murmur" sound="src: #snd-murmur; autoplay: false; loop: false; positional: false; volume: 5"></a-entity>
+      <a-entity id="fx-murmur" sound="src: #snd-murmur; autoplay: false; loop: false; positional: false; volume: 1;"></a-entity>
       <a-entity id="fx-door" sound="src: #snd-door; autoplay: false; loop: false; positional: false; volume: 1"></a-entity>
       <a-entity id="fx-yawn"   sound="src: #snd-yawn;   autoplay: false; loop: false; positional: false; volume: 0.8"></a-entity>
-      <a-entity id="fx-laugh"  sound="src: #snd-laugh;  autoplay: false; loop: false; positional: false; volume: 0.7"></a-entity>
+      <a-entity id="fx-laugh"  sound="src: #snd-laugh;  autoplay: false; loop: false; positional: false; volume: 0.7;"></a-entity>
       <a-entity id="fx-cough" sound="src: #snd-caugh; autoplay: false; loop: false; positional: false; volume: 0.1"></a-entity>
       <a-entity id="fx-wthought" sound="src: #snd-wthought; autoplay: false; loop: false; positional: false; volume: 0.3"></a-entity>
       <a-entity id="fx-cough2" sound="src: #snd-cough; autoplay: false; loop: false; positional: false; volume: 0.5"></a-entity>
@@ -850,21 +850,38 @@
 
       function now(){ return performance.now(); }
 
+      function stopAllCues() {
+        for (const el of [fxMurmurEl, fxLaughEl]) {
+          const c = el?.components?.sound;
+          if (c?.isPlaying) c.stopSound();
+        }
+      }
+      
       function playEl(el){
         const c = comp(el);
         if (!c) { el.addEventListener('sound-loaded', ()=>playEl(el), {once:true}); return; }
+      
         const t = now();
+      
+        // ✅ anti-spam: evita cues demasiado seguidos
         if (t - lastCueAt < MIN_SEP_MS) {
           const id = setTimeout(()=>playEl(el), MIN_SEP_MS - (t - lastCueAt) + 50);
           scheduledTimers.push(id);
           return;
         }
+      
         lastCueAt = t;
+      
+        // evita simultáneo
+        stopAllCues();
+        // (opcional) por seguridad, también detén el mismo
         c.stopSound();
+      
         c.playSound();
         logCue(el);
         triggerEmojiBurst(el.id);
       }
+
 
       function clearScheduled(){
         for (const id of scheduledTimers) clearTimeout(id);
