@@ -64,7 +64,7 @@ window.ASSET_MANIFEST = {
           rotation: "0 90 0",
           visible: "false"
         }},
-      { entityId: "static-visitor2_5", assetId: "lvl2-visitor5", src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/p5.glb", components: { "idle-pose": "" },
+      { entityId: "static-visitor2_5", assetId: "lvl2-visitor5", src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/p5_ios.glb", components: { "idle-pose": "" },
         attrs: {
           position: "-2 -0.5 -11",
           scale: "0.4 0.45 0.4"
@@ -94,7 +94,7 @@ window.ASSET_MANIFEST = {
           position: "1.8 -0.1 -4",
           scale: "0.35 0.44 0.35"
         }},
-      { entityId: "static-visitor-3_3", assetId: "lvl3-visitor-3", src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/p5.glb", components: { "idle-pose": "" },
+      { entityId: "static-visitor-3_3", assetId: "lvl3-visitor-3", src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/p5_ios.glb", components: { "idle-pose": "" },
         attrs: {
           position: "-4.8 -1 -5",
           scale: "0.4 0.4 0.4"
