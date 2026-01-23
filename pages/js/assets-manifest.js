@@ -7,7 +7,7 @@ window.ASSET_MANIFEST = {
       rotation: "0 -90 0"
     },
     visitors: [
-      { entityId: "static-visitor",  assetId: "lvl1-visitor",  src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/m1sitted.glb", components: { "idle-pose": "" },           // componente sin valor
+      { entityId: "static-visitor",  assetId: "lvl1-visitor",  src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/m1sitted_ios.glb", components: { "idle-pose": "" },           // componente sin valor
         attrs: {
           position: "-1.5 0.2 -3.8",
           scale: "0.5 0.5 0.5",
@@ -25,7 +25,7 @@ window.ASSET_MANIFEST = {
           rotation: "0 90 0",
           visible: "false"
         }},
-      { entityId: "static-visitor4", assetId: "lvl1-visitor4", src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/womanclapping.glb", components: { "idle-pose": "" },
+      { entityId: "static-visitor4", assetId: "lvl1-visitor4", src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/womanclapping_ios.glb", components: { "idle-pose": "" },
         attrs: {
           position: "0.8 0.3 -6",
           scale: "1.1 0.9 0.9",
