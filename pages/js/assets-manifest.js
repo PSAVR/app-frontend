@@ -75,7 +75,7 @@ window.ASSET_MANIFEST = {
   dificil: {
     scene: {
       id: "modelo-dificil",
-      src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/dif/lecturehall2.glb",
+      src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/dif/lecturehall2_ios256.glb",
       position: "-19.4 -0.75 4"
     },
     visitors: [
