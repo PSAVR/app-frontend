@@ -37,7 +37,7 @@ window.ASSET_MANIFEST = {
   intermedio: {
     scene: {
       id: "modelo-inter",
-      src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/inter/inter-class.glb",
+      src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/inter/inter-class_ios5.glb",
       rotation: "0 180 0",
       position: "-2 -0.5 -6.5"
     },
