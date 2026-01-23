@@ -61,7 +61,7 @@ function triggerEmojiBurst(audioId) {
     setTimeout(() => spawnEmoji(face), i * 120);
   }
 }
-
+/*
 AFRAME.registerComponent("lvl1-visitor-event", {
   schema:{ enabled:{default:false} },
 
@@ -251,4 +251,4 @@ playFullAnimationOnce: function () {
 
   waitMixer();
 }
-});
+});*/
