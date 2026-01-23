@@ -2,7 +2,7 @@ window.ASSET_MANIFEST = {
   facil: {
     scene: {
       id: "modelo-facil",
-      src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/facil/easy-scenario2_ios_optimized.glb",
+      src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/facil/easy-scenario2_ios_final.glb.glb",
       position: "-4 0 -7",
       rotation: "0 -90 0"
     },
@@ -18,7 +18,7 @@ window.ASSET_MANIFEST = {
             position:"-2.3 0.2 -2.3",
             scale:"0.35 0.35 0.35",
             visible: "true"} },
-      { entityId: "static-visitor3", assetId: "lvl1-visitor3", src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/exit.glb", components: { "idle-pose": "" },
+      { entityId: "static-visitor3", assetId: "lvl1-visitor3", src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/exit_ios.glb", components: { "idle-pose": "" },
         attrs: {
           position: "-3.5 0.2 -6.3",
           scale: "1 1 1",
