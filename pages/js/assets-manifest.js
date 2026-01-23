@@ -2,7 +2,7 @@ window.ASSET_MANIFEST = {
   facil: {
     scene: {
       id: "modelo-facil",
-      src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/facil/easy-scenario2.glb",
+      src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/facil/easy-scenario2_ios_optimized.glb",
       position: "-4 0 -7",
       rotation: "0 -90 0"
     },
