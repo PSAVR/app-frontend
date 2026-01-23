@@ -61,29 +61,8 @@
       </div>
     </div>
 
-    <a-scene
-      id="escena-vr"
-    
-      lvl1-visitor-event="enabled: false"
-      lvl2-visitor-event="enabled: false"
-      lvl3-visitor-event="enabled: false"
-    
-      vr-mode-ui="enabled: true"
-      webxr="optionalFeatures: dom-overlay; overlayElement: #dom-overlay"
-    
-      background="color: #ffffff"
-    
-      renderer="
-        antialias: false;
-        precision: mediump;
-        powerPreference: low-power;
-        physicallyCorrectLights: false;
-        colorManagement: true;
-        alpha: true;
-        sortObjects: true;
-        logarithmicDepthBuffer: false;
-        pixelRatio: 1;
-      ">
+    <a-scene lvl1-visitor-event="enabled: false" lvl2-visitor-event="enabled: false" lvl3-visitor-event="enabled: false" id="escena-vr" vr-mode-ui="enabled: true" shadow="type: pcfsoft" webxr="optionalFeatures: dom-overlay, hit-test; overlayElement: #dom-overlay"
+             renderer="colorManagement: true; physicallyCorrectLights: true; alpha: true" background="color: white" >
 
       <a-assets>
         
