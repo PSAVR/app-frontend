@@ -6,7 +6,7 @@ window.ASSET_MANIFEST = {
       position: "-4 0 -7",
       rotation: "0 -90 0"
     },
-    /*visitors: [
+    visitors: [
       { entityId: "static-visitor",  assetId: "lvl1-visitor",  src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/m1sitted.glb", components: { "idle-pose": "" },           // componente sin valor
         attrs: {
           position: "-1.5 0.2 -3.8",
@@ -31,7 +31,7 @@ window.ASSET_MANIFEST = {
           scale: "1.1 0.9 0.9",
           visible: "true"
         }}
-    ]*/
+    ]
   },
 
   intermedio: {

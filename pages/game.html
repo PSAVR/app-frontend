@@ -137,7 +137,7 @@
       </a-assets>
       <a-entity id="world" >
       <a-entity id="contenedor-modelo" position="0 0 -3"></a-entity>
-      <!--<a-entity id="static-visitor" ></a-entity>
+      <a-entity id="static-visitor" ></a-entity>
       <a-entity id="static-visitor2"></a-entity>
       <a-entity id="static-visitor3"></a-entity>
       <a-entity id="static-visitor4"></a-entity>
@@ -152,7 +152,7 @@
       <a-entity id="static-visitor-3_2" ></a-entity>
       <a-entity id="static-visitor-3_3" ></a-entity>
       <a-entity id="static-visitor-3_4" ></a-entity>
-      <a-entity id="static-visitor-3_5" ></a-entity>-->
+      <a-entity id="static-visitor-3_5" ></a-entity>
 
 
       <a-entity id="fx-murmur" sound="src: #snd-murmur; autoplay: false; loop: false; positional: false; volume: 1.5"></a-entity>
@@ -308,7 +308,7 @@
         </a-entity>
       
     </a-scene>
-    <script src="./js/assets-manifest.js?v=3"></script>
+    <script src="./js/assets-manifest.js"></script>
     <script src="./js/assets-loader.js"></script>
     <script src="./js/config.js"></script>
     <script src="./js/global.js"></script>
@@ -1128,7 +1128,7 @@
         const params = new URLSearchParams(window.location.search);
         return params.get("nivel")?.toLowerCase() || "facil";
       }
-      /*document.addEventListener("DOMContentLoaded", () => {
+      document.addEventListener("DOMContentLoaded", () => {
         const nivel = getNivel();
         const v1 = document.querySelector("#static-visitor");
         const v2 = document.querySelector("#static-visitor2");
@@ -1179,7 +1179,7 @@
           if (v7) v7.setAttribute("visible", false);
           if (v8) v8.setAttribute("visible", false);
         }
-      });*/
+      });
     </script>
     <script>
     function safeShowScene() {
