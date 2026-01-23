@@ -42,7 +42,7 @@ window.ASSET_MANIFEST = {
       position: "-2 -0.5 -6.5"
     },
     visitors: [
-      { entityId: "static-visitor2_1", assetId: "lvl2-visitor",  src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/mansitted.glb", components: { "idle-pose": "", "fix-mixamo-shine": "" },
+      { entityId: "static-visitor2_1", assetId: "lvl2-visitor",  src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/mansitted_ios.glb", components: { "idle-pose": "", "fix-mixamo-shine": "" },
         attrs: {
           position: "-5 -0.6 -8",
           scale: "1.3 1.5 1.3"
@@ -57,7 +57,7 @@ window.ASSET_MANIFEST = {
             position: "1.2 -0.5 -0.6",
             scale: "0.5 0.5 0.5"
         }},
-      { entityId: "static-visitor2_4", assetId: "lvl2-visitor4", src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/exit.glb", components: { "idle-pose": "", "fix-mixamo-shine": "" },
+      { entityId: "static-visitor2_4", assetId: "lvl2-visitor4", src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/exit_ios.glb", components: { "idle-pose": "", "fix-mixamo-shine": "" },
         attrs: {
           position: "-6 -0.4 -1",
           scale: "1.3 1.32 1.3",
@@ -79,12 +79,12 @@ window.ASSET_MANIFEST = {
       position: "-19.4 -0.75 4"
     },
     visitors: [
-      { entityId: "static-visitor-3",   assetId: "lvl3-visitor",   src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/mansitted.glb", components: { "idle-pose": "" },
+      { entityId: "static-visitor-3",   assetId: "lvl3-visitor",   src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/mansitted_ios.glb", components: { "idle-pose": "" },
         attrs: {
           position: "-1.4 0.8 -11",
           scale: "1.3 1.5 1.3"
         }},
-      { entityId: "static-visitor-3_1", assetId: "lvl3-visitor-1", src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/womanclapping.glb", components: { "idle-pose": "" },
+      { entityId: "static-visitor-3_1", assetId: "lvl3-visitor-1", src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/womanclapping_ios.glb", components: { "idle-pose": "" },
         attrs: {
           position: "-13 1 -10.3",
           scale: "1.2 1.2 1.2",
@@ -104,7 +104,7 @@ window.ASSET_MANIFEST = {
           position: "-11.8 0.4 -7",
           scale: "0.4 0.4 0.4"
         }},
-      { entityId: "static-visitor-3_5", assetId: "lvl3-visitor-5", src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/m1sitted.glb", components: { "idle-pose": "" },
+      { entityId: "static-visitor-3_5", assetId: "lvl3-visitor-5", src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/m1sitted_ios.glb", components: { "idle-pose": "" },
         attrs: {
           position: "-12.6 1.5 -11.7",
           scale: "0.6 0.55 0.5"
