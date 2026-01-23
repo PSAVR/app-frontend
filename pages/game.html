@@ -4,8 +4,66 @@
     <meta charset="utf-8">
     <title>Selector de Escenario VR</title>
     <meta name="description" content="WebXR VR Level Selector">
+    <script src="https://unpkg.com/meshoptimizer@0.20.0/meshopt_decoder.js"></script>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+
+    <script>
+      window.MeshoptDecoder = MeshoptDecoder;
+
+      (function patchAframeGltfModelMeshopt() {
+        function applyDecoder(cmpInstance) {
+          const loader = cmpInstance && (cmpInstance.loader || cmpInstance.system?.loader);
+          if (loader && loader.setMeshoptDecoder && window.MeshoptDecoder) {
+            loader.setMeshoptDecoder(window.MeshoptDecoder);
+            if (window.MeshoptDecoder.ready && typeof window.MeshoptDecoder.ready.then === "function") {
+              window.MeshoptDecoder.ready.then(() => {
+              });
+            }
+            return true;
+          }
+          return false;
+        }
+
+        function tryPatch() {
+          const A = window.AFRAME;
+          if (!A || !A.components || !A.components["gltf-model"]) return false;
+
+          const Comp = A.components["gltf-model"].Component;
+          if (!Comp || !Comp.prototype || Comp.prototype.__meshoptPatched) return false;
+
+          const p = Comp.prototype;
+
+          if (typeof p.init === "function") {
+            const origInit = p.init;
+            p.init = function () {
+              origInit.call(this);
+              applyDecoder(this);
+            };
+          }
+
+          if (typeof p.update === "function") {
+            const origUpdate = p.update;
+            p.update = function () {
+              applyDecoder(this);
+              origUpdate.call(this);
+              applyDecoder(this);
+            };
+          }
+
+          p.__meshoptPatched = true;
+          console.log("[Meshopt] Patched gltf-model init/update ✅");
+          return true;
+        }
+
+        (function loop() {
+          if (!tryPatch()) setTimeout(loop, 50);
+        })();
+      })();
+    </script>
+
+
     <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
+
     <link rel="stylesheet" href="../styles/game.css" />
   </head>
   <body>
@@ -773,8 +831,8 @@
           isTimerRunning = true;
           if (actionBtnText) actionBtnText.setAttribute('value', 'ENVIAR');
         
-          if (!NO_AUDIO && typeof startAudioCues === 'function') startAudioCues();
-          if (!NO_EMOJIS && typeof startEmojis === 'function') startEmojis();
+          if (typeof startAudioCues === 'function') startAudioCues();
+          if (typeof startEmojis === 'function') startEmojis();
           window.visitorEventEnabled = true;  
         }
       }
@@ -813,10 +871,6 @@
         setTimeout(showInitialTime, 100);
       });
 
-      const QS = new URLSearchParams(window.location.search);
-      const NO_EMOJIS = QS.has('noemojis');
-      const NO_AUDIO  = QS.has('noaudio');
-      console.log('[FLAGS]', { NO_EMOJIS, NO_AUDIO });
 
       const sceneEl = document.querySelector('#escena-vr');
       const fxMurmurEl = document.querySelector('#fx-murmur');
@@ -855,8 +909,7 @@
       function now(){ return performance.now(); }
 
       function playEl(el){
-        if (NO_AUDIO) return;  
-        if (!el) return;
+        if(!el) return;
         const c = comp(el);
         if (!c) { el.addEventListener('sound-loaded', ()=>playEl(el), {once:true}); return; }
         const t = now();
@@ -869,9 +922,7 @@
         c.stopSound();
         c.playSound();
         logCue(el);
-        if (!NO_EMOJIS && typeof triggerEmojiBurst === 'function') {
-          triggerEmojiBurst(el.id);
-        }
+        triggerEmojiBurst(el.id);
       }
 
       function clearScheduled(){
@@ -934,19 +985,9 @@
         schedulePhase1();
       }
 
-      sceneEl.addEventListener('enter-vr', () => {
-        if (isTimerRunning) {
-          if (!NO_AUDIO) startAudioCues();
-          if (!NO_EMOJIS) startEmojis();
-        }
-      });
+      sceneEl.addEventListener('enter-vr', () => { if (isTimerRunning) { startAudioCues(); startEmojis(); } });
       sceneEl.addEventListener('exit-vr',  () => { stopEmojis(); stopAudioCues(); });
-      sceneEl.addEventListener('enter-ar', () => {
-        if (isTimerRunning) {
-          if (!NO_AUDIO) startAudioCues();
-          if (!NO_EMOJIS) startEmojis();
-        }
-      });
+      sceneEl.addEventListener('enter-ar', () => { if (isTimerRunning) { startAudioCues(); startEmojis(); } });
       sceneEl.addEventListener('exit-ar',  () => { stopEmojis(); stopAudioCues(); });
 
       function computeXRANGE() {
