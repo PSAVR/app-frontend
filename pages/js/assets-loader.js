@@ -100,7 +100,6 @@ async function loadLevelAssets() {
   applySceneConfig(cfg.scene);
   for (const v of (cfg.visitors || [])) applyVisitorConfig(v);
 
-  // ✅ esperar entidades (escenario + visitantes)
   await waitEntityModelLoaded("contenedor-modelo", 20000);
   await Promise.all((cfg.visitors || []).map(v => waitEntityModelLoaded(v.entityId, 20000)));
 

@@ -19,7 +19,7 @@ window.EVAL_MANIFEST = {
         {
           entityId: "static-visitor",
           assetId: "lvl1-visitor",
-          src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/m1sitted.glb",
+          src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/m1sitted_ios.glb",
           components: { "idle-pose": "" },
           attrs: {
             position: "-1.5 0.2 -3.8",
@@ -41,7 +41,7 @@ window.EVAL_MANIFEST = {
         {
           entityId: "static-visitor3",
           assetId: "lvl1-visitor3",
-          src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/exit.glb",
+          src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/exit_ios.glb",
           components: { "idle-pose": "" },
           attrs: {
             position: "-3.5 0.2 -6.3",
@@ -53,7 +53,7 @@ window.EVAL_MANIFEST = {
         {
           entityId: "static-visitor4",
           assetId: "lvl1-visitor4",
-          src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/womanclapping.glb",
+          src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/womanclapping_ios.glb",
           components: { "idle-pose": "" },
           attrs: {
             position: "0.8 0.3 -6",
@@ -81,7 +81,7 @@ window.EVAL_MANIFEST = {
         {
           entityId: "static-visitor2_1",
           assetId: "lvl2-visitor",
-          src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/mansitted.glb",
+          src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/mansitted_ios.glb",
           components: { "idle-pose": "" },
           attrs: {
             position: "-5 -0.6 -8",
@@ -114,7 +114,7 @@ window.EVAL_MANIFEST = {
         {
           entityId: "static-visitor2_4",
           assetId: "lvl2-visitor4",
-          src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/exit.glb",
+          src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/exit_ios.glb",
           components: { "idle-pose": "" },
           attrs: {
             position: "-6 -0.4 -1",
@@ -126,7 +126,7 @@ window.EVAL_MANIFEST = {
         {
           entityId: "static-visitor2_5",
           assetId: "lvl2-visitor5",
-          src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/p5.glb",
+          src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/p5_ios.glb",
           components: { "idle-pose": "" },
           attrs: {
             position: "-2 -0.5 -11",
@@ -154,7 +154,7 @@ window.EVAL_MANIFEST = {
         {
           entityId: "static-visitor-3",
           assetId: "lvl3-visitor",
-          src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/mansitted.glb",
+          src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/mansitted_ios.glb",
           components: { "idle-pose": "" },
           attrs: {
             position: "-1.4 0.8 -11",
@@ -165,7 +165,7 @@ window.EVAL_MANIFEST = {
         {
           entityId: "static-visitor-3_1",
           assetId: "lvl3-visitor-1",
-          src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/womanclapping.glb",
+          src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/womanclapping_ios.glb",
           components: { "idle-pose": "" },
           attrs: {
             position: "-13 1 -10.3",
@@ -187,7 +187,7 @@ window.EVAL_MANIFEST = {
         {
           entityId: "static-visitor-3_3",
           assetId: "lvl3-visitor-3",
-          src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/p5.glb",
+          src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/p5_ios.glb",
           components: { "idle-pose": "" },
           attrs: {
             position: "-4.8 -1 -5",
@@ -209,7 +209,7 @@ window.EVAL_MANIFEST = {
         {
           entityId: "static-visitor-3_5",
           assetId: "lvl3-visitor-5",
-          src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/m1sitted.glb",
+          src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/people/m1sitted_ios.glb",
           components: { "idle-pose": "" },
           attrs: {
             position: "-12.6 1.5 -11.7",

@@ -1,6 +1,6 @@
 console.log('[logout.js] cargado. path =', window.location.pathname);
 
-const API_BASE = 'https://vr-backend-api-asdperfqg9a4fncv.canadacentral-01.azurewebsites.net';
+const API_BASE = '';
 
 function createLogoutButton(){
   const path = window.location.pathname.toLowerCase();
