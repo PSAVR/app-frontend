@@ -6,7 +6,7 @@
   <meta name="description" content="WebXR VR Evaluation System">
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
   <script src="https://unpkg.com/meshoptimizer@0.20.0/meshopt_decoder.js"></script>
-  <script>
+     <script>
       window.MeshoptDecoder = MeshoptDecoder;
 
       (function patchAframeGltfModelMeshopt() {
@@ -62,6 +62,13 @@
   <link rel="stylesheet" href="../styles/evaluacion-inicial.css" />
   <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
   </head>
+  <style>
+    .top-left-container,
+    #loading-modal,
+    #progreso-modal {
+      display: none !important;
+    }
+  </style>
   <body>
   <div id="dom-overlay" style="position:fixed; inset:0; pointer-events:none; z-index:10000;">
     <div id="loader-escena"
@@ -95,6 +102,11 @@
       Cargando inmersión...
     </p>
   </div>
+
+    <div class="top-left-container" style="pointer-events:auto">
+      <div id="timer-display">00:30</div>
+      <button id="action-btn">INICIAR</button>
+    </div>
 
     <div id="loading-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; pointer-events:auto;">
       <div style="background: white; padding: 60px 80px; border-radius: 20px; text-align: center; max-width: 500px;">
