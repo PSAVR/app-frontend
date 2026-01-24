@@ -2,7 +2,7 @@ window.ASSET_MANIFEST = {
   facil: {
     scene: {
       id: "modelo-facil",
-      src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/facil/easy-scenario2_ios_final.glb",
+      src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/facil/easy-scenario2_ios128.glb",
       position: "-4 0 -7",
       rotation: "0 -90 0"
     },
@@ -37,7 +37,7 @@ window.ASSET_MANIFEST = {
   intermedio: {
     scene: {
       id: "modelo-inter",
-      src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/inter/inter-class_ios5.glb",
+      src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/inter/inter-class_ios128.glb",
       rotation: "0 180 0",
       position: "-2 -0.5 -6.5"
     },
@@ -75,7 +75,7 @@ window.ASSET_MANIFEST = {
   dificil: {
     scene: {
       id: "modelo-dificil",
-      src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/dif/lecturehall2_ios256.glb",
+      src: "https://pub-f87255c375b24881b5f81a9c0d85cedc.r2.dev/models/dif/lecturehall2_ios128.glb",
       position: "-19.4 -0.75 4"
     },
     visitors: [

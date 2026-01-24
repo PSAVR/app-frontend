@@ -128,7 +128,7 @@
   </main>
   <script src="./pages/js/api-base.js"></script>
   <script>
-  const API_BASE = 'https://vr-backend-api-asdperfqg9a4fncv.canadacentral-01.azurewebsites.net';
+  const API_BASE = '';
   let isRegistering = false;
 
   const loginForm = document.getElementById("loginForm");
@@ -239,6 +239,7 @@
         const resp = await fetch(`${API_BASE}/api/auth/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify({ email, password, username, college,college_id, birthdate,gender })
         });
         const data = await resp.json();

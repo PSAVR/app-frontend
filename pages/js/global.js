@@ -6,7 +6,7 @@ let segundosRestantes = 0;
 let intervaloContador = null;
 let estadoSesion = 'idle';
 
-const API_BASE = 'https://vr-backend-api-asdperfqg9a4fncv.canadacentral-01.azurewebsites.net';
+const API_BASE = '';
 
 function getNivelDesdeURL() {
   const params = new URLSearchParams(window.location.search);
@@ -35,6 +35,7 @@ async function getUserId() {
     const r = await fetch(`${API_BASE}/api/auth/me`, {
       method: "GET",
       headers: authHeaders(),
+      credentials: 'include'
     });
     if (!r.ok) return null;
     const me = await r.json();
@@ -252,7 +253,7 @@ async function enviarAudioYMostrarResultados(blob, ext='webm') {
   showLoading3D();
 
   try {
-    const base = 'https://vr-backend-api-asdperfqg9a4fncv.canadacentral-01.azurewebsites.net';
+    const base = '';
     const user_id = await getUserId();
     if (!user_id) {
       alert('Sesión no válida. Inicia sesión.');
@@ -268,6 +269,7 @@ async function enviarAudioYMostrarResultados(blob, ext='webm') {
     const r = await fetch(`${base}/api/sessions/audio`, {
       method: 'POST',
       body: form,
+      credentials: 'include',
       headers: authHeaders(),
     });
 

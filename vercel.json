@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://vr-backend-api-asdperfqg9a4fncv.canadacentral-01.azurewebsites.net/api/$1"
+    }
+  ]
+}
+
