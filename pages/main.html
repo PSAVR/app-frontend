@@ -29,8 +29,7 @@
   </div>
 </div>
 
-  <a-scene webxr="referenceSpaceType: local; requiredFeatures: dom-overlay; optionalFeatures: hit-test; overlayElement: #dom-overlay"
-  vr-mode-ui="enabled: true">
+  <a-scene vr-mode-ui="enabled: true" webxr="optionalFeatures: dom-overlay, hit-test; overlayElement: #dom-overlay">
     <a-assets>
       <canvas id="lavaCanvas" width="1024" height="1024"></canvas>
     </a-assets>
