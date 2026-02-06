@@ -249,6 +249,47 @@ async function ensureMicReady() {
   }
 }
 
+async function pollSessionResult({ base, task_id, ctx, timeoutMs = 180000 }) {
+  const t0 = Date.now();
+  let attempt = 0;
+
+  // 1s, 2s, 4s, 8s, 12s, 15s, 15s...
+  const schedule = [1000, 2000, 4000, 8000, 12000, 15000];
+
+  while (true) {
+    const url = `${base}/api/sessions/audio_result/${encodeURIComponent(task_id)}?ctx=${encodeURIComponent(ctx)}`;
+    const r = await fetch(url, {
+      method: "GET",
+      credentials: "include",
+      headers: authHeaders(),
+    });
+
+    if (!r.ok) {
+      let body = "";
+      try { body = await r.text(); } catch {}
+      throw new Error(`Error consultando resultado (${r.status}): ${body.slice(0, 160)}`);
+    }
+
+    const data = await r.json();
+    if (data?.status === "done") return data;
+
+    if (Date.now() - t0 > timeoutMs) {
+      throw new Error("Timeout esperando resultado del modelo");
+    }
+
+    const idx = Math.min(attempt, schedule.length - 1);
+    let waitMs = schedule[idx];
+
+    // jitter +/- 20% para evitar que muchos usuarios consulten al mismo tiempo
+    const jitter = 0.8 + Math.random() * 0.4;
+    waitMs = Math.round(waitMs * jitter);
+
+    attempt++;
+    await new Promise(res => setTimeout(res, waitMs));
+  }
+}
+
+
 async function enviarAudioYMostrarResultados(blob, ext='webm') {
   showLoading3D();
 
@@ -256,6 +297,7 @@ async function enviarAudioYMostrarResultados(blob, ext='webm') {
     const base = '';
     const user_id = await getUserId();
     if (!user_id) {
+      hideLoading3D();
       alert('Sesión no válida. Inicia sesión.');
       return;
     }
@@ -265,18 +307,37 @@ async function enviarAudioYMostrarResultados(blob, ext='webm') {
     form.append('audio', blob, `speech.${ext}`);
     form.append('immersion_level_name', nivel);
 
-
-    const r = await fetch(`${base}/api/sessions/audio`, {
-      method: 'POST',
+    const enqueue = await fetch(`${base}/api/sessions/audio_async`, {
+      method: "POST",
       body: form,
-      credentials: 'include',
+      credentials: "include",
       headers: authHeaders(),
     });
 
+    const enqueueData = await enqueue.json().catch(() => ({}));
+    if (!enqueue.ok) {
+      hideLoading3D();
+      throw new Error(enqueueData.error || "Fallo en audio_async");
+    }
 
-    const data = await r.json();
+    const { task_id, ctx } = enqueueData;
+    if (!task_id || !ctx) {
+      hideLoading3D();
+      throw new Error("Respuesta inválida: falta task_id o ctx");
+    }
 
-    const payload = data?.result || data;
+    const doneData = await pollSessionResult({ base, task_id, ctx, timeoutMs: 180000 });
+
+    const data = doneData?.result || doneData;
+
+
+    const payload = data;
+    const star_rating = Number(
+      payload?.detail?.star_rating ??
+      payload?.model?.stars ??
+      0
+    );
+
     
     const ansiedadRaw = payload?.model?.anxiety_pct ?? payload?.anxiety_pct;
     const ansiedadNum = Number(ansiedadRaw);
@@ -295,19 +356,7 @@ async function enviarAudioYMostrarResultados(blob, ext='webm') {
       return;
     }
 
-    if (!r.ok) {
-      hideLoading3D();
-      throw new Error(data.error || 'Fallo procesando audio');
-    }
-
     hideLoading3D();
-
-    const star_rating = Number(
-      data?.detail?.star_rating ??
-      payload?.detail?.star_rating ??
-      payload?.model?.stars ??
-      0
-    );
 
     const LEVEL_ID = { facil: 1, intermedio: 2, dificil: 3 };
     const currentId = LEVEL_ID[nivel] || 1;
