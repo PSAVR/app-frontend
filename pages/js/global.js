@@ -278,14 +278,17 @@ async function pollSessionResult({ base, task_id, ctx, timeoutMs = 180000 }) {
     }
 
     const idx = Math.min(attempt, schedule.length - 1);
-    let waitMs = schedule[idx];
+    //let waitMs = schedule[idx];
 
     // jitter +/- 20% para evitar que muchos usuarios consulten al mismo tiempo
-    const jitter = 0.8 + Math.random() * 0.4;
-    waitMs = Math.round(waitMs * jitter);
+    //const jitter = 0.8 + Math.random() * 0.4;
+    //waitMs = Math.round(waitMs * jitter);
+    //attempt++;
+    //await new Promise(res => setTimeout(res, waitMs));
 
-    attempt++;
+    const waitMs = Math.round(15000 * (0.8 + Math.random() * 0.4));
     await new Promise(res => setTimeout(res, waitMs));
+
   }
 }
 
