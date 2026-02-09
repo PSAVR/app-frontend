@@ -1,26 +1,44 @@
-(function navDebug() {
-  const origAssign = window.location.assign.bind(window.location);
+(function navDebugSafe() {
+  const origAssign  = window.location.assign.bind(window.location);
   const origReplace = window.location.replace.bind(window.location);
 
-  window.location.assign = function(url) {
-    console.warn('[NAV] location.assign ->', url, '\n', new Error().stack);
+  window.location.assign = function (url) {
+    console.warn("[NAV] location.assign ->", url, "\n", new Error().stack);
     return origAssign(url);
   };
 
-  window.location.replace = function(url) {
-    console.warn('[NAV] location.replace ->', url, '\n', new Error().stack);
+  window.location.replace = function (url) {
+    console.warn("[NAV] location.replace ->", url, "\n", new Error().stack);
     return origReplace(url);
   };
 
-  const origHref = Object.getOwnPropertyDescriptor(Location.prototype, 'href');
-  Object.defineProperty(window.location, 'href', {
-    set(url) {
-      console.warn('[NAV] location.href ->', url, '\n', new Error().stack);
-      return origHref.set.call(window.location, url);
-    },
-    get() { return origHref.get.call(window.location); }
+  const origPush = history.pushState.bind(history);
+  const origRep  = history.replaceState.bind(history);
+
+  history.pushState = function (state, title, url) {
+    console.warn("[NAV] history.pushState ->", url, "\n", new Error().stack);
+    return origPush(state, title, url);
+  };
+
+  history.replaceState = function (state, title, url) {
+    console.warn("[NAV] history.replaceState ->", url, "\n", new Error().stack);
+    return origRep(state, title, url);
+  };
+
+  window.addEventListener("popstate", () => {
+    console.warn("[NAV] popstate ->", location.href);
   });
+
+  document.addEventListener(
+    "click",
+    (e) => {
+      const a = e.target && e.target.closest ? e.target.closest("a[href]") : null;
+      if (a) console.warn("[NAV] click <a> ->", a.href, "\n", new Error().stack);
+    },
+    true
+  );
 })();
+
 
 let mediaRecorder = null;
 let recordedChunks = [];
@@ -415,7 +433,8 @@ async function enviarAudioYMostrarResultados(blob, ext='webm') {
 }
 
 window.onResultOk = function () {
-  window.location.href = '/pages/main.html';
+  console.warn("[NAV BLOCKED] onResultOk -> main.html");
+  //window.location.href = '/pages/main.html';
 };
 
 
@@ -468,7 +487,10 @@ async function iniciarGrabacion() {
           await enviarAudioYMostrarResultados(blob, ext);
         } else {
           console.warn('[NAV] Redirect to main. Reason=', window.__lastReason);
-          window.location.href = '/pages/main.html';
+          showMicBanner(
+            "La grabación se detuvo antes de enviar. Toca INICIAR para intentar de nuevo.",
+            "#664d03", "#fff3cd", "#ffecb5"
+          );
         }
       } finally {
         try { stream.getTracks().forEach(t => t.stop()); } catch {}
