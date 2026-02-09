@@ -1,3 +1,27 @@
+(function navDebug() {
+  const origAssign = window.location.assign.bind(window.location);
+  const origReplace = window.location.replace.bind(window.location);
+
+  window.location.assign = function(url) {
+    console.warn('[NAV] location.assign ->', url, '\n', new Error().stack);
+    return origAssign(url);
+  };
+
+  window.location.replace = function(url) {
+    console.warn('[NAV] location.replace ->', url, '\n', new Error().stack);
+    return origReplace(url);
+  };
+
+  const origHref = Object.getOwnPropertyDescriptor(Location.prototype, 'href');
+  Object.defineProperty(window.location, 'href', {
+    set(url) {
+      console.warn('[NAV] location.href ->', url, '\n', new Error().stack);
+      return origHref.set.call(window.location, url);
+    },
+    get() { return origHref.get.call(window.location); }
+  });
+})();
+
 let mediaRecorder = null;
 let recordedChunks = [];
 let uploadOnStop = false;
