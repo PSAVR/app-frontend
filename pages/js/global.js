@@ -8,6 +8,13 @@ let estadoSesion = 'idle';
 
 const API_BASE = '';
 
+window.addEventListener('pagehide', (e) => console.warn('[PAGE] pagehide', e.persisted));
+document.addEventListener('visibilitychange', () => console.warn('[PAGE] visibility', document.visibilityState));
+window.addEventListener('freeze', () => console.warn('[PAGE] freeze'));
+window.addEventListener('unhandledrejection', (e) => console.error('[ERR] unhandledrejection', e.reason));
+window.addEventListener('error', (e) => console.error('[ERR] error', e.message, e.filename, e.lineno));
+
+
 function getNivelDesdeURL() {
   const params = new URLSearchParams(window.location.search);
   return params.get('nivel') || localStorage.getItem('nivelSeleccionado') || 'facil';
@@ -408,6 +415,7 @@ async function iniciarGrabacion() {
 
     const track = stream.getAudioTracks()[0];
     track.addEventListener('ended', () => {
+      window.__lastReason = 'mic_track_ended';
       console.warn('🎤 Track ended (iOS capture failure)');
       try { finalizarSesion(false); } catch {}
       showMicBanner("Se perdió el micrófono. Toca INICIAR y vuelve a intentar.");
@@ -435,6 +443,7 @@ async function iniciarGrabacion() {
         if (uploadOnStop) {
           await enviarAudioYMostrarResultados(blob, ext);
         } else {
+          console.warn('[NAV] Redirect to main. Reason=', window.__lastReason);
           window.location.href = '/pages/main.html';
         }
       } finally {
