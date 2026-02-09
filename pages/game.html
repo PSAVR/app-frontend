@@ -321,6 +321,7 @@
     
     <script>
       function applyHudMobileTuning() {
+        if (window.estadoSesion && window.estadoSesion !== 'idle') return;
         const ui   = document.getElementById("ui-3d-container");
         const btn  = document.getElementById("action-btn-3d");
         const text = document.getElementById("action-btn-text");
