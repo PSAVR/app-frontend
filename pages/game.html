@@ -454,45 +454,75 @@
           this.titleEl = this.el.querySelector('#result-title-3d');
           this.msgEl = this.el.querySelector('#result-message-3d');
           this.starsContainer = this.el.querySelector('#result-stars-container-3d');
-        
-          const okBtn = this.el.querySelector('#result-ok-3d');
-          if (okBtn) {
-            okBtn.addEventListener('click', () => {
-              this.hide();
-              setCameraControlsEnabled(true);
-
-              if (typeof window.onResultOk === 'function') {
-                window.onResultOk();
-              }
-            });
+      
+          this._armed = false;
+          this._lastOk = 0;
+          this._armTimer = null;
+      
+          this.okBtn = this.el.querySelector('#result-ok-3d');
+      
+          const handler = (ev) => {
+            try {
+              ev.preventDefault?.();
+              ev.stopPropagation?.();
+            } catch {}
+      
+            const now = performance.now();
+      
+            if (!this._armed) {
+              console.warn('[OK] blocked: not armed yet');
+              return;
+            }
+            if (now - this._lastOk < 800) {
+              console.warn('[OK] blocked: double tap');
+              return;
+            }
+            this._lastOk = now;
+      
+            this.hide();
+            if (typeof window.onResultOk === 'function') window.onResultOk();
+          };
+      
+          if (this.okBtn) {
+            this.okBtn.addEventListener('touchstart', handler, { passive: false });
+            this.okBtn.addEventListener('mousedown', handler, { passive: false });
+            this.okBtn.addEventListener('click', handler, { passive: false });
           }
         },
       
         show: function (message, stars, title) {
           this.clearStars();
-
-          if (this.titleEl && title) {
-            this.titleEl.setAttribute('value', title);
-          }
-          if (this.msgEl && message) {
-            this.msgEl.setAttribute('value', message);
-          }
-
+          if (this.titleEl && title) this.titleEl.setAttribute('value', title);
+          if (this.msgEl && message) this.msgEl.setAttribute('value', message);
           this.renderStars(stars);
-
+      
           this.el.setAttribute('visible', true);
           setCameraControlsEnabled(false);
+      
+          this._armed = false;
+          if (this._armTimer) clearTimeout(this._armTimer);
+      
+          if (this.okBtn) this.okBtn.classList.remove('clickable');
+      
+          this._armTimer = setTimeout(() => {
+            this._armed = true;
+            if (this.okBtn) this.okBtn.classList.add('clickable');
+          }, 1000);
         },
       
         hide: function () {
           this.el.setAttribute('visible', false);
+          this._armed = false;
+          if (this._armTimer) clearTimeout(this._armTimer);
+          this._armTimer = null;
+      
+          if (this.okBtn) this.okBtn.classList.add('clickable'); // lo dejamos normal
+      
           setCameraControlsEnabled(true);
         },
       
-        clearStars: function() {
-          if (this.starsContainer) {
-            this.starsContainer.innerHTML = '';
-          }
+        clearStars: function () {
+          if (this.starsContainer) this.starsContainer.innerHTML = '';
         },
       
       renderStars: function(stars) {
@@ -634,26 +664,21 @@
     function setCameraControlsEnabled(enabled) {
       const cam = document.querySelector('[camera]');
       if (!cam || !cam.components) return;
-
+    
       const wasd = cam.components['wasd-controls'];
-      if (wasd && typeof wasd.pause === 'function' && typeof wasd.play === 'function') {
-        if (enabled) {
-          wasd.play();
-        } else {
-          wasd.pause();
-        }
-      }
-
+      if (wasd && wasd.pause && wasd.play) enabled ? wasd.play() : wasd.pause();
+    
       const look = cam.components['look-controls'];
-      if (look && typeof look.play === 'function') {
-        look.play(); 
-      }
-
-      const cursor = document.querySelector('[cursor]');
-      if (cursor) {
-        cursor.setAttribute('visible', true);
+      if (look && look.pause && look.play) enabled ? look.play() : look.pause();
+    
+      const cursorEl = document.querySelector('[cursor]');
+      if (cursorEl) {
+        cursorEl.setAttribute('visible', enabled);
+        cursorEl.setAttribute('raycaster', `objects: ${enabled ? '.clickable' : ''}`);
+        cursorEl.setAttribute('cursor', `fuse: ${enabled}; fuseTimeout: 1000`);
       }
     }
+
 
     function getCmp(id, name) {
       const el = document.querySelector(id);
