@@ -433,8 +433,8 @@ async function enviarAudioYMostrarResultados(blob, ext='webm') {
 }
 
 window.onResultOk = function () {
-  console.warn("[NAV BLOCKED] onResultOk -> main.html");
-  //window.location.href = '/pages/main.html';
+  console.log("[NAV] OK pressed -> main.html");
+  window.location.href = '/pages/main.html';
 };
 
 
