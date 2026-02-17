@@ -585,6 +585,25 @@
         }
       });
 
+    function setCameraControlsEnabled(enabled) {
+      const cam = document.querySelector('[camera]');
+      if (!cam || !cam.components) return;
+    
+      const wasd = cam.components['wasd-controls'];
+      if (wasd && wasd.pause && wasd.play) enabled ? wasd.play() : wasd.pause();
+    
+      const look = cam.components['look-controls'];
+      if (look && look.pause && look.play) enabled ? look.play() : look.pause();
+    
+      const cursorEl = document.querySelector('[cursor]');
+      if (cursorEl) {
+        cursorEl.setAttribute('visible', enabled);
+        cursorEl.setAttribute('raycaster', `objects: ${enabled ? '.clickable' : ''}`);
+        cursorEl.setAttribute('cursor', `fuse: ${enabled}; fuseTimeout: 1000`);
+      }
+    }
+
+
       function getCmp(id, name) {
         const el = document.querySelector(id);
         if (!el) return null;
@@ -594,16 +613,19 @@
       window.showLoading3D = function () {
         const cmp = getCmp('#loading-panel-3d', 'loading-modal-3d');
         if (cmp) cmp.show();
+        setCameraControlsEnabled(true);
       };
 
       window.hideLoading3D = function () {
         const cmp = getCmp('#loading-panel-3d', 'loading-modal-3d');
         if (cmp) cmp.hide();
+        setCameraControlsEnabled(true);
       };
 
       window.showResult3D = function (message, stars, title) {
         const cmp = getCmp('#result-panel-3d', 'result-modal-3d');
         if (cmp) cmp.show(message, stars, title || 'Resultados');
+        setCameraControlsEnabled(true);
       };
 
       window.hideResult3D = function () {
