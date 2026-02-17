@@ -68,6 +68,15 @@
     #progreso-modal {
       display: none !important;
     }
+    a-scene {
+      cursor: none !important;
+    }
+    
+    [cursor] {
+      visibility: visible !important;
+      opacity: 1 !important;
+      display: block !important;
+    }
   </style>
   <body>
   <div id="dom-overlay" style="position:fixed; inset:0; pointer-events:none; z-index:10000;">
@@ -1392,6 +1401,7 @@
             elementos.modal.classList.add('active');
           }
 
+          if (window.ensureCursorVisible) window.ensureCursorVisible();
           showResult3D(elementos.resumenProgreso.textContent, 0, 'Resultados');
           return;
         }
@@ -1438,6 +1448,8 @@
           elementos.modal.style.display = 'flex';
           elementos.modal.classList.add('active');
         }
+        
+        if (window.ensureCursorVisible) window.ensureCursorVisible();
 
         const plainText = elementos.resumenProgreso.textContent || elementos.resumenProgreso.innerText || '';
         showResult3D(plainText, estrellasNivel, 'Resultados');
@@ -1693,10 +1705,34 @@
         return originalDetenerGrabacion(...args);
       };
 
-      sceneEl.addEventListener('enter-vr',  ()=>{ startAudioCues(); startEmojis(); });
-      sceneEl.addEventListener('exit-vr',   ()=>{ stopAudioCues(); stopEmojis(); });
-      sceneEl.addEventListener('enter-ar',  ()=>{ startAudioCues(); startEmojis(); });
-      sceneEl.addEventListener('exit-ar',   ()=>{ stopAudioCues(); stopEmojis(); });
+      window.ensureCursorVisible = function() {
+        const cursorEl = document.querySelector('[cursor]');
+        if (cursorEl) {
+          cursorEl.setAttribute('visible', 'true');
+          if (cursorEl.object3D) {
+            cursorEl.object3D.visible = true;
+          }
+          // Force material opacity
+          const mesh = cursorEl.getObject3D('mesh');
+          if (mesh && mesh.material) {
+            mesh.material.opacity = 1;
+            mesh.material.transparent = false;
+            mesh.material.needsUpdate = true;
+          }
+        }
+      };
+
+      // Ensure cursor stays visible - check periodically
+      setInterval(() => {
+        if (window.ensureCursorVisible) {
+          window.ensureCursorVisible();
+        }
+      }, 100);
+
+      sceneEl.addEventListener('enter-vr',  ()=>{ startAudioCues(); startEmojis(); ensureCursorVisible(); });
+      sceneEl.addEventListener('exit-vr',   ()=>{ stopAudioCues(); stopEmojis(); ensureCursorVisible(); });
+      sceneEl.addEventListener('enter-ar',  ()=>{ startAudioCues(); startEmojis(); ensureCursorVisible(); });
+      sceneEl.addEventListener('exit-ar',   ()=>{ stopAudioCues(); stopEmojis(); ensureCursorVisible(); });
     </script>
     
   </body>
