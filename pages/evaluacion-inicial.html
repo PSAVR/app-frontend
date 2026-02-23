@@ -678,7 +678,7 @@
           scene.appendChild(fill);
         }
       
-        if (levelName === "intermedio") {
+        if (nivel === "intermedio") {
           const ambient = document.createElement("a-entity");
           ambient.setAttribute("light", { type: "ambient", color: "#FFFFFF", intensity: 4 });
           scene.appendChild(ambient);
@@ -1309,12 +1309,16 @@
           const ansiedadValida = Number.isFinite(ansiedadNum);
         
           if (!ansiedadValida) {
+            const silencioExcesivo = detail?.silence_disqualified === true;
             console.warn(`Ansiedad inválida para audio ${indiceEscenario + 1}:`, ansiedadRaw);
             estado.resultados[indiceEscenario] = {
               escenario: escenario.nombre,
               nivel: escenario.nivel,
               error: true,
-              mensaje: "No se detecto ninguna voz, por favor intentar de nuevo."
+              silenceDisqualified: silencioExcesivo,
+              mensaje: silencioExcesivo
+                ? "Se detectaron más de 30 segundos de silencio. El audio fue descalificado."
+                : "No se detectó ninguna voz, por favor intentar de nuevo."
             };
           } else {
             const resultado = {
