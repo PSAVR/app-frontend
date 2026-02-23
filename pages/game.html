@@ -163,7 +163,7 @@
       <a-entity id="fx-wthought" sound="src: #snd-wthought; autoplay: false; loop: false; positional: false; volume: 0.3"></a-entity>
       <a-entity id="fx-cough2" sound="src: #snd-cough; autoplay: false; loop: false; positional: false; volume: 0.5"></a-entity>
       </a-entity>
-      <a-entity id="ui-3d-container" position="-1.8 2.8 -2.5">
+      <a-entity id="ui-3d-container" position="-1.8  2.8 -2.5">
         <a-rounded id="timer-3d-bg" width="0.6" height="0.16" radius="0.03" color="#FFFFFF" opacity="0.95" 
                  position="0 0.19 0" material="shader: flat">
           <a-text id="timer-3d-text" value="00:00" color="#3b2e6d" align="center" 
@@ -333,10 +333,10 @@
         if (!isMobile) return;
       
         const isLandscape = window.matchMedia("(orientation: landscape)").matches;
-        const uiScale = isLandscape ? 1.6 : 1.2;
+        const uiScale = isLandscape ? 1.3 : 0.95;
       
         ui.setAttribute("scale", `${uiScale} ${uiScale} ${uiScale}`);
-        ui.setAttribute("position", isLandscape ? "-1 1.6 -2.6" : "-1 2.1 -2.9");
+        ui.setAttribute("position", isLandscape ? "0 2.3 -2.6" : "0 2.6 -2.9");
       
         btn.setAttribute("width",  isLandscape ? "1.40" : "1.35");
         btn.setAttribute("height", isLandscape ? "0.25" : "0.20");
@@ -737,15 +737,9 @@
         const nivel = getNivel();
         const scene = document.querySelector("a-scene");
 
-        if (nivel === "intermedio") {
-          console.log("Applying bright lighting for INTERMEDIATE level...");
-
+        if (nivel === "facil") {
           const ambient = document.createElement("a-entity");
-          ambient.setAttribute("light", {
-            type: "ambient",
-            color: "#FFFFFF",
-            intensity: 1.5        
-          });
+          ambient.setAttribute("light", { type: "ambient", color: "#FFFFFF", intensity: 0.9 });
           scene.appendChild(ambient);
 
           const sun = document.createElement("a-entity");
@@ -753,22 +747,50 @@
             type: "directional",
             castShadow: false,
             color: "#FFFFFF",
-            intensity: 1.5
+            intensity: 4
           });
           sun.setAttribute("position", "1 4 -2");
           scene.appendChild(sun);
-
+                
           const fill = document.createElement("a-entity");
-          fill.setAttribute("light", {
-            type: "hemisphere",
-            intensity: 1.4,
-            groundColor: "#dddddd",
-            color: "#FFFFFF"
-          });
+          fill.setAttribute("light", { type: "hemisphere", intensity: 1, groundColor: "#cccccc", color: "#FFFFFF" });
           fill.setAttribute("position", "0 3 0");
           scene.appendChild(fill);
         }
-      });
+
+        if (nivel === "intermedio") {
+          const ambient = document.createElement("a-entity");
+          ambient.setAttribute("light", { type: "ambient", color: "#FFFFFF", intensity: 4 });
+          scene.appendChild(ambient);
+        
+          const sun = document.createElement("a-entity");
+          sun.setAttribute("light", { type: "directional", color: "#FFFFFF", intensity: 3.5, castShadow: false });
+          sun.setAttribute("position", "1 4 -2");
+          scene.appendChild(sun);
+        
+          const fill = document.createElement("a-entity");
+          fill.setAttribute("light", { type: "hemisphere", intensity: 4.0, groundColor: "#dddddd", color: "#FFFFFF" });
+          fill.setAttribute("position", "0 3 0");
+          scene.appendChild(fill);
+        }
+
+        if (nivel === "dificil") {
+          const ambient = document.createElement("a-entity");
+          ambient.setAttribute("light", { type: "ambient", color: "#FFFFFF", intensity: 2.0 });
+          scene.appendChild(ambient);
+        
+          const sun = document.createElement("a-entity");
+          sun.setAttribute("light", { type: "directional", color: "#FFFFFF", intensity: 2.5, castShadow: false });
+          sun.setAttribute("position", "0 5 2");
+          scene.appendChild(sun);
+        
+          const fill = document.createElement("a-entity");
+          fill.setAttribute("light", { type: "hemisphere", intensity: 2.0, groundColor: "#bbbbbb", color: "#FFFFFF" });
+          fill.setAttribute("position", "0 3 0");
+          scene.appendChild(fill);
+        } 
+        }
+      );
       </script>
 
     <script>

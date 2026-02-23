@@ -200,7 +200,7 @@ function showResultModal({
 
 
 function showNoVoiceModal() {
-  const mensaje = 'No se detectó ninguna voz, por favor intentar de nuevo.';
+  const mensaje = 'No se detecto ninguna voz, por favor intentar de nuevo.';
 
   if (typeof showResult3D === 'function') {
     showResult3D(mensaje, 0, 'Resultados');
@@ -400,6 +400,16 @@ async function enviarAudioYMostrarResultados(blob, ext='webm') {
     const pauseRatio   = payload?.model?.pause_ratio   ?? payload?.pause_ratio   ?? null;
     const pausesPerMin = payload?.model?.pauses_per_min?? payload?.pauses_per_min?? null;
 
+    const silenceSeconds = payload?.model?.silence_seconds ?? null;
+    if (silenceSeconds !== null && silenceSeconds >= 30) {
+      hideLoading3D();
+      if (typeof showResult3D === 'function') {
+        showResult3D('Se detectaron más de 30 segundos de silencio. El audio fue descalificado, por favor intentar de nuevo.', 0, 'Audio descalificado');
+      } else {
+        alert('Se detectaron más de 30 segundos de silencio. El audio fue descalificado.');
+      }
+      return;
+    }
 
     if (!ansiedadValida) {
       console.warn('Ansiedad inválida recibida desde el backend:', ansiedadRaw);
@@ -407,6 +417,8 @@ async function enviarAudioYMostrarResultados(blob, ext='webm') {
       showNoVoiceModal();
       return;
     }
+
+    
 
     hideLoading3D();
 
