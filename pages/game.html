@@ -163,7 +163,8 @@
       <a-entity id="fx-wthought" sound="src: #snd-wthought; autoplay: false; loop: false; positional: false; volume: 0.3"></a-entity>
       <a-entity id="fx-cough2" sound="src: #snd-cough; autoplay: false; loop: false; positional: false; volume: 0.5"></a-entity>
       </a-entity>
-      <a-entity id="ui-3d-container" position="-1.8  2.8 -2.5">
+      <a-entity id="ui-3d-container" position="-3 2.5 -2.5" 
+          scale="1.8 1.8 1.8">
         <a-rounded id="timer-3d-bg" width="0.6" height="0.16" radius="0.03" color="#FFFFFF" opacity="0.95" 
                  position="0 0.19 0" material="shader: flat">
           <a-text id="timer-3d-text" value="00:00" color="#3b2e6d" align="center" 
@@ -186,7 +187,7 @@
 
       </a-entity>
 
-      <a-entity camera look-controls wasd-controls position="0 1.6 0">
+      <a-entity  id="camera-rig" camera look-controls wasd-controls position="-0.7 1.6 0.3">
         <a-entity cursor="fuse: true; fuseTimeout: 1000" position="0 0 -1"
           geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
           material="color: black; shader: flat"
@@ -251,7 +252,8 @@
                   position="0 0 -2"
                   visible="false"
                   result-modal-3d
-                  follow-camera>
+                  follow-camera
+                  scale="0.7 0.7 0.7">
             
           <a-plane width="50" height="50"
                    color="#000000"
@@ -791,6 +793,21 @@
         } 
         }
       );
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const nivel = getNivel();
+        const cam = document.getElementById("camera-rig");
+        if (!cam) return;
+
+        const positions = {
+          facil:      "-0.7 1.6 0.3",
+          intermedio: "-1.5 1.6 0.5",      
+          dificil:    "-4 1.6 0.5"       
+        };
+      
+        const pos = positions[nivel] || "0 1.6 0";
+        cam.setAttribute("position", pos);
+      });
       </script>
 
     <script>

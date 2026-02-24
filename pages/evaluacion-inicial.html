@@ -67,15 +67,7 @@
     #loading-modal,
     #progreso-modal {
       display: none !important;
-    }
-    a-scene {
-      cursor: none !important;
-    }
-    
-    [cursor] {
-      visibility: visible !important;
-      opacity: 1 !important;
-      display: block !important;
+      pointer-events: none !important;
     }
   </style>
   <body>
@@ -117,7 +109,7 @@
       <button id="action-btn">INICIAR</button>
     </div>
 
-    <div id="loading-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 999; justify-content: center; align-items: center; pointer-events:auto;">
+    <div id="loading-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 999; justify-content: center; align-items: center; pointer-events:auto;">
       <div style="background: white; padding: 60px 80px; border-radius: 20px; text-align: center; max-width: 500px;">
         <h2 style="margin: 0 0 20px 0; color: #333; font-size: 28px;">Generando tus resultados,<br>no salgas de esta vista</h2>
         <div class="spinner" style="margin: 30px auto; width: 60px; height: 60px; border: 6px solid #f3f3f3; border-top: 6px solid #9b59b6; border-radius: 50%; animation: spin 1s linear infinite;"></div>
@@ -130,23 +122,19 @@
       </div>
     </div>
 
-    <div id="progreso-modal" class="result-overlay" style="display:none; pointer-events:auto;">
-  <div class="result-card">
-    <h3 class="result-title">Resultados</h3>
-
-    <p id="resumen-progreso" class="result-text">
-      ¡Buen trabajo! Sigue intentándolo.
-    </p>
-
-    <div id="estrellas-ultima-sesion" class="result-stars"></div>
-
-    <button id="btn-salir" class="result-ok">Aceptar</button>
-  </div>
-</div>
-
+    <div id="progreso-modal" class="result-overlay" style=" pointer-events:auto;">
+      <div class="result-card">
+        <h3 class="result-title">Resultados</h3>
+        <p id="resumen-progreso" class="result-text">
+          ¡Buen trabajo! Sigue intentándolo.
+        </p>
+        <div id="estrellas-ultima-sesion" class="result-stars"></div>
+        <button id="btn-salir" class="result-ok">Aceptar</button>
+      </div>
+    </div>
   </div>
 
-    <a-scene id="escena-vr" style="opacity:0;" lvl1-visitor-event="enabled:true" lvl2-visitor-event="enabled:false" lvl3-visitor-event="enabled:false" vr-mode-ui="enabled: true" shadow="type: pcfsoft" renderer="colorManagement: true; physicallyCorrectLights: true; alpha: true" background="color: white" webxr="optionalFeatures: dom-overlay, hit-test; overlayElement: #dom-overlay">
+    <a-scene id="escena-vr" lvl1-visitor-event="enabled:true" lvl2-visitor-event="enabled:false" lvl3-visitor-event="enabled:false" vr-mode-ui="enabled: true" shadow="type: pcfsoft" renderer="colorManagement: true; physicallyCorrectLights: true; alpha: true" background="color: white" webxr="optionalFeatures: dom-overlay, hit-test; overlayElement: #dom-overlay">
       <a-assets>
         <audio id="snd-murmur" src="../audios/Murmur.mp3" preload="auto"></audio>
         <audio id="snd-door" src="../audios/door.mp3" preload="auto"></audio>
@@ -192,7 +180,15 @@
       <a-entity id="fx-cough2" sound="src: #snd-cough; autoplay: false; loop: false; positional: false; volume: 0.5"></a-entity>
       
       </a-entity>
-      <a-entity id="ui-3d-container" position="0 2.8 -2.5">
+      <a-entity  id="camera-rig" camera look-controls wasd-controls position="-0.7 1.6 0.3">
+        <a-entity cursor="fuse: true; fuseTimeout: 1000" position="0 0 -1"
+          geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
+          material="color: black; shader: flat"
+          raycaster="objects: .clickable">
+        </a-entity>
+      </a-entity>
+      <a-entity id="ui-3d-container" position="-3 2.5 -2.5" 
+          scale="1.8 1.8 1.8">
         <a-rounded id="timer-3d-bg"
                    width="0.6"
                    height="0.16"
@@ -227,15 +223,7 @@
                   font="roboto"></a-text>
         </a-rounded>
       </a-entity>
-      <a-entity camera look-controls wasd-controls position="0 1.6 0">
-        <a-entity 
-          cursor="fuse: true; fuseTimeout: 1000" 
-          raycaster="objects: .clickable"
-          position="0 0 -1"
-          geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
-          material="color: black; shader: flat">
-        </a-entity>
-      </a-entity>
+
       <a-entity id="loading-panel-3d"
                 position="0 0 -2"
                 visible="false"
@@ -244,8 +232,8 @@
         <a-plane width="50" height="50"
                  color="#000000"
                  opacity="0.75"
-                 position="0 0 -0.02"
-                 material="shader: flat"></a-plane>
+                 position="0 0 0"
+                 material="shader: flat;"></a-plane>
 
         <a-rounded width="1"
                    height="0.4"
@@ -253,7 +241,8 @@
                    color="#FFFFFF"
                    opacity="0.98"
                    position="0 0 0.01"
-                   material="shader: flat"></a-rounded>
+                   material="shader: flat"
+                   ></a-rounded>
 
         <a-text value="Generando tus resultados,"
                 align="center"
@@ -291,13 +280,14 @@
                 position="0 0 -2"
                 visible="false"
                 result-modal-3d
-                follow-camera>
+                follow-camera
+                scale="1.4 1.4 1.4">
 
         <a-plane width="80" height="80"
                  color="#000000"
                  opacity="0.75"
                  position="0 0 -0.02"
-                 material="shader: flat"></a-plane>
+                 material="shader: flat;"></a-plane>
 
         <a-rounded width="1.2"
                    height="0.8"
@@ -456,7 +446,7 @@
           this.el.setAttribute('position', {
             x: p.x,
             y: p.y,
-            z: p.z - 0.6
+            z: p.z - 1.2
           });
         
           this.el.setAttribute('rotation', {
@@ -678,17 +668,17 @@
           scene.appendChild(fill);
         }
       
-        if (nivel === "intermedio") {
-          const ambient = document.createElement("a-entity");
+        if (levelName === "intermedio") {
+          const ambient = createLight(); 
           ambient.setAttribute("light", { type: "ambient", color: "#FFFFFF", intensity: 4 });
           scene.appendChild(ambient);
-        
-          const sun = document.createElement("a-entity");
+
+          const sun = createLight();  
           sun.setAttribute("light", { type: "directional", color: "#FFFFFF", intensity: 3.5, castShadow: false });
           sun.setAttribute("position", "1 4 -2");
           scene.appendChild(sun);
-        
-          const fill = document.createElement("a-entity");
+
+          const fill = createLight();  
           fill.setAttribute("light", { type: "hemisphere", intensity: 4.0, groundColor: "#dddddd", color: "#FFFFFF" });
           fill.setAttribute("position", "0 3 0");
           scene.appendChild(fill);
@@ -714,7 +704,7 @@
       document.addEventListener("escenario-cambiado", (ev) => {
         const idx = ev.detail?.indice ?? 0;
         const escenario = window.EVAL_MANIFEST?.escenarios?.[idx];
-        const levelName = escenario?.immersion_level_name;
+        const levelName = escenario?.immersion_level_name?.toLowerCase();
       
         if (levelName) {
           applyEvalLights(levelName);
@@ -723,6 +713,22 @@
         }
       });
 
+      document.addEventListener("escenario-cambiado", (ev) => {
+        const idx = ev.detail?.indice ?? 0;
+        const escenario = window.EVAL_MANIFEST?.escenarios?.[idx];
+        const levelName = escenario?.immersion_level_name?.toLowerCase();
+        const cam = document.getElementById("camera-rig");
+        if (!cam) return;
+
+        const positions = {
+          facil:      "-0.7 1.6 0.3",
+          intermedio: "-1.5 1.6 0.5",      
+          dificil:    "-4 1.6 0.5"  
+        };
+      
+        const pos = positions[levelName] || "0 1.6 0";
+        cam.setAttribute("position", pos);
+      });
     </script>
 
     <script>
@@ -1318,7 +1324,7 @@
               silenceDisqualified: silencioExcesivo,
               mensaje: silencioExcesivo
                 ? "Se detectaron más de 30 segundos de silencio. El audio fue descalificado."
-                : "No se detectó ninguna voz, por favor intentar de nuevo."
+                : "No se detecto ninguna voz, por favor intentar de nuevo."
             };
           } else {
             const resultado = {
@@ -1366,7 +1372,7 @@
       async function finalizarEvaluacion() {
         console.log('Finalizando evaluacion...');
         if (elementos.loadingModal) {
-          elementos.loadingModal.style.display = 'flex';
+          //elementos.loadingModal.style.display = 'flex';
         }
 
         if (elementos.escena) {
@@ -1378,7 +1384,7 @@
         }
 
         if (elementos.loadingModal) {
-          elementos.loadingModal.style.display = 'flex';
+          //elementos.loadingModal.style.display = 'flex';
         }
         showLoading3D();
 
@@ -1725,30 +1731,18 @@
         stopEmojis();
         return originalDetenerGrabacion(...args);
       };
+      
+      ['enter-vr','exit-vr','enter-ar','exit-ar'].forEach(evt => {
+        sceneEl?.addEventListener(evt, () => window.ensureCursorVisible?.());
+      });
 
-      window.ensureCursorVisible = function() {
-        const cursorEl = document.querySelector('[cursor]');
-        if (cursorEl) {
-          cursorEl.setAttribute('visible', 'true');
-          if (cursorEl.object3D) {
-            cursorEl.object3D.visible = true;
-          }
-          // Force material opacity
-          const mesh = cursorEl.getObject3D('mesh');
-          if (mesh && mesh.material) {
-            mesh.material.opacity = 1;
-            mesh.material.transparent = false;
-            mesh.material.needsUpdate = true;
-          }
-        }
+      // extra: cuando muestras/ocultas modales 3D
+      const _showResult3D = window.showResult3D;
+      window.showResult3D = function() {
+        const r = _showResult3D?.apply(this, arguments);
+        window.ensureCursorVisible?.();
+        return r;
       };
-
-      // Ensure cursor stays visible - check periodically
-      setInterval(() => {
-        if (window.ensureCursorVisible) {
-          window.ensureCursorVisible();
-        }
-      }, 100);
 
       sceneEl.addEventListener('enter-vr',  ()=>{ startAudioCues(); startEmojis(); ensureCursorVisible(); });
       sceneEl.addEventListener('exit-vr',   ()=>{ stopAudioCues(); stopEmojis(); ensureCursorVisible(); });
