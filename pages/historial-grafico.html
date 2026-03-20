@@ -6,6 +6,60 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <link rel="stylesheet" href="../styles/historial-grafico.css" />
+  <style>
+    .tab-nav {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin: 0 0 18px 0;
+    }
+    .tab-btn {
+      padding: 9px 28px;
+      border: none;
+      border-radius: 999px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+      background: rgba(255,255,255,0.18);
+      color: #5E5E5E;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+    .tab-btn.active {
+      background: #A998FF;
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(169,152,255,0.4);
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    .today-empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 200px;
+      color: #7b7b9a;
+      font-size: 15px;
+      font-weight: 500;
+      text-align: center;
+      padding: 20px;
+    }
+    .session-summary {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 0 0 14px 0;
+    }
+    .summary-pill {
+      background: rgba(169,152,255,0.15);
+      border-radius: 999px;
+      padding: 6px 18px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #5E5E5E;
+    }
+    .summary-pill span { color: #8B7AE5; }
+  </style>
 </head>
 <body>
   <section class="stage">
@@ -13,7 +67,27 @@
          z-index:-1; pointer-events:none;"></canvas>
     <h1 class="title" id="pageTitle">Nivel *</h1>
 
-    <div class="controls">
+    <div class="tab-nav">
+      <button class="tab-btn active" id="tabBtnHoy"       onclick="switchTab('hoy')">Hoy</button>
+      <button class="tab-btn"        id="tabBtnHistorial" onclick="switchTab('historial')">Historial</button>
+    </div>
+
+    <div class="tab-panel active" id="panelHoy">
+      <div class="session-summary" id="todaySummary" style="display:none"></div>
+
+      <div class="chart-block chart-has-data" id="todayChartWithData" style="display:none">
+        <div class="chart-box">
+          <canvas id="todayChart"></canvas>
+        </div>
+        <p id="todayPeriodMsg" class="chart-period-msg"></p>
+      </div>
+
+      <div class="chart-block chart-no-data" id="todayChartNoData">
+        <p id="todayStatusMsg" class="today-empty">Cargando…</p>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="panelHistorial">
       <div class="date-selector">
         <div class="date-group">
           <label for="startDate">Fecha Inicio</label>
@@ -43,9 +117,173 @@
       <p id="statusMsg"></p>
     </div>
 
+    </div>
+
   </section>
   <script>
   const API_BASE = '';
+
+  function switchTab(tab) {
+    document.getElementById('panelHoy').classList.toggle('active', tab === 'hoy');
+    document.getElementById('panelHistorial').classList.toggle('active', tab === 'historial');
+    document.getElementById('tabBtnHoy').classList.toggle('active', tab === 'hoy');
+    document.getElementById('tabBtnHistorial').classList.toggle('active', tab === 'historial');
+  }
+
+  async function fetchTodaySessions(userId, levelId) {
+    const r = await fetch(
+      `${API_BASE}/api/sessions/users/${userId}/sessions/level/${levelId}/today`,
+      { credentials: 'include' }
+    );
+    if (!r.ok) throw new Error('No se pudo cargar sesiones de hoy');
+    return r.json();
+  }
+
+  async function runCleanup() {
+    try {
+      await fetch(`${API_BASE}/api/sessions/sessions/cleanup`, {
+        method: 'POST', credentials: 'include'
+      });
+    } catch (e) { console.warn('Cleanup silenciado:', e); }
+  }
+
+  function parseAnxiety(row) {
+    const summary = row.performance_summary || '';
+    const match = summary.match(/anxiety\s*=\s*([\d.]+)/i);
+    if (match) return parseFloat(match[1]);
+    return Number(row.anxiety_pct ?? 0);
+  }
+
+  function renderTodaySummary(rows) {
+    const anx   = rows.map(parseAnxiety);
+    const best  = Math.round(Math.min(...anx));
+    const last  = Math.round(anx[anx.length - 1]);
+    const avg   = Math.round(anx.reduce((a, b) => a + b, 0) / anx.length);
+    const stars = Math.max(...rows.map(r => r.star_rating ?? 0));
+    const el = document.getElementById('todaySummary');
+    el.innerHTML = `
+      <div class="summary-pill">Sesiones hoy: <span>${rows.length}</span></div>
+      <div class="summary-pill">Mejor: <span>${best}%</span></div>
+      <div class="summary-pill">Última: <span>${last}%</span></div>
+      <div class="summary-pill">Promedio: <span>${avg}%</span></div>
+      <div class="summary-pill">Máx. ★: <span>${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}</span></div>
+    `;
+    el.style.display = 'flex';
+  }
+
+  let todayChart;
+  function renderTodayChart(rows) {
+    const ctx = document.getElementById('todayChart').getContext('2d');
+    if (todayChart) todayChart.destroy();
+
+    const labels   = rows.map((_, i) => `Sesión ${i + 1}`);
+    const data     = rows.map(r => Math.round(parseAnxiety(r)));
+    const tooltips = rows.map(r => ({
+      anxiety:   Math.round(parseAnxiety(r)),
+      star:      r.star_rating ?? 0,
+      emo:       r.emotion_result || '—',
+      pauses:    r.pauses_count ?? 0,
+      played_at: new Date(r.played_at).toLocaleString('es-PE', { timeZone: 'America/Lima' })
+    }));
+
+    const pointColors = data.map(v => v < 33.3 ? '#4ade80' : v <= 66.6 ? '#facc15' : '#f87171');
+
+    todayChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Ansiedad por sesión',
+          data,
+          borderColor: '#A998FF',
+          backgroundColor: function(context) {
+            const chart = context.chart;
+            const {ctx: c, chartArea} = chart;
+            if (!chartArea) return 'rgba(169,152,255,0.1)';
+            const g = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+            g.addColorStop(0,   'rgba(169,152,255,0.35)');
+            g.addColorStop(1,   'rgba(169,152,255,0.03)');
+            return g;
+          },
+          borderWidth: 3,
+          fill: true,
+          tension: 0.3,
+          pointRadius: 10,
+          pointHoverRadius: 14,
+          pointBackgroundColor: pointColors,
+          pointBorderColor: '#fff',
+          pointBorderWidth: 3,
+          pointHoverBorderColor: '#fff',
+          pointHoverBorderWidth: 4,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { intersect: false, mode: 'index' },
+        scales: {
+          y: {
+            title: { display: true, text: 'Porcentaje de Ansiedad', font: { size: 20, weight: '700' }, color: '#5E5E5E' },
+            ticks: { stepSize: 20, font: { size: 18, weight: '600' }, color: '#5E5E5E', callback: v => v + '%' },
+            beginAtZero: true, max: 100,
+            grid: { color: 'rgba(94,94,94,0.08)', lineWidth: 1 }
+          },
+          x: {
+            ticks: { font: { size: 13, weight: '600' }, color: '#5E5E5E', maxRotation: 45, minRotation: 45 },
+            grid: { display: false }
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            titleColor: '#5E5E5E', bodyColor: '#5E5E5E',
+            titleFont: { size: 18, weight: '700' }, bodyFont: { size: 16 },
+            backgroundColor: 'rgba(255,255,255,0.98)',
+            borderColor: 'rgba(169,152,255,0.5)', borderWidth: 2,
+            padding: 16, cornerRadius: 12, displayColors: false,
+            callbacks: {
+              title: items => items[0].label,
+              label: (ctx) => {
+                const t = tooltips[ctx.dataIndex];
+                if (!t || t.played_at === '—') return 'Sin datos';
+                const stars = '★'.repeat(t.star) + '☆'.repeat(3 - t.star);
+                return [
+                  `Ansiedad: ${Math.round(t.anxiety)}%`,
+                  `Estrellas: ${stars}`,
+                  `Pausas: ${t.pauses}`,
+                  `Hora: ${t.played_at}`
+                ];
+              }
+            }
+          }
+        },
+        animation: { duration: 800, easing: 'easeInOutQuart' }
+      }
+    });
+  }
+
+  async function loadTodayData() {
+    const statusEl = document.getElementById('todayStatusMsg');
+    try {
+      statusEl.textContent = 'Cargando…';
+      const rows = await fetchTodaySessions(userData.user_id, levelData.level_id);
+      if (!rows.length) {
+        document.getElementById('todayChartWithData').style.display = 'none';
+        document.getElementById('todayChartNoData').style.display   = 'flex';
+        statusEl.textContent = '¡Todavía no tienes sesiones hoy! Realiza tu primera práctica del día.';
+        return;
+      }
+      renderTodaySummary(rows);
+      renderTodayChart(rows);
+      document.getElementById('todayChartWithData').style.display = 'block';
+      document.getElementById('todayChartNoData').style.display   = 'none';
+    } catch (err) {
+      console.error(err);
+      statusEl.textContent = 'No se pudo cargar las sesiones de hoy.';
+    }
+  }
+
+  
 
   function getQueryParams(){
     const p = new URLSearchParams(location.search);
@@ -383,6 +621,10 @@
       if(!userData) return;
       
       levelData = await fetchLevelIdByName(level);
+
+      runCleanup();
+
+      await loadTodayData();
 
       hasAnySessionsForThisLevel = await hasAnySessionForLevel(
         userData.user_id,
