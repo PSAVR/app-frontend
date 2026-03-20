@@ -6,60 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <link rel="stylesheet" href="../styles/historial-grafico.css" />
-  <style>
-    .tab-nav {
-      display: flex;
-      gap: 8px;
-      justify-content: center;
-      margin: 0 0 18px 0;
-    }
-    .tab-btn {
-      padding: 9px 28px;
-      border: none;
-      border-radius: 999px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-      background: rgba(255,255,255,0.18);
-      color: #5E5E5E;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-    }
-    .tab-btn.active {
-      background: #A998FF;
-      color: #fff;
-      box-shadow: 0 4px 16px rgba(169,152,255,0.4);
-    }
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
-    .today-empty {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 200px;
-      color: #7b7b9a;
-      font-size: 15px;
-      font-weight: 500;
-      text-align: center;
-      padding: 20px;
-    }
-    .session-summary {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin: 0 0 14px 0;
-    }
-    .summary-pill {
-      background: rgba(169,152,255,0.15);
-      border-radius: 999px;
-      padding: 6px 18px;
-      font-size: 13px;
-      font-weight: 700;
-      color: #5E5E5E;
-    }
-    .summary-pill span { color: #8B7AE5; }
-  </style>
 </head>
 <body>
   <section class="stage">
@@ -87,7 +33,7 @@
       </div>
     </div>
 
-    <div class="tab-panel" id="panelHistorial">
+    <div class="tab-panel" id="panelHistorial" style="display:none">
       <div class="date-selector">
         <div class="date-group">
           <label for="startDate">Fecha Inicio</label>
@@ -123,11 +69,40 @@
   <script>
   const API_BASE = '';
 
+  let historialLoaded = false;
   function switchTab(tab) {
-    document.getElementById('panelHoy').classList.toggle('active', tab === 'hoy');
-    document.getElementById('panelHistorial').classList.toggle('active', tab === 'historial');
+    document.getElementById('panelHoy').style.display       = tab === 'hoy'       ? 'block' : 'none';
+    document.getElementById('panelHistorial').style.display = tab === 'historial' ? 'block' : 'none';
     document.getElementById('tabBtnHoy').classList.toggle('active', tab === 'hoy');
     document.getElementById('tabBtnHistorial').classList.toggle('active', tab === 'historial');
+
+    if (tab === 'historial' && !historialLoaded && userData && levelData) {
+      historialLoaded = true;
+      loadHistorialTab();
+    }
+  }
+
+  async function loadHistorialTab() {
+    const statusEl = document.getElementById('statusMsg');
+    try {
+      hasAnySessionsForThisLevel = await hasAnySessionForLevel(userData.user_id, levelData.level_id);
+      if (!hasAnySessionsForThisLevel) {
+        document.getElementById('chartWithData').style.display = 'none';
+        document.getElementById('chartNoData').style.display   = 'flex';
+        statusEl.textContent = 'Aún no tienes registros de simulaciones. Realiza tu primera práctica para comenzar a ver tu progreso';
+        return;
+      }
+      const today = new Date(); today.setHours(0,0,0,0);
+      currentEndDate   = new Date(today);
+      currentStartDate = new Date(today); currentStartDate.setDate(today.getDate() - 6);
+      document.getElementById('startDate').valueAsDate = currentStartDate;
+      document.getElementById('endDate').valueAsDate   = currentEndDate;
+      updateWeekInfo();
+      await loadData();
+    } catch (err) {
+      console.error(err);
+      statusEl.textContent = 'No se pudo cargar el historial.';
+    }
   }
 
   async function fetchTodaySessions(userId, levelId) {
@@ -561,13 +536,20 @@
       currentEndDate
     );
 
+    if (!rows.length) {
+      document.getElementById('chartWithData').style.display = 'none';
+      document.getElementById('chartNoData').style.display   = 'flex';
+      document.getElementById('statusMsg').textContent = 'No hay sesiones en este período.';
+      periodMsg.textContent = '';
+      return;
+    }
+
     const ds = buildDataset(rows, currentStartDate, currentEndDate);
     renderChart(ds);
 
     document.getElementById('chartWithData').style.display = 'block';
-    document.getElementById('chartNoData').style.display = 'none';
-
-    periodMsg.textContent = rows.length ? '' : 'No hay sesiones en este período.';
+    document.getElementById('chartNoData').style.display   = 'none';
+    periodMsg.textContent = '';
   } catch (err) {
     console.error(err);
     periodMsg.textContent = 'No se pudo cargar el historial.';
@@ -610,48 +592,22 @@
   });
 
   (async ()=>{
-    const status = document.getElementById('statusMsg');
     const { level } = getQueryParams();
     const pretty = { Facil:'Fácil', Intermedio:'Intermedio', Dificil:'Difícil' }[level] || level;
     document.getElementById('pageTitle').textContent = `Nivel ${pretty}`;
 
     try{
-      status.textContent = 'Cargando…';
       userData = await ensureSession(); 
       if(!userData) return;
       
       levelData = await fetchLevelIdByName(level);
 
-      runCleanup();
 
       await loadTodayData();
 
-      hasAnySessionsForThisLevel = await hasAnySessionForLevel(
-        userData.user_id,
-        levelData.level_id
-      );
-
-      if (!hasAnySessionsForThisLevel) {
-        document.getElementById('chartWithData').style.display = 'none';
-        document.getElementById('chartNoData').style.display = 'flex';
-
-        status.textContent = 'Aún no tienes registros de simulaciones. Realiza tu primera práctica para comenzar a ver tu progreso';
-        return;
-      }
-      
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      currentEndDate = new Date(today);
-      currentStartDate = new Date(today);
-      currentStartDate.setDate(today.getDate() - 6);
-      
-      document.getElementById('startDate').valueAsDate = currentStartDate;
-      document.getElementById('endDate').valueAsDate = currentEndDate;
-      updateWeekInfo();
-      await loadData();
     }catch(err){
       console.error(err);
-      status.textContent = 'No se pudo cargar el historial.';
+      document.getElementById('todayStatusMsg').textContent = 'No se pudo cargar las sesiones de hoy.';
     }
   })();
 </script>
