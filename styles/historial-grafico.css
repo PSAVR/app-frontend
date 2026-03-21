@@ -229,7 +229,7 @@ html, body {
 }
 
 .tab-panel { display: none !important; }
-.tab-panel.active { display: block !important; }
+.tab-panel.active { display: flex !important; flex-direction: column; gap: 3vh; }
 
 /* ── Tab Hoy ── */
 .today-empty {
