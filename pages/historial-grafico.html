@@ -34,35 +34,34 @@
     </div>
 
     <div class="tab-panel" id="panelHistorial" style="display:none">
-      <div class="date-selector">
-        <div class="date-group">
-          <label for="startDate">Fecha Inicio</label>
-          <input type="date" id="startDate" />
+      <div class="controls">
+        <div class="date-selector">
+          <div class="date-group">
+            <label for="startDate">Fecha Inicio</label>
+            <input type="date" id="startDate" />
+          </div>
+          <div class="date-group">
+            <label for="endDate">Fecha Fin</label>
+            <input type="date" id="endDate" />
+          </div>
         </div>
-        <div class="date-group">
-          <label for="endDate">Fecha Fin</label>
-          <input type="date" id="endDate" />
+        <div class="week-nav">
+          <button id="prevWeek" title="Semana anterior">‹</button>
+          <span class="week-info" id="weekInfo">Semana actual</span>
+          <button id="nextWeek" title="Semana siguiente">›</button>
         </div>
       </div>
-      
-      <div class="week-nav">
-        <button id="prevWeek" title="Semana anterior">‹</button>
-        <span class="week-info" id="weekInfo">Semana actual</span>
-        <button id="nextWeek" title="Semana siguiente">›</button>
+
+      <div class="chart-block chart-has-data" id="chartWithData">
+        <div class="chart-box">
+          <canvas id="histChart"></canvas>
+        </div>
+        <p id="periodMsg" class="chart-period-msg"></p>
       </div>
-    </div>
 
-    <div class="chart-block chart-has-data" id="chartWithData">
-      <div class="chart-box">
-        <canvas id="histChart"></canvas>
+      <div class="chart-block chart-no-data" id="chartNoData">
+        <p id="statusMsg"></p>
       </div>
-      <p id="periodMsg" class="chart-period-msg"></p>
-    </div>
-
-    <div class="chart-block chart-no-data" id="chartNoData">
-      <p id="statusMsg"></p>
-    </div>
-
     </div>
 
   </section>
