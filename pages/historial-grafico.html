@@ -33,7 +33,7 @@
       </div>
     </div>
 
-    <div class="tab-panel" id="panelHistorial" style="display:none">
+    <div class="tab-panel" id="panelHistorial">
       <div class="controls">
         <div class="date-selector">
           <div class="date-group">
@@ -70,8 +70,8 @@
 
   let historialLoaded = false;
   function switchTab(tab) {
-    document.getElementById('panelHoy').style.display       = tab === 'hoy'       ? 'block' : 'none';
-    document.getElementById('panelHistorial').style.display = tab === 'historial' ? 'block' : 'none';
+    document.getElementById('panelHoy').classList.toggle('active', tab === 'hoy');
+    document.getElementById('panelHistorial').classList.toggle('active', tab === 'historial');
     document.getElementById('tabBtnHoy').classList.toggle('active', tab === 'hoy');
     document.getElementById('tabBtnHistorial').classList.toggle('active', tab === 'historial');
 
