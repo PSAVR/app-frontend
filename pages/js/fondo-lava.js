@@ -5,8 +5,7 @@
       console.warn("[background-lava] No se encontró #lavaCanvas.");
       return;
     }
-    canvas.width = canvas.width || 2048;
-    canvas.height = canvas.height || 1024;
+
     const ctx = canvas.getContext("2d");
     const inAFrame = !!document.querySelector("a-scene");
 
@@ -43,7 +42,7 @@
     const TINT_ALPHA_2D   = 0.5; 
 
     let tex = null;
-    /*function ensureTexture() {
+    function ensureTexture() {
       if (!inAFrame) return;
       const skyEl = document.getElementById("sky");
       const mesh = skyEl && skyEl.getObject3D && skyEl.getObject3D("mesh");
@@ -54,33 +53,6 @@
         mesh.material.needsUpdate = true;
       }
       tex.needsUpdate = true;
-    }*/
-    let tex = null;
-    let skyReady = false;
-    
-    function ensureTexture() {
-      if (!inAFrame) return;
-    
-      const skyEl = document.getElementById("sky");
-      if (!skyEl) return;
-    
-      const mesh = skyEl.getObject3D("mesh");
-      if (!mesh || !mesh.material) return;
-    
-      if (!skyReady) {
-        tex = new THREE.CanvasTexture(canvas);
-        tex.needsUpdate = true;
-    
-        mesh.material.map = tex;
-        mesh.material.needsUpdate = true;
-    
-        skyReady = true;
-        console.log("[background-lava] CanvasTexture aplicada al sky");
-      }
-    
-      if (tex) {
-        tex.needsUpdate = true;
-      }
     }
 
     function drawBlob(x, y, R, color, t, idx, circular) {
