@@ -59,24 +59,14 @@
       const skyEl = document.getElementById("sky");
       if (!skyEl) return;
     
+      // Fuerza a A-Frame a volver a leer el canvas como textura
+      skyEl.setAttribute("material", "shader: flat; src: #lavaCanvas");
+    
       const mesh = skyEl.getObject3D("mesh");
-    
-      // Si mesh aún no está listo → esperar
-      if (!mesh) {
-        skyEl.addEventListener("object3dset", ensureTexture, { once: true });
-        return;
-      }
-    
-      // Forzar material correcto para VR
-      if (!tex) {
-        tex = new THREE.CanvasTexture(canvas);
-    
-        mesh.material.map = tex;
-        mesh.material.side = THREE.BackSide;  
+      if (mesh && mesh.material && mesh.material.map) {
+        mesh.material.map.needsUpdate = true;
         mesh.material.needsUpdate = true;
       }
-    
-      tex.needsUpdate = true;
     }
 
     function drawBlob(x, y, R, color, t, idx, circular) {
