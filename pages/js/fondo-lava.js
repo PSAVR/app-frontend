@@ -5,6 +5,8 @@
       console.warn("[background-lava] No se encontró #lavaCanvas.");
       return;
     }
+    canvas.width = canvas.width || 2048;
+    canvas.height = canvas.height || 1024;
     const ctx = canvas.getContext("2d");
     const inAFrame = !!document.querySelector("a-scene");
 
