@@ -1193,7 +1193,11 @@
         sprite.scale.set(size, size, 1);
         sprite.position.set(x, y, EMOJI_DIST_Z);
       
-        camEl.object3D.add(sprite);
+        //camEl.object3D.add(sprite);
+        const rig = document.getElementById('camera-rig');
+        if (!rig) return;
+        
+        rig.object3D.add(sprite);
       
         const meta = { el: sprite, x, y, halfDiag: Math.hypot(size, size)/2, _tex: tex, _mat: mat };
         ACTIVE_EMOJIS.add(meta);
