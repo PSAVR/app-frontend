@@ -143,13 +143,33 @@
     }
 
     let start = null;
-    function loop(ts) {
-      if (!start) start = ts;
-      const t = ((ts - start) / 1000) * SPEED;
-      draw(t);
+
+    if (inAFrame) {
+      const sceneEl = document.querySelector('a-scene');
+    
+      if (!AFRAME.components['lava-bg']) {
+        AFRAME.registerComponent('lava-bg', {
+          tick: function(time) {
+            if (!start) start = time;
+            const t = ((time - start) / 1000) * SPEED;
+            draw(t);
+          }
+        });
+      }
+    
+      const addComponent = () => sceneEl.setAttribute('lava-bg', '');
+      if (sceneEl.hasLoaded) addComponent();
+      else sceneEl.addEventListener('loaded', addComponent);
+    
+    } else {
+      function loop(ts) {
+        if (!start) start = ts;
+        const t = ((ts - start) / 1000) * SPEED;
+        draw(t);
+        requestAnimationFrame(loop);
+      }
       requestAnimationFrame(loop);
     }
-    requestAnimationFrame(loop);
 
     if (!inAFrame) {
       const fit = () => {
