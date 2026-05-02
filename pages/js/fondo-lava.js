@@ -55,19 +55,31 @@
       }
       tex.needsUpdate = true;
     }*/
+    let tex = null;
+    let skyReady = false;
+    
     function ensureTexture() {
       if (!inAFrame) return;
     
       const skyEl = document.getElementById("sky");
       if (!skyEl) return;
     
-      // Fuerza a A-Frame a volver a leer el canvas como textura
-      skyEl.setAttribute("material", "shader: flat; src: #lavaCanvas");
-    
       const mesh = skyEl.getObject3D("mesh");
-      if (mesh && mesh.material && mesh.material.map) {
-        mesh.material.map.needsUpdate = true;
+      if (!mesh || !mesh.material) return;
+    
+      if (!skyReady) {
+        tex = new THREE.CanvasTexture(canvas);
+        tex.needsUpdate = true;
+    
+        mesh.material.map = tex;
         mesh.material.needsUpdate = true;
+    
+        skyReady = true;
+        console.log("[background-lava] CanvasTexture aplicada al sky");
+      }
+    
+      if (tex) {
+        tex.needsUpdate = true;
       }
     }
 
