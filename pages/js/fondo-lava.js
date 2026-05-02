@@ -41,7 +41,7 @@
     const TINT_ALPHA_2D   = 0.5; 
 
     let tex = null;
-    function ensureTexture() {
+    /*function ensureTexture() {
       if (!inAFrame) return;
       const skyEl = document.getElementById("sky");
       const mesh = skyEl && skyEl.getObject3D && skyEl.getObject3D("mesh");
@@ -51,6 +51,31 @@
         mesh.material.map = tex;
         mesh.material.needsUpdate = true;
       }
+      tex.needsUpdate = true;
+    }*/
+    function ensureTexture() {
+      if (!inAFrame) return;
+    
+      const skyEl = document.getElementById("sky");
+      if (!skyEl) return;
+    
+      const mesh = skyEl.getObject3D("mesh");
+    
+      // Si mesh aún no está listo → esperar
+      if (!mesh) {
+        skyEl.addEventListener("object3dset", ensureTexture, { once: true });
+        return;
+      }
+    
+      // Forzar material correcto para VR
+      if (!tex) {
+        tex = new THREE.CanvasTexture(canvas);
+    
+        mesh.material.map = tex;
+        mesh.material.side = THREE.BackSide;  
+        mesh.material.needsUpdate = true;
+      }
+    
       tex.needsUpdate = true;
     }
 
