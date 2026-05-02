@@ -1206,18 +1206,25 @@
       
         const start = performance.now();
         const dur = LIFE_MS;
+        let cleaned = false;
+
+        function cleanup() {
+          if (cleaned) return;
+          cleaned = true;
+          if (sprite.parent) sprite.parent.remove(sprite);
+          tex.dispose(); mat.dispose();
+          ACTIVE_EMOJIS.delete(meta);
+        }
+
         function tick(t) {
           const k = Math.min(1, (t - start) / dur);
           mat.opacity = 1 - k;
           if (k < 1 && sprite.parent) requestAnimationFrame(tick);
-          else {
-            //if (sprite.parent) camEl.object3D.remove(sprite);
-            if (sprite.parent) sprite.parent.remove(sprite);
-            tex.dispose(); mat.dispose();
-            ACTIVE_EMOJIS.delete(meta);
-          }
+          else cleanup();
         }
         requestAnimationFrame(tick);
+
+        setTimeout(cleanup, dur + 500);
       }
 
       function startEmojis() {
