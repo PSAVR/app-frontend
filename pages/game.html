@@ -1202,18 +1202,18 @@
       
         const start = performance.now();
         const dur = LIFE_MS;
-
-        const tickFn = function() {
-          const k = Math.min(1, (performance.now() - start) / dur);
+        function tick(t) {
+          const k = Math.min(1, (t - start) / dur);
           mat.opacity = 1 - k;
-          if (k >= 1 || !sprite.parent) {
-            sceneEl.removeEventListener('tick', tickFn);
-            if (sprite.parent) camEl.object3D.remove(sprite);
+          if (k < 1 && sprite.parent) requestAnimationFrame(tick);
+          else {
+            //if (sprite.parent) camEl.object3D.remove(sprite);
+            if (sprite.parent) sprite.parent.remove(sprite);
             tex.dispose(); mat.dispose();
             ACTIVE_EMOJIS.delete(meta);
           }
-        };
-        sceneEl.addEventListener('tick', tickFn);
+        }
+        requestAnimationFrame(tick);
       }
 
       function startEmojis() {
