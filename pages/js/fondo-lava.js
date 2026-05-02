@@ -41,6 +41,7 @@
     const EDGE_ALPHA_2D   = 0.26; 
     const TINT_ALPHA_2D   = 0.5; 
 
+    /*
     let tex = null;
     function ensureTexture() {
       if (!inAFrame) return;
@@ -52,6 +53,36 @@
         mesh.material.map = tex;
         mesh.material.needsUpdate = true;
       }
+      tex.needsUpdate = true;
+    }*/
+    let tex = null;
+    let lavaSphere = null;
+    
+    function ensureTexture() {
+      if (!inAFrame) return;
+    
+      const sceneEl = document.querySelector("a-scene");
+      if (!sceneEl || !sceneEl.object3D) return;
+    
+      if (!tex) {
+        tex = new THREE.CanvasTexture(canvas);
+        tex.needsUpdate = true;
+    
+        const geo = new THREE.SphereGeometry(500, 64, 32);
+        const mat = new THREE.MeshBasicMaterial({
+          map: tex,
+          side: THREE.BackSide
+        });
+    
+        lavaSphere = new THREE.Mesh(geo, mat);
+        sceneEl.object3D.add(lavaSphere);
+    
+        const oldSky = document.getElementById("sky");
+        if (oldSky) oldSky.setAttribute("visible", "false");
+    
+        console.log("[background-lava] Sky reemplazado por esfera estable para VR");
+      }
+    
       tex.needsUpdate = true;
     }
 
