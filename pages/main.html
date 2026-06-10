@@ -33,6 +33,9 @@
     <a-assets>
       <canvas id="lavaCanvas" width="1024" height="1024"></canvas>
     </a-assets>
+    <a-assets>
+      <img id="star-img" src="./estrellas.png" crossorigin="anonymous">
+    </a-assets>
     <a-sky id="sky" material="shader: flat; src: #lavaCanvas"></a-sky>
     <a-entity camera look-controls position="0 1.6 0">
       <a-entity
@@ -218,7 +221,7 @@
     
       for (let i = 0; i < stars; i++) {
         const star = document.createElement("a-image");
-        star.setAttribute("src", STAR_SRC);
+        star.setAttribute("src", '#star-img');
         star.setAttribute("width", size);
         star.setAttribute("height", size);
         star.setAttribute("transparent", true);
@@ -282,7 +285,7 @@
           d="M50 4l12.3 25 27.6 4-20 19.2 4.7 27.3L50 69.6 25.4 79.5l4.7-27.3-20-19.2 27.6-4L50 4z"/>
       </svg>
     `);
-    const STAR_SRC = `data:image/svg+xml;utf8,${STAR_SVG}`;
+    const STAR_SRC = './estrellas.png';
 
     function coerceStars(row){ return Number(row?.max_stars ?? row?.stars ?? row?.best_stars ?? row?.max ?? 0); }
 
