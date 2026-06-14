@@ -661,6 +661,21 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log(debeSubir
           ? '30+ segundos - ENVIAR al modelo'
           : 'Menos de 30 segundos - NO enviar al modelo');
+
+        if (!debeSubir) {
+          if (typeof stopTimer === 'function') stopTimer();
+          if (typeof stopAudioCues === 'function') stopAudioCues();
+          if (typeof stopEmojis === 'function') stopEmojis();
+          finalizarSesion(false);
+          if (typeof window.showResult3D === 'function') {
+            window.showResult3D(
+              'No se llegó al tiempo mínimo de audio requerido para procesar los resultados.',
+              0,
+              'Tiempo insuficiente'
+            );
+          }
+          return;
+        }
         
         if (typeof window.finalizarSesionWrapper === 'function') {
           window.finalizarSesionWrapper(debeSubir);
