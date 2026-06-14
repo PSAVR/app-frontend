@@ -350,7 +350,7 @@ async function enviarAudioYMostrarResultados(blob, ext='webm') {
     const user_id = await getUserId();
     if (!user_id) {
       hideLoading3D();
-      alert('Sesión no válida. Inicia sesión.');
+      alert('Sesion no válida. Inicia sesion.');
       return;
     }
 
@@ -375,7 +375,7 @@ async function enviarAudioYMostrarResultados(blob, ext='webm') {
     const { task_id, ctx } = enqueueData;
     if (!task_id || !ctx) {
       hideLoading3D();
-      throw new Error("Respuesta inválida: falta task_id o ctx");
+      throw new Error("Respuesta invalida: falta task_id o ctx");
     }
 
     const doneData = await pollSessionResult({ base, task_id, ctx, timeoutMs: 180000 });
@@ -403,7 +403,7 @@ async function enviarAudioYMostrarResultados(blob, ext='webm') {
     const silencioExcesivo = payload?.detail?.silence_disqualified === true;
     if (silencioExcesivo) {
       hideLoading3D();
-      const msg = 'Se detectaron más de 30 segundos de silencio. El audio fue descalificado, por favor intentar de nuevo.';
+      const msg = 'Se detectaron mas de 30 segundos de silencio. El audio fue descalificado, por favor intentar de nuevo.';
       if (typeof showResult3D === 'function') {
         showResult3D(msg, 0, 'Audio descalificado');
       } else {
@@ -413,7 +413,7 @@ async function enviarAudioYMostrarResultados(blob, ext='webm') {
     }
 
     if (!ansiedadValida) {
-      console.warn('Ansiedad inválida recibida desde el backend:', ansiedadRaw);
+      console.warn('Ansiedad invalida recibida desde el backend:', ansiedadRaw);
       hideLoading3D();
       showNoVoiceModal();
       return;
@@ -474,7 +474,7 @@ async function iniciarGrabacion() {
       window.__lastReason = 'mic_track_ended';
       console.warn('🎤 Track ended (iOS capture failure)');
       try { finalizarSesion(false); } catch {}
-      showMicBanner("Se perdió el micrófono. Toca INICIAR y vuelve a intentar.");
+      showMicBanner("Se perdio el micrófono. Toca INICIAR y vuelve a intentar.");
     });
 
     mediaRecorder.ondataavailable = (e) => {
@@ -498,10 +498,12 @@ async function iniciarGrabacion() {
         const blob = new Blob(recordedChunks, { type });
         if (uploadOnStop) {
           await enviarAudioYMostrarResultados(blob, ext);
+        } else if (window.__minTimeStop) {
+          window.__minTimeStop = false;
         } else {
           console.warn('[NAV] Redirect to main. Reason=', window.__lastReason);
           showMicBanner(
-            "La grabación se detuvo antes de enviar. Toca INICIAR para intentar de nuevo.",
+            "La grabacion se detuvo antes de enviar. Toca INICIAR para intentar de nuevo.",
             "#664d03", "#fff3cd", "#ffecb5"
           );
         }
@@ -511,8 +513,6 @@ async function iniciarGrabacion() {
       }
     };
 
-
-    // chunks periódicos (menos memoria)
     mediaRecorder.start(1000); // 1s chunks
     console.log('Grabación iniciada', { mimeType });
   } catch (err) {
@@ -666,10 +666,11 @@ document.addEventListener('DOMContentLoaded', () => {
           if (typeof stopTimer === 'function') stopTimer();
           if (typeof stopAudioCues === 'function') stopAudioCues();
           if (typeof stopEmojis === 'function') stopEmojis();
+          window.__minTimeStop = true;
           finalizarSesion(false);
           if (typeof window.showResult3D === 'function') {
             window.showResult3D(
-              'No se llegó al tiempo mínimo de audio requerido para procesar los resultados.',
+              'No se llego al tiempo minimo de audio requerido para procesar los resultados.',
               0,
               'Tiempo insuficiente'
             );
@@ -686,7 +687,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   } else {
-    console.warn('No se encontró #action-btn / #start-btn / #action-btn-3d');
+    console.warn('No se encontro #action-btn / #start-btn / #action-btn-3d');
   }
 });
 
